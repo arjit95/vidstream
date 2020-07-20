@@ -1,0 +1,64 @@
+apply plugin: 'java'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'idea'
+
+repositories {
+  maven { url "https://plugins.gradle.org/m2/" }
+}
+
+buildscript {
+    dependencies {
+        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.12"
+    }
+
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }       
+    }
+}
+
+dependencies {
+    compile 'com.google.protobuf:protobuf-java:3.12.2'
+    compile 'io.grpc:grpc-stub:1.30.0'
+    compile 'io.grpc:grpc-protobuf:1.30.0'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.12.3"
+        
+    }
+    generatedFilesBaseDir = "$projectDir/build"
+    clean {
+        delete generatedFilesBaseDir
+    }
+    plugins {
+        grpc_java {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.30.0'
+        }
+    }
+    generateProtoTasks {
+         all().each { task ->
+             task.plugins {
+                 grpc_java {}
+             }
+
+             task.builtins {
+                 java { }
+                 go {
+                    option 'plugins=grpc'
+                 }
+             }
+         }
+    }
+}
+
+idea {
+    module {
+        sourceDirs += file('build/main/java')
+        sourceDirs += file('build/main/grpc_java')
+        sourceDirs += file('build/main/go')
+        generatedSourceDirs += file('build/main/java')
+        generatedSourceDirs += file('build/main/grpc_java')
+        generatedSourceDirs += file('build/main/go')
+    }
+}

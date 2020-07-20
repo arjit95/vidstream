@@ -1,0 +1,54 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+build:
+  artifacts:
+    - image: vidstream-frontend
+      context: src/frontend
+    - image: hello-service
+      context: src/hello
+    - image: upload-service
+      context: src/uploadservice
+    - image: transcode-service
+      context: src/transcodemaster
+    - image: transcode-worker
+      context: src/transcodeworker
+    - image: transcode-reducer
+      context: src/transcodereducer
+  tagPolicy:
+    envTemplate:
+        template: "{{.IMAGE_NAME}}:v1"
+deploy:
+  helm:
+    releases:
+        - name: rabbitmq
+          chartPath: bitnami/rabbitmq
+          remote: true
+          setValues:
+              auth.username: test
+              auth.password: test
+              persistence.enabled: false
+        # - name: elasticsearch
+        #   remote: true
+        #   chartPath: bitnami/elasticsearch
+        #   artifactOverrides:
+        #     image: elasticsearch
+        # - name: mysql
+        #   remote: true
+        #   chartPath: bitnami/mysql
+        #   artifactOverrides:
+        #     image: mysql
+        - name: nfs-server
+          remote: true
+          chartPath: stable/nfs-server-provisioner
+          setValues:
+            storageClass.mountOptions[0]: "vers=4.2"
+  kubectl:
+    manifests:
+      - kubernetes-manifests/configmap.yml
+      - kubernetes-manifests/pvc.yml
+      - kubernetes-manifests/hello.yml
+      - kubernetes-manifests/uploadservice.yml
+      - kubernetes-manifests/transcodemaster.yml
+      - kubernetes-manifests/transcodeworker.yml
+      - kubernetes-manifests/transcodereducer.yml
+      - kubernetes-manifests/frontend.yml

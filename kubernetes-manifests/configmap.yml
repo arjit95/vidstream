@@ -1,0 +1,32 @@
+apiVersion: v1
+
+kind: ConfigMap
+metadata:
+    name: network-config
+data:
+    JAEGER_SERVICE_ADDR: jaeger-query.istio-system:16686
+    HELLO_SERVICE_ADDR: hello-service:8080
+    UPLOAD_SERVICE_ADDR: http://upload-service:8080
+    QUEUE_SERVICE: amqp://test:test@rabbitmq.vidstream:5672
+    DB_SERVICE: mysql:3306
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: storage-config
+data:
+    UPLOAD_DIR: /data/uploads
+    CONVERTED_DIR: /data/converted
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: queue-config
+data:
+    TRANSCODE_QUEUE: transcode_queue
+    CONVERT_QUEUE: convert_queue
+    REDUCE_QUEUE: reduce_queue
