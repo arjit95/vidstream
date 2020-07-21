@@ -8,7 +8,7 @@ const ffprobeMeta = {
 
 class FFProbe {
     static getMetadata() {
-        return `${Helpers.mergeCommandObj(ffprobeMeta)} - `;
+        return `${Helpers.mergeCommandObj(ffprobeMeta)}`;
     }    
 }
 

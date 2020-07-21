@@ -18,34 +18,9 @@ build:
     envTemplate:
         template: "{{.IMAGE_NAME}}:v1"
 deploy:
-  helm:
-    releases:
-        - name: rabbitmq
-          chartPath: bitnami/rabbitmq
-          remote: true
-          setValues:
-              auth.username: test
-              auth.password: test
-              persistence.enabled: false
-        # - name: elasticsearch
-        #   remote: true
-        #   chartPath: bitnami/elasticsearch
-        #   artifactOverrides:
-        #     image: elasticsearch
-        # - name: mysql
-        #   remote: true
-        #   chartPath: bitnami/mysql
-        #   artifactOverrides:
-        #     image: mysql
-        - name: nfs-server
-          remote: true
-          chartPath: stable/nfs-server-provisioner
-          setValues:
-            storageClass.mountOptions[0]: "vers=4.2"
   kubectl:
     manifests:
       - kubernetes-manifests/configmap.yml
-      - kubernetes-manifests/pvc.yml
       - kubernetes-manifests/hello.yml
       - kubernetes-manifests/uploadservice.yml
       - kubernetes-manifests/transcodemaster.yml

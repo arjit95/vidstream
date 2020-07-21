@@ -14,7 +14,8 @@ module.exports = function(queueInstance, fsUtils) {
         const inputPath = path.resolve(UPLOAD_DIR, fileName);
         const cmd = FFProbe.getMetadata();
         const binary = Executor.getBinary('ffprobe');
-        const metadata = JSON.parse(await Executor.exec(`${binary} ${cmd}`, {shell: true, stdio: [fsUtils.getReadStream(inputPath), 'pipe', 'pipe']}));
+        const metadata = JSON.parse(await Executor.exec(`${binary} ${cmd} ${inputPath}`));
+
         const duration = parseFloat(metadata.streams[0].duration);
         const resolution = metadata.streams[0];
         const applicableResolutions = FFMpeg.Plugin.Resolution.DefaultResolutions.filter(res => res <= resolution.height);
@@ -65,7 +66,8 @@ module.exports = function(queueInstance, fsUtils) {
         console.log(`Total workers required for job ${path.basename(baseUploadURL)}: ${jobs.length}`);
 
         const context = {
-            jobs
+            jobs,
+            source: inputPath
         };
 
         for (let job of jobs) {

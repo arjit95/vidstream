@@ -33,9 +33,8 @@ COPY web /go/bin/web
 ############################
 # using static nonroot image
 # user:group is nobody:nobody, uid:gid = 65534:65534
-# FROM gcr.io/distroless/static@sha256:c6d5981545ce1406d33e61434c61e9452dad93ecd8397c41e89036ef977a88f4
+FROM gcr.io/distroless/static@sha256:c6d5981545ce1406d33e61434c61e9452dad93ecd8397c41e89036ef977a88f4
 
-FROM golang@sha256:1e9c36b3fd7d7f9ab95835fb1ed898293ec0917e44c7e7d2766b4a2d9aa43da6
 # Copy our static executable
 COPY --from=builder /go/bin /go/bin
 

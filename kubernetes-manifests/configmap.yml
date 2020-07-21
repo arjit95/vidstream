@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
     name: network-config
 data:
-    JAEGER_SERVICE_ADDR: jaeger-query.istio-system:16686
+    # JAEGER_SERVICE_ADDR: jaeger-query.istio-system:16686
     HELLO_SERVICE_ADDR: hello-service:8080
     UPLOAD_SERVICE_ADDR: http://upload-service:8080
     QUEUE_SERVICE: amqp://test:test@rabbitmq.vidstream:5672

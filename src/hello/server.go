@@ -8,10 +8,8 @@ import (
 
 	"hello/proto"
 
-	"contrib.go.opencensus.io/exporter/jaeger"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
 	"google.golang.org/grpc"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
@@ -33,13 +31,6 @@ func main() {
 	}
 
 	log.Out = os.Stdout
-
-	if os.Getenv("DISABLE_TRACING") == "" {
-		log.Info("Tracing enabled.")
-		go initJaegerTracing()
-	} else {
-		log.Info("Tracing disabled.")
-	}
 
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
@@ -73,25 +64,4 @@ func run(port string) string {
 
 	go srv.Serve(l)
 	return l.Addr().String()
-}
-
-func initJaegerTracing() {
-	svcAddr := os.Getenv("JAEGER_SERVICE_ADDR")
-	if svcAddr == "" {
-		log.Info("jaeger initialization disabled.")
-		return
-	}
-	// Register the Jaeger exporter to be able to retrieve
-	// the collected spans.
-	exporter, err := jaeger.NewExporter(jaeger.Options{
-		CollectorEndpoint: fmt.Sprintf("http://%s", svcAddr),
-		Process: jaeger.Process{
-			ServiceName: "helloservice",
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	trace.RegisterExporter(exporter)
-	log.Info("jaeger initialization completed.")
 }

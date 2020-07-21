@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
+const { pipeline } = require('stream');
 
 const crypto = require('crypto');
-const pump = require('pump');
 const Busboy = require('busboy');
 const http = require('http');
 
@@ -40,12 +40,28 @@ function upload(req, res) {
         const ext = path.extname(filename);
         savedFileName = crypto.createHash('md5').update((filename + Date.now().toString().substring(5) + makeid(5))).digest('hex');
         savedFileName = savedFileName.substring(savedFileName.length - 10) + ext; 
-
         console.info("Generated file " + savedFileName);
-        pump(file, fs.createWriteStream(path.resolve(UPLOAD_DIR, savedFileName)));
+
+        pipeline(
+            file,
+            fs.createWriteStream(path.resolve(UPLOAD_DIR, savedFileName)),
+            (err) => {
+                if (err) {
+                    res.writeHead(500);
+                    res.write('Unable to save file');
+                    fs.unlinkSync(savedFileName);
+                    res.end();
+                    console.log(pumpErr);
+                }
+            }
+        );
     });
-    
-    parser.on('finish', function() {        
+
+    parser.on('finish', function() {
+        if (res.headersSent) {
+            return;
+        }
+
         console.debug('Upload completed');
         queueService.enqueue(TRANSCODE_QUEUE, {name: savedFileName});
         res.statusCode = 200;

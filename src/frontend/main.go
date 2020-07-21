@@ -17,6 +17,7 @@ import (
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/trace"
+
 	// "golang.org/x/net/http2"
 	"google.golang.org/grpc"
 
@@ -132,12 +133,13 @@ func initTracing(log logrus.FieldLogger) {
 	// trace.ProbabilitySampler set at the desired probability.
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
-	initJaegerTracing(log)
+	svcAddr := os.Getenv("JAEGER_SERVICE_ADDR")
+	if svcAddr != "" {
+		initJaegerTracing(log, svcAddr)
+	}
 }
 
-func initJaegerTracing(log logrus.FieldLogger) {
-
-	svcAddr := os.Getenv("JAEGER_SERVICE_ADDR")
+func initJaegerTracing(log logrus.FieldLogger, svcAddr string) {
 	if svcAddr == "" {
 		log.Info("jaeger initialization disabled.")
 		return

@@ -8,7 +8,7 @@ class Splitter extends Plugin {
     }
 
     getCommand() {
-        return `-ss ${this.start} -to ${this.end}`; ;
+        return `-ss ${this.start} -to ${this.end}`;
     }
 }
 
@@ -20,6 +20,11 @@ class SplitterWrapper extends Plugin {
     }
 
     getTotalParts() {
+        const remainder = this.totalDuration % this.splitDuration;
+        if (remainder < 0.5) {
+            return Math.floor(this.totalDuration / this.splitDuration);
+        }
+
         return Math.ceil(this.totalDuration / this.splitDuration);
     }
 

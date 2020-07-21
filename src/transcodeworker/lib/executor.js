@@ -4,20 +4,6 @@ const path = require('path');
 const BIN_DIR = process.env.BIN_DIR;
 
 class Executor {
-    static _attachCloseHandlers(source, target, callback) {
-        target.on('error', function(err) {
-            if (['ECONNRESET', 'EPIPE', 'EOF'].indexOf(err.code) >= 0) { return; }
-            return callback(err);
-        });
-        
-        // Once ffprobe's input stream closes, we need no more data from the
-        // input
-        target.on('close', function() {
-            source.pause();
-            source.unpipe(target);
-        });
-    }
-
     static exec(args, options = {shell: true}) {
 		return new Promise((resolve, reject) => {
 			if (options.cwd) {
@@ -28,12 +14,6 @@ class Executor {
             let proc;
             console.log('Executing ' + args);
             try {
-                const pipes = {
-                    stdin: process.stdin,
-                    stdout: process.stdout,
-                    stderr: process.stderr
-                };
-
                 if (Array.isArray(options.stdio)) {
                     const pipeTypes = Object.keys(pipes);
                     pipeTypes.forEach((pipe, idx) => {
@@ -48,15 +28,6 @@ class Executor {
                 }
 
                 proc = spawn(args, options);
-
-                for (let pipe in pipes) {
-                    if (pipe === 'stdin') {
-                        pipes[pipe].pipe(proc[pipe]);
-                        Executor._attachCloseHandlers(pipes[pipe], proc[pipe], reject)
-                    } else {
-                        proc[pipe].pipe(pipes[pipe]);
-                    }
-                }
             } catch(err) {
                 return reject(err);
             }

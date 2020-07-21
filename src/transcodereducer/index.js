@@ -25,12 +25,12 @@ function getSplitCommand(videoDir, resolutions, videoId, duration = 6) {
         return acc;
     }, '');
 
-    command += ` --segment_duration ${duration} --hls_master_playlist_output ${path.resolve(videoFolder, "video.m3u8")}`;
+    command += ` --segment_duration ${duration} --hls_master_playlist_output ${path.resolve(videoDir, "video.m3u8")}`;
     command += ` --hls_base_url /api/stream/raw?path=${videoId}`;
 
     let audioCommand = '';
     if (fs.existsSync(path.resolve(videoDir, 'audio.mp4'))) {
-        audioCommand = `'in=audio.mp4,stream=audio,init_segment=${path.join(videoDir, 'audio', 'init.mp4')},`;
+        audioCommand = `'in=${path.resolve(videoDir, 'audio.mp4')},stream=audio,init_segment=${path.join(videoDir, 'audio', 'init.mp4')},`;
         audioCommand += `segment_template=${path.join(videoDir, 'audio', '$Number$.m4s')},playlist_name=${path.join(videoDir, 'audio', 'main.m3u8')},hls_group_id=audio,hls_name=ENGLISH' `;
     }
 
@@ -63,12 +63,10 @@ async function reduce({context}) {
 
         dirPath = dirPath || path.dirname(resolutions[resolution][0]);
         const concatFilePath = path.resolve(dirPath, `${resolution}.txt`);
-        const stream = fileService.getWriteStream(concatFilePath); 
-        stream.write(content);
-        await new Promise(resolve => stream.close(resolve));
+        fs.writeFileSync(concatFilePath, content); 
 
         const outputFile = path.resolve(dirPath, resolution + '.mp4');
-        await Executor.exec(`${binary} -y -f concat -safe 0 -i ${concatFilePath} -c copy ${outputFile}`);
+        await Executor.exec(`${binary} -y -f concat -i ${concatFilePath} -c copy ${outputFile}`);
 
         resolutions[resolution].forEach(file => {
             fs.unlinkSync(file);
@@ -81,6 +79,18 @@ async function reduce({context}) {
     const packagerBinary = Executor.getBinary('packager');
 
     await Executor.exec(`${packagerBinary} ${packagerCommand}`);
+
+    // cleanup
+    fs.unlinkSync(context.source);
+
+    for (let resolution in resolutions) {
+        fs.unlinkSync(path.resolve(dirPath, `${resolution}.mp4`));
+    }
+
+    const audioFilePath = path.resolve(dirPath, 'audio.mp4');
+    if (fs.existsSync(audioFilePath)) {
+        fs.unlinkSync(audioFilePath);
+    }
 }
 
 async function start() {

@@ -1,30 +1,17 @@
-FROM node:14-slim
+FROM google/shaka-packager:release-v2.4.2 AS builder
+
+FROM node:14-alpine3.12
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
 
-RUN npm install
+RUN apk add --no-cache ffmpeg
 
-# If you are building your code for production
-# RUN npm ci --only=production
+COPY --from=builder /usr/bin/packager /usr/bin/packager
+ADD package.json .
+ADD package-lock.json .
+RUN npm install --only=production
 
-# Bundle app source
-COPY . .
-
-RUN apt-get update && apt-get install -y ca-certificates wget
-RUN mkdir ffmpeg && cd ffmpeg \
-    && wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
-    && tar -xvf ffmpeg-release-amd64-static.tar.xz --strip-components 1 \
-    && cp ffmpeg /bin/ \
-    && wget https://github.com/google/shaka-packager/releases/download/v2.4.2/packager-linux \
-    && mv packager-linux packager && chmod +x packager \
-    && cp packager /bin/ \
-    && cd ../ \
-    && rm -rf ffmpeg
-
+ADD . .
 CMD [ "node", "--inspect=0.0.0.0:9222", "index.js" ]
