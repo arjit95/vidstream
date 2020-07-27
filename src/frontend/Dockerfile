@@ -8,8 +8,6 @@ FROM golang@sha256:1e9c36b3fd7d7f9ab95835fb1ed898293ec0917e44c7e7d2766b4a2d9aa43
 # Ensure ca-certficates are up to date
 RUN update-ca-certificates
 
-WORKDIR .
-
 ENV GOPATH=
 
 # use modules
@@ -17,8 +15,6 @@ COPY go.mod .
 
 ENV GO111MODULE=on
 RUN go mod download
-RUN go mod verify
-
 COPY . .
 
 # Build the static binary
@@ -26,7 +22,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
       -ldflags='-w -s -extldflags "-static"' -a \
       -o /go/bin/app .
 
-COPY web /go/bin/web
+# COPY web /go/bin/web
+COPY certs /go/bin/certs
 
 ############################
 # STEP 2 build a small image

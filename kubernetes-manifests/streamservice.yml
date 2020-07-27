@@ -1,21 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: stream-service
 spec:
   selector:
     matchLabels:
-      app: frontend
+      app: stream-service
   template:
     metadata:
       labels:
-        app: frontend
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        app: stream-service
     spec:
       containers:
         - name: server
-          image: vidstream-frontend:v1
+          image: stream-service:v1
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -23,30 +21,44 @@ spec:
             httpGet:
               path: "/_healthz"
               port: 8080
-              scheme: HTTPS
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
               path: "/_healthz"
               port: 8080
-              scheme: HTTPS
           envFrom:
           - configMapRef:
                 name: network-config
+          - configMapRef:
+                name: storage-config
+          - configMapRef:
+                name: queue-config
           env:
           - name: PORT
             value: "8080"
+          volumeMounts:
+          - name: pv0001
+            mountPath: /data
+
+      volumes:
+      - name: pv0001
+        persistentVolumeClaim:
+          claimName: upload-pvc
+          readOnly: false
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: stream-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
-    app: frontend
+    app: stream-service
   ports:
-  - name: https
-    port: 80
+  - name: http
+    port: 8080
     targetPort: 8080
-    nodePort: 32767
+  - name: tcp
+    port: 9222
+    targetPort: 9222

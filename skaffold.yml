@@ -14,6 +14,8 @@ build:
       context: src/transcodeworker
     - image: transcode-reducer
       context: src/transcodereducer
+    - image: stream-service
+      context: src/streamservice
   tagPolicy:
     envTemplate:
         template: "{{.IMAGE_NAME}}:v1"
@@ -23,6 +25,7 @@ deploy:
       - kubernetes-manifests/configmap.yml
       - kubernetes-manifests/hello.yml
       - kubernetes-manifests/uploadservice.yml
+      - kubernetes-manifests/streamservice.yml
       - kubernetes-manifests/transcodemaster.yml
       - kubernetes-manifests/transcodeworker.yml
       - kubernetes-manifests/transcodereducer.yml

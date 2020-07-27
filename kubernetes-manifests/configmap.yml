@@ -8,6 +8,7 @@ data:
     HELLO_SERVICE_ADDR: hello-service:8080
     UPLOAD_SERVICE_ADDR: http://upload-service:8080
     QUEUE_SERVICE: amqp://test:test@rabbitmq.vidstream:5672
+    STREAM_SERVICE_ADDR: http://stream-service:8080
     DB_SERVICE: mysql:3306
 
 ---

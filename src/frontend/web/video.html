@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MSE Demo</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://vjs.zencdn.net/7.0.0/video-js.css" rel="stylesheet"/>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+	<link href="/assets/css/videojs-hls-quality-selector.css"/>
+	<link href="/assets/css/videojs-vtt-thumbnails.css"/>
+	<link href="/assets/css/base.css" rel="stylesheet" type="text/css"/>
+	<link href="/assets/css/video.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="theme-dark">
+	<nav class="header">
+		<div class="nav-wrapper flex-row">
+			<a class="brand-logo">Logo</a>
+			<ul class="pull-left">
+				<li><a href="#">Link 1</a></li>
+				<li><a href="#">Link 2</a></li>
+				<li><a href="#">Link 3</a></li>
+			</ul>
+			
+			<ul class="pull-right user-options">
+				<li><a href="#">Login</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="container-fluid flex-column">
+		<div class="flex-row color-container">
+			<div class="player-container">
+				<div>
+					<video-js id="video" class="video-js vjs-default-skin" controls>
+					</video-js>
+				</div>
+
+				<div class="video-info flex-column">
+					<div class="video-meta flex-column">
+						<div id="video-name" class="flex-column">
+							<p class="channel">Nature</p>
+							<p class="title">Big Buck bunny trailer</p>
+							<p class="views">3,015,263</p>
+						</div>
+						<div class="video-stats flex-row">
+							<p class="likes"><i class="fa fa-thumbs-o-up"></i> 987</p>
+							<p class="dislikes"><i class="fa fa-thumbs-o-down"></i> 1235</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="video-list">
+			<h3>Up Next</h3>
+			<div class="flex-row">
+				<div class="video-thumb-block">
+					<img class="video-thumb" src="holder.js/150x80">
+					<div class="video-info">
+						<p class="video-heading">Some name</p>
+						<p class="video-channel">Channel</p>
+						<p class="video-views">123,123 Views | 1 day ago</p>
+					</div>
+				</div>
+				<div class="video-thumb-block">
+					<img class="video-thumb" src="holder.js/150x80">
+					<div class="video-info">
+						<p class="video-heading">Some name</p>
+						<p class="video-channel">Channel</p>
+						<p class="video-views">123,123 Views | 1 day ago</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="extra-video-content flex-row color-container">
+			<div class="extra-video-info">
+				<ul class="content-header">
+					<li class="active" data-target="description">Description</li> |
+					<li data-target="comments">Comments</li>
+				</ul>
+				<hr/>
+				<div class="description active flex-row" data-target-id="description">
+					<img class="video-thumb" src="holder.js/72x72">
+					<section class="flex-column">
+						<p class="channel-name">Channel Name </p>
+						<p class="channel-subscribers">327 subscribers</p>
+						<p class="video-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged</p>
+					</section>
+					<section class="flex-column">
+						Follow
+					</section>
+				</div>
+				<div class="comments flex-column" data-target-id="comments">
+					<section class="flex-row">
+						<img class="video-thumb" src="holder.js/72x72">
+						<textarea></textarea>
+					</section>
+					<hr/>
+					<section class="user-comments">
+						<div class="flex-row comment">
+							<img src="holder.js/72x72">
+							<div class="flex-column">
+								<p><a href="#">User</a><small>2 days ago</small></p>
+								<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+							</div>
+						</div>
+						<div class="flex-row comment">
+							<img src="holder.js/72x72">
+							<div class="flex-column">
+								<p><a href="#">User</a><small>2 days ago</small></p>
+								<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+			<div class="recommended">
+				<h3>Recommended</h3>
+				<div class="flex-column">
+					<div class="video-thumb-block">
+						<img class="video-thumb" src="holder.js/150x80">
+						<div class="video-info">
+							<p class="video-heading">Some name</p>
+							<p class="video-channel">Channel</p>
+							<p class="video-views">123,123 Views | 1 day ago</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://vjs.zencdn.net/7.0.0/video.min.js"></script>
+	<script src="/assets/js/videojs-contrib-quality-levels.min.js"></script>
+	<script src="/assets/js/videojs-hls-quality-selector.js"></script>
+	<script src="/assets/js/videojs-vtt-thumbnails.min.js"></script>>
+	<script src="https://cdn.jsdelivr.net/npm/holderjs@2.9.7/holder.min.js"></script>
+	<script>
+		function debounce(timeout, cb) {
+			let timer, self = this;
+			let debounced = {
+				stop: function() {
+					clearTimeout(timer);
+					timer = null;
+				},
+
+				start: function() {
+					let args = arguments;
+					timer = setTimeout(() => cb.apply(self, args), timeout);
+				}
+			};
+
+			return debounced;
+		}
+
+		var video = document.getElementById('video');
+
+		var player = window.player = videojs('video', {
+			html5: {
+				vhs: {
+					overrideNative: true
+				},
+				nativeAudioTracks: false,
+    			nativeVideoTracks: false
+			}
+		});
+		player.vttThumbnails({
+			src: 'https://192.168.39.184:32767/api/stream/raw?path=a42fdc6e2c/thumb.vtt',
+			baseUrl: 'https://192.168.39.184:32767/'
+		});
+
+		const playerContainer = document.querySelector('.player-container');
+
+		player.on('ready', function() {
+			player.requestFullscreen = playerContainer.requestFullscreen.bind(playerContainer);
+			player.exitFullscreen = document.exitFullscreen.bind(document);
+			player.isFullscreen = () => document.fullscreen;
+		});
+
+		player.src({
+			src: 'https://192.168.39.184:32767/api/stream/raw?path=a42fdc6e2c/video.m3u8',
+  			type: 'application/x-mpegURL'
+		})
+
+		player.hlsQualitySelector();
+
+		const videoInfo = document.querySelector('.video-info');
+		const debouncedHide = debounce(2500, function() {
+			videoInfo.classList.add('hidden');
+		});
+		const hideInfoScreen = function() {
+			if (player.paused()) return;
+
+			debouncedHide.stop();
+			videoInfo.classList.remove('hidden');
+			debouncedHide.start();
+		};
+
+		videoInfo.addEventListener('click', function() {
+			player.paused() && !player.ended() ? player.play() : player.pause();
+		});
+	
+		video.addEventListener('mousemove', hideInfoScreen);
+	
+		player.on('error', console.error);
+		player.on('playing', function() {
+			videoInfo.classList.add('hidden');
+			player.bigPlayButton.hide();
+		});
+
+		player.on('pause', function() {
+			if (player.seeking()) {
+				return;
+			}
+
+			videoInfo.classList.remove('hidden');
+		});
+
+	</script>
+</body>
+</html>

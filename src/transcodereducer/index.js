@@ -7,9 +7,11 @@ const REDUCE_QUEUE = process.env.REDUCE_QUEUE;
 const Executor = require('./lib/executor');
 const port = process.env.PORT || 8080;
 
-let queueService, fileService;
+const HLS_BASE_URL = process.env.HLS_BASE_URL || '/api/stream/raw';
 
-function getSplitCommand(videoDir, resolutions, videoId, duration = 6) {
+let queueService;
+
+function getSplitCommand(videoDir, resolutions, context, duration = 6) {
     let command = resolutions.reduce((acc, resolution) => {
         resolution = resolution.toString();
 
@@ -18,29 +20,45 @@ function getSplitCommand(videoDir, resolutions, videoId, duration = 6) {
         const segmentTemplate = path.join(videoFolder, "$Number$.m4s");
         const playListName = path.join(videoFolder, "playlist.m3u8");
         const iframe = path.join(videoFolder, "iframe.m3u8");
+        const inputFile = path.join(videoDir, resolution + '.mp4');
 
-        acc += `'in=${path.join(videoDir, resolution)}.mp4,stream=video,init_segment=${initSegment},`;
-        acc += `segment_template=${segmentTemplate},playlist_name=${playListName},`;
-        acc += `iframe_playlist_name=${iframe}' `;
+        acc += `'in=${inputFile},stream=video,init_segment=${initSegment},`;
+        acc += `segment_template=${segmentTemplate},playlist_name=${playListName},iframe_playlist_name=${iframe}' `;
         return acc;
     }, '');
 
-    command += ` --segment_duration ${duration} --hls_master_playlist_output ${path.resolve(videoDir, "video.m3u8")}`;
-    command += ` --hls_base_url /api/stream/raw?path=${videoId}`;
+    const audioFiles = context.jobs.filter(({type}) => type === 'audio');
 
-    let audioCommand = '';
-    if (fs.existsSync(path.resolve(videoDir, 'audio.mp4'))) {
-        audioCommand = `'in=${path.resolve(videoDir, 'audio.mp4')},stream=audio,init_segment=${path.join(videoDir, 'audio', 'init.mp4')},`;
-        audioCommand += `segment_template=${path.join(videoDir, 'audio', '$Number$.m4s')},playlist_name=${path.join(videoDir, 'audio', 'main.m3u8')},hls_group_id=audio,hls_name=ENGLISH' `;
+    for (let audioFile of audioFiles) {
+        const dirName = path.basename(audioFile.fileName, '.mp4');
+        const dirPath = path.join(videoDir, dirName);
+        const filePath = path.join(videoDir, audioFile.fileName);
+
+        command += `'in=${filePath},stream=audio,init_segment=${path.join(dirPath, 'init.mp4')},`;
+        command += `segment_template=${path.join(dirPath, '$Number$.m4s')},playlist_name=${path.join(dirPath, 'playlist.m3u8')},hls_name=${audioFile.language.toUpperCase()},hls_group_id=audio' `;
     }
 
-    return audioCommand + command;
+    const subtitleFiles = context.jobs.filter(({type}) => type === 'subtitle');
+    for (let subtitleFile of subtitleFiles) {
+        const dirName = path.basename(subtitleFile.fileName, '.vtt');
+        const dirPath = path.join(videoDir, dirName);
+        const filePath = path.join(videoDir, subtitleFile.fileName);
+
+        command += `'in=${filePath},stream=text,`;
+        command += `segment_template=${path.join(dirPath, '$Number$.vtt')},playlist_name=${path.join(dirPath, 'main.m3u8')},hls_name=${subtitleFile.language.toUpperCase()},hls_group_id=text' `;
+    }
+
+    const videoId = path.basename(videoDir);
+    command += `--segment_duration ${duration} --hls_master_playlist_output ${path.resolve(videoDir, "video.m3u8")} `;
+    command += `--hls_base_url ${HLS_BASE_URL}?path=${videoId}/`;
+
+    return command;
 }
 
 async function reduce({context}) {
     const resolutions = {};
     context.jobs.forEach((job) => {
-        if (job.resolution === 'audio') return;
+        if (job.type !== 'video') return;
 
         const regex = /"(.*?)"/g;
         const output = [...job.command.matchAll(regex)];
@@ -54,14 +72,13 @@ async function reduce({context}) {
     });
 
     const binary = Executor.getBinary('ffmpeg');
-    let dirPath;
+    const dirPath = context.target;
 
     for (let resolution in resolutions) {
         let content = resolutions[resolution].reduce((acc, filePath) => {
             return acc + 'file ' + path.basename(filePath) + '\n';
         }, '');
 
-        dirPath = dirPath || path.dirname(resolutions[resolution][0]);
         const concatFilePath = path.resolve(dirPath, `${resolution}.txt`);
         fs.writeFileSync(concatFilePath, content); 
 
@@ -75,10 +92,11 @@ async function reduce({context}) {
         fs.unlinkSync(concatFilePath);
     }
 
-    const packagerCommand = getSplitCommand(dirPath, Object.keys(resolutions), path.basename(dirPath));
+    const packagerCommand = getSplitCommand(dirPath, Object.keys(resolutions), context);
     const packagerBinary = Executor.getBinary('packager');
 
     await Executor.exec(`${packagerBinary} ${packagerCommand}`);
+    await moveThumbnailTracks(context.source, context.target);
 
     // cleanup
     fs.unlinkSync(context.source);
@@ -87,10 +105,26 @@ async function reduce({context}) {
         fs.unlinkSync(path.resolve(dirPath, `${resolution}.mp4`));
     }
 
-    const audioFilePath = path.resolve(dirPath, 'audio.mp4');
-    if (fs.existsSync(audioFilePath)) {
-        fs.unlinkSync(audioFilePath);
+    for (let job of context.jobs) {
+        if (job.type === 'video' || job.type === 'thumbnail') continue;
+
+        const filePath = path.join(context.target, job.fileName);
+        fs.unlinkSync(filePath);
     }
+}
+
+async function moveThumbnailTracks(source, target) {
+    const extname = path.extname(source);
+    const sourceDir = path.dirname(source);
+    const fileName = path.basename(source, extname);
+
+    const sThumbnailName = path.resolve(sourceDir, fileName + '.jpg');
+    const sSubtitleTrack = path.resolve(sourceDir, fileName + '.vtt');
+    const tThumbnailName = path.resolve(target, fileName + '.jpg');
+    const tSubtitleTrack = path.resolve(target, 'thumb.vtt');
+
+    fs.renameSync(sThumbnailName, tThumbnailName);
+    fs.renameSync(sSubtitleTrack, tSubtitleTrack);
 }
 
 async function start() {

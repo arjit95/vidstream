@@ -1,7 +1,9 @@
-package uploadservice
+package upload
 
 import (
 	"net/http"
+
+	"frontend/helpers"
 
 	"github.com/gorilla/mux"
 )
@@ -14,5 +16,5 @@ func AddUploadRoutes(route *mux.Router, client http.Client, addr string) {
 	}
 
 	route.HandleFunc("/upload/file", instance.upload).Methods("POST")
-	route.HandleFunc("/upload/echo", instance.echo).Methods("GET")
+	route.HandleFunc("/upload/echo", helpers.GenericRequestForward(addr)).Methods("GET")
 }

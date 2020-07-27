@@ -12,6 +12,7 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/plugin/ochttp"
@@ -64,9 +65,11 @@ func main() {
 	svc := new(services.FrontendServer)
 	mustMapEnv(&svc.HelloAddr, "HELLO_SERVICE_ADDR")
 	mustMapEnv(&svc.UploadAddr, "UPLOAD_SERVICE_ADDR")
+	mustMapEnv(&svc.StreamAddr, "STREAM_SERVICE_ADDR")
 
 	mustConnGRPC(ctx, &svc.HelloSvcConn, svc.HelloAddr)
 	svc.UploadSvcConn = mustConnHTTP()
+	svc.StreamSvcConn = mustConnHTTP()
 
 	apiRoutes := r.PathPrefix("/api").Subrouter()
 	svc.AddEndpoints(apiRoutes)
@@ -83,9 +86,14 @@ func main() {
 	}
 
 	handler = &logHandler{log: log, next: handler} // add logging
+	handler = cors.New(cors.Options{
+		OptionsPassthrough: true,
+		AllowedMethods:     []string{"HEAD", "GET", "POST", "OPTIONS"},
+		AllowCredentials:   true,
+	}).Handler(handler)
 
 	log.Infof("starting server on port :" + srvPort)
-	log.Fatal(http.ListenAndServe(":"+srvPort, handler))
+	log.Fatal(http.ListenAndServeTLS(":"+srvPort, "./certs/server.crt", "./certs/server.key", handler))
 }
 
 func mustMapEnv(target *string, envKey string) {

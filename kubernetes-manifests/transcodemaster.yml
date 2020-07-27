@@ -37,10 +37,10 @@ spec:
           - name: PORT
             value: "8080"
           volumeMounts:
-          - name: transcode-master-storage
+          - name: pv0001
             mountPath: /data
       volumes:
-      - name: transcode-master-storage
+      - name: pv0001
         persistentVolumeClaim:
           claimName: upload-pvc
           readOnly: false

@@ -8,8 +8,6 @@ FROM golang@sha256:1e9c36b3fd7d7f9ab95835fb1ed898293ec0917e44c7e7d2766b4a2d9aa43
 # Ensure ca-certficates are up to date
 RUN update-ca-certificates
 
-WORKDIR .
-
 ENV GOPATH=
 
 # use modules

@@ -7,7 +7,8 @@ import (
 	"google.golang.org/grpc"
 
 	"frontend/services/hello"
-	"frontend/services/uploadservice"
+	"frontend/services/stream"
+	"frontend/services/upload"
 )
 
 // FrontendServer contains all the connection details for various grpc servers
@@ -17,10 +18,14 @@ type FrontendServer struct {
 
 	UploadAddr    string
 	UploadSvcConn http.Client
+
+	StreamAddr    string
+	StreamSvcConn http.Client
 }
 
 // AddEndpoints for all the services
 func (fs *FrontendServer) AddEndpoints(router *mux.Router) {
 	hello.AddHelloRoutes(router, fs.HelloSvcConn)
-	uploadservice.AddUploadRoutes(router, fs.UploadSvcConn, fs.UploadAddr)
+	upload.AddUploadRoutes(router, fs.UploadSvcConn, fs.UploadAddr)
+	stream.AddStreamRoutes(router, fs.StreamSvcConn, fs.StreamAddr)
 }

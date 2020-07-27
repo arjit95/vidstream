@@ -10,8 +10,10 @@ require (
 	github.com/google/pprof v0.0.0-20200630070148-6609db78bf68 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/googleapis/gax-go v1.0.3 // indirect
+	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/pkg/errors v0.9.1
+	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.6.0
 	go.opencensus.io v0.22.4
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e

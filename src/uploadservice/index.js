@@ -73,7 +73,7 @@ function upload(req, res) {
 
 const server = http.createServer(function(req, res) {
     switch(req.url) {
-        case '/api/echo':
+        case '/api/upload/echo':
         case '/_healthz':
             res.statusCode = 200;
             res.write('ok');

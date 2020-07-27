@@ -30,12 +30,16 @@ let enqueued = debounce(5000, function(context) {
     queueService.enqueue(process.env.REDUCE_QUEUE, {context});
 });
 
-async function encode({command, context}) {
-    const binary = Executor.getBinary('ffmpeg');
-
+async function encode(message) {
     enqueued.stop();
-    await Executor.exec(`${binary} ${command}`);
-    enqueued.start(context);
+    try {
+        await Executor.exec(message.command);
+    } catch(err) {
+        console.dir(message);
+        return;
+    }
+    
+    enqueued.start(message.context);
 }
 
 async function start() {

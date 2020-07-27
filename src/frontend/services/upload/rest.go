@@ -1,4 +1,4 @@
-package uploadservice
+package upload
 
 import (
 	"bytes"

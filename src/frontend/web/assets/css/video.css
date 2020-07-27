@@ -1,0 +1,185 @@
+body.theme-dark .color-container {
+	background-color: #131722;
+}
+
+.player-container {
+	height: 70vh;
+	width: 100%;
+	max-width: 976px;	
+	justify-content: center;
+	background: black;
+	margin: 70px auto 30px auto;
+	position: relative;
+}
+.video-js .vjs-control-bar {
+	z-index: 9999;
+}
+
+.player-container > div {
+	width: 100%;
+	height: 100%;
+}
+
+.video-js .vjs-big-play-button {
+	right: 24%;
+	top: 38%;
+	left: auto;
+	bottom: auto;
+	border: 0;
+	border-radius: 200px;
+	width: 3em;
+	height: 3em;
+	z-index: 9999;
+	position: absolute;
+	line-height: 3em;
+}
+
+.player-container .video-info {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgb(2,0,36);
+	background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(255,255,255,0) 100%);
+	display: flex;
+	justify-content: center;
+	transition: all 1s;
+}
+.player-container .video-info:-moz-full-screen { position: absolute; }
+.player-container .video-info:-webkit-full-screen { position: absolute; }
+.player-container .video-info:-ms-fullscreen { position: absolute; }
+.player-container .video-info:fullscreen { position: absolute; }
+
+.player-container #video {
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	border-radius: 4px;
+	padding: 0;
+}
+
+.player-container #video:focus {
+	outline: none;
+}
+
+.player-container .video-meta {
+	align-items: flex-start;
+	width: 60%;
+	margin-left: 24px;
+}
+
+.player-container .video-meta .title {
+	font-size: 42px;
+	margin-bottom: 12px;
+	font-weight: bold;
+	margin-top: 0;
+}
+
+.player-container .video-meta .views {
+	font-size: 16px;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+
+.player-container .video-stats {
+	align-items: center;
+}
+
+.player-container .video-stats .likes,
+.player-container .video-stats .dislikes {
+	cursor: pointer;
+	margin: 16px 8px 8px 0;
+}
+
+.extra-video-content {
+	padding: 12px;
+}
+
+.extra-video-content .extra-video-info {
+	width: 68%;
+	margin-right: 2%;
+}
+
+.extra-video-content .extra-video-info > div {
+	display: none;
+	margin-top: 24px;
+}
+
+.extra-video-content .extra-video-info > div.active {
+	display: flex;
+}
+
+.extra-video-content .content-header {
+	list-style-type: none;
+	display: flex;
+	width: 96%;
+	justify-content: center;
+	align-items: center;
+}
+
+.extra-video-content .content-header li {
+	margin: 0 12px;
+	color: #aaa;
+	cursor: pointer;
+	font-size: 20px;
+}
+
+.extra-video-content .content-header li.active {
+	color: #0a5dfd;
+}
+
+.extra-video-info .comments textarea {
+	width: 90%;
+	height: 120px;
+}
+
+.extra-video-info .comments img.video-thumb,
+.comments .user-comments > div > img {
+	width: 48px;
+	height: 48px;
+	margin-right: 12px;
+}
+
+.comments .comment {
+	margin-bottom: 16px;
+}
+
+.comments .comment > div > p {
+	margin-top: 0;
+	margin-bottom: 2px;
+}
+
+.comments .comment small {
+	margin-left: 6px;
+	vertical-align: middle;
+	line-height: 16px;
+}
+
+.comments .comment > div > p > a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.extra-video-content .description > section {
+	margin-left: 12px;
+}
+
+.extra-video-content .description > section p {
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+.extra-video-content .description > section .channel-name {
+	font-weight: bold;
+}
+
+.extra-video-content .description > section .channel-subscribers {
+	opacity: 0.8;
+	font-size: 12px;
+}
+
+.extra-video-content .description > section .video-description {
+	margin-top: 10px;
+	width: 70%;
+}
