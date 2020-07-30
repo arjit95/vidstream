@@ -2,8 +2,8 @@ apiVersion: skaffold/v2beta5
 kind: Config
 build:
   artifacts:
-    - image: vidstream-frontend
-      context: src/frontend
+    - image: vidstream-api
+      context: src/api
     - image: hello-service
       context: src/hello
     - image: upload-service
@@ -16,17 +16,20 @@ build:
       context: src/transcodereducer
     - image: stream-service
       context: src/streamservice
+    - image: vidstream-web
+      context: src/web
   tagPolicy:
     envTemplate:
         template: "{{.IMAGE_NAME}}:v1"
 deploy:
   kubectl:
     manifests:
-      - kubernetes-manifests/configmap.yml
-      - kubernetes-manifests/hello.yml
-      - kubernetes-manifests/uploadservice.yml
-      - kubernetes-manifests/streamservice.yml
-      - kubernetes-manifests/transcodemaster.yml
-      - kubernetes-manifests/transcodeworker.yml
-      - kubernetes-manifests/transcodereducer.yml
-      - kubernetes-manifests/frontend.yml
+      - deploy/kubectl/configmap.yml
+      - deploy/kubectl/hello.yml
+      - deploy/kubectl/uploadservice.yml
+      - deploy/kubectl/streamservice.yml
+      - deploy/kubectl/transcodemaster.yml
+      - deploy/kubectl/transcodeworker.yml
+      - deploy/kubectl/transcodereducer.yml
+      - deploy/kubectl/api.yml
+      - deploy/kubectl/web.yml

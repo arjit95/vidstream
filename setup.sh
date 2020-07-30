@@ -8,4 +8,4 @@ helm install \
     --set storageClass.mountOptions[0]="vers=4.2" \
     nfs-server stable/nfs-server-provisioner
 
-kubectl apply -f kubernetes-manifests/pv.yml
+kubectl apply -f deploy/kubectl/pv.yml
