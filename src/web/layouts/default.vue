@@ -2,7 +2,14 @@
   <v-app :is-dark="darkMode">
     <nav-drawer :items="items" :items2="items2"></nav-drawer>
 
-    <v-app-bar clipped-left app elevate-on-scroll color="transparent" dense>
+    <v-app-bar
+      class="app-bar"
+      clipped-left
+      app
+      elevate-on-scroll
+      color="transparent"
+      dense
+    >
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-icon class="mx-4" large>
         mdi-theater
@@ -78,6 +85,10 @@
 </style>
 
 <style lang="scss" scoped>
+.app-bar {
+  z-index: 99999 !important;
+}
+
 .overlay {
   position: absolute;
   top: 0;

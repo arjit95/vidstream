@@ -100,7 +100,7 @@ export default {
   build: {},
 
   server: {
-    port: process.env.PORT || 8080,
+    port: process.env.PORT || 3000,
     host: '0.0.0.0',
   },
 

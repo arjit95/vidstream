@@ -13,7 +13,6 @@
         <v-row
           v-show="!isLoading"
           ref="playerInfo"
-          justify="center"
           align="center"
           class="video-info"
         >
@@ -24,19 +23,26 @@
               <p class="views">3,015,263</p>
             </v-col>
             <v-col class="video-stats d-flex flex-row">
-              <v-list-item-action-text class="likes"
-                ><v-icon>mdi-thumb-up-outline</v-icon>
-                987</v-list-item-action-text
-              >
-              <v-list-item-action-text class="dislikes">
-                <v-icon>mdi-thumb-down-outline</v-icon> 1235
-              </v-list-item-action-text>
-              <v-list-item-action-text class="lights" @click="toggleLights">
-                <v-icon
-                  >mdi-lightbulb-{{ lights ? 'off' : 'on' }}-outline</v-icon
-                >
-                Turn {{ lights ? 'off' : 'on' }} lights
-              </v-list-item-action-text>
+              <v-tooltip slot="append" top>
+                <template #activator="{ on }">
+                  <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
+                </template>
+                <span>987</span>
+              </v-tooltip>
+              <v-tooltip slot="append" top>
+                <template #activator="{ on }">
+                  <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
+                </template>
+                <span>1235</span>
+              </v-tooltip>
+              <v-tooltip slot="append" top>
+                <template #activator="{ on }">
+                  <v-icon slot="activator" @click="toggleLights" v-on="on"
+                    >mdi-lightbulb-{{ lights ? 'off' : 'on' }}-outline</v-icon
+                  >
+                </template>
+                <span>Turn {{ lights ? 'off' : 'on' }} lights</span>
+              </v-tooltip>
             </v-col>
           </v-col>
         </v-row>
@@ -74,6 +80,12 @@
     line-height: 3em;
   }
 }
+
+.player-container:fullscreen {
+  .vjs-control-bar {
+    bottom: 1em !important;
+  }
+}
 </style>
 
 <style lang="scss" scoped>
@@ -81,7 +93,15 @@
 #video {
   width: 100%;
   height: 70vh;
+}
+
+.loader,
+#video > video {
   z-index: 10;
+}
+
+#video > *:not(video) {
+  z-index: 12;
 }
 
 .accent-glow {
@@ -104,17 +124,34 @@
   z-index: 11;
 }
 
-.video-info:-moz-full-screen {
-  position: absolute;
-}
-.video-info:-webkit-full-screen {
-  position: absolute;
-}
-.video-info:-ms-fullscreen {
-  position: absolute;
-}
-.video-info:fullscreen {
-  position: absolute;
+.player-container:fullscreen {
+  margin: 0;
+  padding: 0;
+
+  > * {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+
+  #video {
+    height: 100vh;
+  }
+
+  .video-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-meta {
+    width: 100%;
+    margin: 0;
+  }
 }
 
 .player-container {
@@ -124,7 +161,7 @@
     margin-left: 24px;
 
     .title {
-      font-size: 42px !important;
+      font-size: 150% !important;
       margin-bottom: 12px;
       font-weight: bold;
       margin-top: 0;
@@ -140,9 +177,7 @@
   .video-stats {
     align-items: center;
 
-    .likes,
-    .dislikes,
-    .lights {
+    > * {
       cursor: pointer;
       margin: 16px 8px 8px 0;
     }
@@ -164,6 +199,8 @@ class PlayerUtils {
     this.info = info
     this.video = video
     this.debouncedHide = _.debounce(() => {
+      if (this.player.paused()) return
+
       info.classList.add('d-none')
     }, 2500)
   }
