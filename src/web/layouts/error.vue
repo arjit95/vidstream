@@ -1,20 +1,24 @@
 <template>
-  <v-app dark>
+  <v-col align="center">
+    <v-img src="/vuetify-logo.svg" aspect-ratio="2" height="125" contain />
     <h1 v-if="error.statusCode === 404">
       {{ pageNotFound }}
+    </h1>
+    <h1 v-if="error.statusCode === 404">
+      {{ error.message }}
     </h1>
     <h1 v-else>
       {{ otherError }}
     </h1>
-    <NuxtLink to="/">
-      Home page
-    </NuxtLink>
-  </v-app>
+    <span style="cursor: pointer;" @click="$router.go(-1)">
+      Go Back
+    </span>
+  </v-col>
 </template>
 
 <script>
 export default {
-  layout: 'empty',
+  layout: 'simple',
   props: {
     error: {
       type: Object,

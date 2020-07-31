@@ -1,16 +1,18 @@
 <template>
-  <v-row class="ms-0">
+  <div class="d-inline-flex flex-row" style="width: auto;">
     <v-avatar class="video-thumb">
-      <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg"></v-img>
+      <v-img :src="video.thumb"></v-img>
     </v-avatar>
     <div class="flex-column ms-3">
-      <div class="text-subtitle-2">{{ video.name }}</div>
+      <div class="text-subtitle-2">
+        <nuxt-link :to="video.url">{{ video.name }}</nuxt-link>
+      </div>
       <div class="text-caption">{{ video.channel }}</div>
       <div class="text-caption">
-        {{ video.views }} | {{ video.uploadedDate }}
+        {{ video.views }} views | {{ video.uploadedDate }}
       </div>
     </div>
-  </v-row>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -32,6 +34,8 @@ export default {
           channel: 'Channel name',
           views: 1234,
           uploadedDate: '4 days ago',
+          thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
+          url: '/watch?vi=123',
         }
       },
     },

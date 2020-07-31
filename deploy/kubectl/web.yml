@@ -21,12 +21,12 @@ spec:
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/_healthz"
+              path: "/healthz"
               port: 8080
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/_healthz"
+              path: "/healthz"
               port: 8080
           envFrom:
           - configMapRef:

@@ -2,49 +2,66 @@
   <v-container fluid>
     <v-row ref="playerContainer" class="player-container">
       <v-col sm="12" offset-md="2" md="8" style="position: relative;">
-        <v-row v-show="!isLoading" justify="center" align="center">
+        <v-row
+          v-show="!isLoading"
+          ref="videoContainer"
+          class="video-container"
+          justify="center"
+          align-md="center"
+        >
           <video
             id="video"
             ref="videoPlayer"
             class="video-js vjs-default-skin"
             controls
           ></video>
-        </v-row>
-        <v-row
-          v-show="!isLoading"
-          ref="playerInfo"
-          align="center"
-          class="video-info"
-        >
-          <v-col class="video-meta" md="8">
-            <v-col id="video-name">
-              <p class="channel">Nature</p>
-              <p class="title">Big Buck bunny trailer</p>
-              <p class="views">3,015,263</p>
+          <v-row
+            v-show="!isLoading"
+            ref="playerInfo"
+            align="center"
+            class="video-info"
+          >
+            <v-col class="video-meta" md="8">
+              <v-col id="video-name">
+                <p class="channel">Nature</p>
+                <p class="title">Big Buck bunny trailer</p>
+                <p class="views">3.2M Views</p>
+              </v-col>
+              <v-col class="video-stats d-flex flex-row">
+                <v-tooltip slot="append" top>
+                  <template #activator="{ on }">
+                    <span>
+                      <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
+                      <small>987</small>
+                    </span>
+                  </template>
+                  <span>Like</span>
+                </v-tooltip>
+                <v-tooltip slot="append" top>
+                  <template #activator="{ on }">
+                    <span>
+                      <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
+                      <small>1238</small>
+                    </span>
+                  </template>
+                  <span>Dislike</span>
+                </v-tooltip>
+                <v-tooltip slot="append" top>
+                  <template #activator="{ on }">
+                    <span>
+                      <v-icon slot="activator" @click="toggleLights" v-on="on"
+                        >mdi-lightbulb-{{
+                          lights ? 'off' : 'on'
+                        }}-outline</v-icon
+                      >
+                      <small>Turn {{ lights ? 'off' : 'on' }} lights</small>
+                    </span>
+                  </template>
+                  <span>Toggle focus on player</span>
+                </v-tooltip>
+              </v-col>
             </v-col>
-            <v-col class="video-stats d-flex flex-row">
-              <v-tooltip slot="append" top>
-                <template #activator="{ on }">
-                  <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
-                </template>
-                <span>987</span>
-              </v-tooltip>
-              <v-tooltip slot="append" top>
-                <template #activator="{ on }">
-                  <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
-                </template>
-                <span>1235</span>
-              </v-tooltip>
-              <v-tooltip slot="append" top>
-                <template #activator="{ on }">
-                  <v-icon slot="activator" @click="toggleLights" v-on="on"
-                    >mdi-lightbulb-{{ lights ? 'off' : 'on' }}-outline</v-icon
-                  >
-                </template>
-                <span>Turn {{ lights ? 'off' : 'on' }} lights</span>
-              </v-tooltip>
-            </v-col>
-          </v-col>
+          </v-row>
         </v-row>
         <v-row justify="center" align="center">
           <v-skeleton-loader
@@ -62,22 +79,24 @@
 
 <style lang="scss">
 #video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .vjs-control-bar {
     z-index: 9999;
   }
 
   .vjs-big-play-button {
-    right: 24%;
-    top: 38%;
-    left: auto;
-    bottom: auto;
-    border: 0;
     border-radius: 200px;
     width: 3em;
     height: 3em;
     z-index: 9999;
-    position: absolute;
+    position: relative;
     line-height: 3em;
+    margin-left: 25%;
+    border-color: transparent;
+    z-index: 12;
+    background-color: rgba(43, 51, 63, 0.9);
   }
 }
 
@@ -89,23 +108,21 @@
 </style>
 
 <style lang="scss" scoped>
+@import '~vuetify/src/styles/styles.sass';
+
 .loader,
 #video {
   width: 100%;
-  height: 70vh;
-}
-
-.loader,
-#video > video {
+  height: 100%;
+  position: relative;
   z-index: 10;
 }
-
-#video > *:not(video) {
-  z-index: 12;
-}
-
 .accent-glow {
   box-shadow: 0px 0px 16px var(--v-accent-lighten2);
+}
+
+.vjs-has-started + .video-info {
+  height: calc(96% - 2em);
 }
 
 .video-info {
@@ -144,8 +161,12 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
+  }
+
+  .vjs-has-started + .video-info {
+    height: calc(100% - 1.7em) !important;
   }
 
   .video-meta {
@@ -154,7 +175,23 @@
   }
 }
 
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+  .player-container {
+    height: 50vh;
+  }
+}
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+  .player-container {
+    height: 70vh;
+  }
+}
+
 .player-container {
+  .video-container {
+    height: 100%;
+  }
+
   .video-meta {
     align-items: flex-start;
     width: 60%;
@@ -207,11 +244,14 @@ class PlayerUtils {
 
   addListeners() {
     const player = this.player
-    this.info.addEventListener('click', () => {
+    const clickHandler = () => {
       player.paused() && !player.ended() ? player.play() : player.pause()
-    })
+    }
 
+    this.info.addEventListener('click', clickHandler)
     this.video.addEventListener('mousemove', this.hideInfoScreen.bind(this))
+    this.info.addEventListener('mousemove', this.hideInfoScreen.bind(this))
+
     player.on('playing', () => {
       this.info.classList.add('d-none')
       player.bigPlayButton.hide()
@@ -263,30 +303,29 @@ export default {
   },
 
   mounted() {
-    setTimeout(async () => {
-      this.isLoading = false
-      this.player = videojs(this.$refs.videoPlayer, this.options)
+    this.player = videojs(this.$refs.videoPlayer, this.options)
 
-      this.player.on('loadstart', () => {
-        const playerContainer = this.$refs.playerContainer
-        this.player.requestFullscreen = playerContainer.requestFullscreen.bind(
-          playerContainer
-        )
-        this.player.exitFullscreen = document.exitFullscreen.bind(document)
-        this.player.isFullscreen = () => document.fullscreen
+    this.player.on('loadstart', () => {
+      const playerContainer = this.$refs.playerContainer
+      this.player.requestFullscreen = playerContainer.requestFullscreen.bind(
+        playerContainer
+      )
+      this.player.exitFullscreen = document.exitFullscreen.bind(document)
+      this.player.isFullscreen = () => document.fullscreen
 
-        const utils = new PlayerUtils({
-          player: this.player,
-          info: this.$refs.playerInfo,
-          video: this.$refs.videoPlayer,
-        })
-
-        utils.addListeners()
+      const utils = new PlayerUtils({
+        player: this.player,
+        info: this.$refs.playerInfo,
+        video: this.$refs.videoPlayer,
       })
 
-      await this.onReady(this.player)
+      utils.addListeners()
+      this.isLoading = false
+    })
+
+    Promise.resolve(this.onReady(this.player)).then(() => {
       this.player.hlsQualitySelector()
-    }, 1000)
+    })
   },
 
   beforeDestroy() {
@@ -297,6 +336,7 @@ export default {
     toggleLights(event) {
       event.stopPropagation()
       this.lights = !this.lights
+
       if (this.lights) {
         this.player.el().classList.remove('accent-glow')
       } else {

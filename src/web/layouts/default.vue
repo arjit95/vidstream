@@ -1,15 +1,8 @@
 <template>
   <v-app :is-dark="darkMode">
-    <nav-drawer :items="items" :items2="items2"></nav-drawer>
+    <nav-drawer :items="items"></nav-drawer>
 
-    <v-app-bar
-      class="app-bar"
-      clipped-left
-      app
-      elevate-on-scroll
-      color="transparent"
-      dense
-    >
+    <v-app-bar class="app-bar" clipped-left app fixed elevate-on-scroll dense>
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-icon class="mx-4" large>
         mdi-theater
@@ -37,9 +30,6 @@
           </v-scale-transition>
           <v-btn icon @click="toggleSearch">
             <v-icon>mdi-magnify</v-icon>
-          </v-btn>
-          <v-btn icon>
-            <nuxt-link to="/login"><v-icon>mdi-account</v-icon></nuxt-link>
           </v-btn>
           <v-menu
             :close-on-content-click="false"
@@ -119,21 +109,14 @@ export default {
     search: null,
     searchResults: [],
     isLoading: false,
-    drawer: false,
+    drawer: null,
     isSearchShown: false,
     items: [
-      { icon: 'mdi-trending-up', text: 'Most Popular' },
-      { icon: 'mdi-youtube-subscription', text: 'Subscriptions' },
-      { icon: 'mdi-history', text: 'History' },
-      { icon: 'mdi-playlist-play', text: 'Playlists' },
-      { icon: 'mdi-clock', text: 'Watch Later' },
-    ],
-    items2: [
-      { picture: 28, text: 'Joseph' },
-      { picture: 38, text: 'Apple' },
-      { picture: 48, text: 'Xbox Ahoy' },
-      { picture: 58, text: 'Nokia' },
-      { picture: 78, text: 'MKBHD' },
+      { icon: 'mdi-trending-up', title: 'Most Popular' },
+      { icon: 'mdi-youtube-subscription', title: 'Subscriptions' },
+      { icon: 'mdi-history', title: 'History' },
+      { icon: 'mdi-playlist-play', title: 'Playlists' },
+      { icon: 'mdi-clock', title: 'Watch Later' },
     ],
   }),
   computed: {
@@ -168,6 +151,7 @@ export default {
      **/
     setTimeout(() => {
       this.$vuetify.theme.dark = this.darkMode
+      this.$nuxt.$emit('toggleDrawer', this.drawer)
     }, 500)
   },
   methods: {
