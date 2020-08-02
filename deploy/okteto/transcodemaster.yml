@@ -1,19 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transcode-reducer
+  name: transcode-service
 spec:
   selector:
     matchLabels:
-      app: transcode-reducer
+      app: transcode-service
   template:
     metadata:
       labels:
-        app: transcode-reducer
+        app: transcode-service
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: transcode-reducer:v1
+          image: registry.gitlab.com/arjit95/vidstream/transcode-service:v1
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -39,9 +41,8 @@ spec:
           volumeMounts:
           - name: pv0001
             mountPath: /data
-
       volumes:
       - name: pv0001
         persistentVolumeClaim:
-            claimName: upload-pvc
-            readOnly: false
+          claimName: upload-pvc
+          readOnly: false

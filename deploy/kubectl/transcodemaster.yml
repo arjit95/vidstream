@@ -44,17 +44,3 @@ spec:
         persistentVolumeClaim:
           claimName: upload-pvc
           readOnly: false
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: transcode-service
-spec:
-  type: ClusterIP
-  selector:
-    app: transcode-service
-  ports:
-  - name: tcp  # Debug port
-    port: 9222
-    targetPort: 9222

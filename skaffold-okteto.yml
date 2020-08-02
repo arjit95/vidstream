@@ -22,11 +22,12 @@ build:
 deploy:
   kubectl:
     manifests:
-      - deploy/kubectl/configmap.yml
-      - deploy/kubectl/uploadservice.yml
-      - deploy/kubectl/streamservice.yml
-      - deploy/kubectl/transcodemaster.yml
-      - deploy/kubectl/transcodeworker.yml
-      - deploy/kubectl/transcodereducer.yml
-      - deploy/kubectl/api.yml
-      - deploy/kubectl/web.yml
+      - deploy/kubectl/pvc.yml
+      - deploy/okteto/configmap.yml
+      - deploy/okteto/uploadservice.yml
+      - deploy/okteto/streamservice.yml
+      - deploy/okteto/transcodemaster.yml
+      - deploy/okteto/transcodeworker.yml
+      - deploy/okteto/transcodereducer.yml
+      - deploy/okteto/api.yml
+      - deploy/okteto/web.yml

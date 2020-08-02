@@ -11,9 +11,11 @@ spec:
       labels:
         app: transcode-reducer
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: transcode-reducer:v1
+          image: registry.gitlab.com/arjit95/vidstream/transcode-reducer:v1
           ports:
           - containerPort: 8080
           readinessProbe:

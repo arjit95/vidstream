@@ -1,48 +1,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: upload-service
 spec:
   selector:
     matchLabels:
-      app: web
+      app: upload-service
   template:
     metadata:
       labels:
-        app: web
+        app: upload-service
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: vidstream-web:v1
+          image: registry.gitlab.com/arjit95/vidstream/upload-service:v1
           ports:
           - containerPort: 8080
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/healthz"
+              path: "/_healthz"
               port: 8080
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/healthz"
+              path: "/_healthz"
               port: 8080
           envFrom:
           - configMapRef:
                 name: network-config
+          - configMapRef:
+                name: storage-config
+          - configMapRef:
+                name: queue-config
           env:
           - name: PORT
             value: "8080"
+          volumeMounts:
+          - name: pv0001
+            mountPath: /data
+
+      volumes:
+      - name: pv0001
+        persistentVolumeClaim:
+          claimName: upload-pvc
+          readOnly: false
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: upload-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
-    app: web
+    app: upload-service
   ports:
   - name: http
-    port: 80
+    port: 8080
     targetPort: 8080
-    nodePort: 32767

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	// "crypto/tls"
 	"fmt"
 	// "net"
@@ -11,16 +10,14 @@ import (
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
-	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/trace"
 
 	// "golang.org/x/net/http2"
-	"google.golang.org/grpc"
+	// "google.golang.org/grpc"
 
 	"frontend/services"
 )
@@ -35,7 +32,6 @@ const (
 )
 
 func main() {
-	ctx := context.Background()
 	log := logrus.New()
 	log.Level = logrus.InfoLevel
 	log.Formatter = &logrus.JSONFormatter{
@@ -63,11 +59,9 @@ func main() {
 	}
 
 	svc := new(services.FrontendServer)
-	mustMapEnv(&svc.HelloAddr, "HELLO_SERVICE_ADDR")
 	mustMapEnv(&svc.UploadAddr, "UPLOAD_SERVICE_ADDR")
 	mustMapEnv(&svc.StreamAddr, "STREAM_SERVICE_ADDR")
 
-	mustConnGRPC(ctx, &svc.HelloSvcConn, svc.HelloAddr)
 	svc.UploadSvcConn = mustConnHTTP()
 	svc.StreamSvcConn = mustConnHTTP()
 
@@ -122,16 +116,16 @@ func mustConnHTTP() http.Client {
 // 	return client
 // }
 
-func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
-	var err error
-	*conn, err = grpc.DialContext(ctx, addr,
-		grpc.WithInsecure(),
-		grpc.WithTimeout(time.Minute*3),
-		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
-	if err != nil {
-		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
-	}
-}
+// func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
+// 	var err error
+// 	*conn, err = grpc.DialContext(ctx, addr,
+// 		grpc.WithInsecure(),
+// 		grpc.WithTimeout(time.Minute*3),
+// 		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+// 	if err != nil {
+// 		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
+// 	}
+// }
 
 func initTracing(log logrus.FieldLogger) {
 	// This is a demo app with low QPS. trace.AlwaysSample() is used here

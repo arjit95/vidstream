@@ -1,27 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello
+  name: web
 spec:
   selector:
     matchLabels:
-      app: hello
+      app: web
   template:
     metadata:
       labels:
-        app: hello
+        app: web
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: hello-service:v1
+          image: registry.gitlab.com/arjit95/vidstream/vidstream-web:v1
           ports:
           - containerPort: 8080
           readinessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/healthz"
+              port: 8080
           livenessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/healthz"
+              port: 8080
           envFrom:
           - configMapRef:
                 name: network-config
@@ -32,12 +38,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-service
+  name: web
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
-    app: hello
+    app: web
   ports:
-  - name: grpc
-    port: 8080
+  - name: http
+    port: 80
     targetPort: 8080
