@@ -20,10 +20,8 @@ export default {
       },
     },
   },
-  created() {
-    this.$nextTick(() => {
-      this.$vuetify.theme.dark = this.darkMode
-    })
+  mounted() {
+    this.$vuetify.theme.dark = this.darkMode
   },
 }
 </script>

@@ -31,7 +31,9 @@
                 <v-tooltip slot="append" top>
                   <template #activator="{ on }">
                     <span>
-                      <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
+                      <v-icon slot="activator" @click="like" v-on="on"
+                        >mdi-thumb-up-outline</v-icon
+                      >
                       <small>987</small>
                     </span>
                   </template>
@@ -40,7 +42,9 @@
                 <v-tooltip slot="append" top>
                   <template #activator="{ on }">
                     <span>
-                      <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
+                      <v-icon slot="activator" @click="dislike" v-on="on"
+                        >mdi-thumb-down-outline</v-icon
+                      >
                       <small>1238</small>
                     </span>
                   </template>
@@ -127,10 +131,10 @@
 
 .video-info {
   position: absolute;
-  left: 1%;
-  top: 2%;
+  left: 1.4%;
+  top: 2.5%;
   width: 100%;
-  height: 96%;
+  height: 95%;
   background: rgb(0, 0, 0);
   background: linear-gradient(
     90deg,
@@ -139,6 +143,11 @@
   );
   transition: all 0.5s;
   z-index: 11;
+}
+
+.video-info,
+.video-info button {
+  color: white;
 }
 
 .player-container:fullscreen {
@@ -348,6 +357,8 @@ export default {
         state: this.lights,
       })
     },
+    like() {},
+    dislike() {},
   },
 }
 </script>

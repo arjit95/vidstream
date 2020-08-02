@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center" dense>
       <v-col sm="12" md="8" justify="center">
-        <v-card class="mx-auto" color="cardBg" outlined>
+        <v-card class="mx-auto" outlined>
           <v-card-title>Upload</v-card-title>
           <v-card-subtitle
             >Upload your video using the form below.</v-card-subtitle

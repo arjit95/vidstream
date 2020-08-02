@@ -34,7 +34,7 @@
         </v-tooltip>
         <v-tooltip slot="append" top>
           <template #activator="{ on }">
-            <span>
+            <span @click="repliesShown = !repliesShown">
               <v-icon v-on="on">mdi-reply-outline</v-icon>
             </span>
           </template>
@@ -46,6 +46,19 @@
           {{ !shown ? 'View' : 'Hide' }} all replies
         </span>
       </v-row>
+      <v-col v-if="repliesShown" xs="12" md="8">
+        <v-row class="d-flex" justify="center">
+          <v-avatar class="comment-thumb">
+            <v-img :src="comment.thumb"></v-img>
+          </v-avatar>
+          <v-textarea class="ms-3" rows="3" no-resize></v-textarea>
+        </v-row>
+        <v-row>
+          <v-btn tile outlined color="accent" small>
+            <v-icon left>mdi-pencil</v-icon> Submit
+          </v-btn>
+        </v-row>
+      </v-col>
       <v-row
         v-if="shown && comment.children && comment.children.length"
         class="mt-4"
@@ -128,11 +141,12 @@ export default {
       shown: false,
       loaded: false,
       loadingChildren: false,
+      repliesShown: false,
     }
   },
   computed: {
     indent() {
-      return { transform: `translate(${this.depth * 5}px)` }
+      return `transform: translate(${this.depth * 5}px)`
     },
   },
   methods: {

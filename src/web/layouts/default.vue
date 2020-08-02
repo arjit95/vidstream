@@ -16,7 +16,6 @@
             <v-autocomplete
               v-show="isSearchShown"
               v-model="searchQuery"
-              class="col-6"
               :loading="isLoading"
               :items="searchResults"
               :search-input.sync="search"
@@ -143,16 +142,7 @@ export default {
   },
   mounted() {
     this.$nuxt.$on('childEvent', this.handleEvent.bind(this))
-    /**
-     * Hack: Waiting for dom to completely render
-     * TODO: Remove setTimeout call
-     * https://github.com/vuetifyjs/vuetify/issues/9453
-     *
-     **/
-    setTimeout(() => {
-      this.$vuetify.theme.dark = this.darkMode
-      this.$nuxt.$emit('toggleDrawer', this.drawer)
-    }, 500)
+    this.$vuetify.theme.dark = this.darkMode
   },
   methods: {
     handleEvent(event) {

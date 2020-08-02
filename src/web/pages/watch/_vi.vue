@@ -7,33 +7,33 @@
     ></video-player>
     <v-row class="flex-row">
       <v-col cols="12">
-        <p class="text-subtitle-1">Up Next</p>
-        <video-thumbs horizontal :videos="next"></video-thumbs>
+        <v-expansion-panels flat :value="0">
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <p class="text-subtitle-1">Up Next</p>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <video-thumbs horizontal :videos="next" dense></video-thumbs>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
     </v-row>
     <v-row class="flex-sm-column-reverse flex-md-row">
       <v-col sm="12" md="8">
         <v-card>
-          <v-tabs
-            v-model="tab"
-            color="primary accent-4"
-            centered
-            @change="loadContent"
-          >
+          <v-tabs v-model="tab" color="accent-4" centered @change="loadContent">
             <v-tab>Description</v-tab>
             <v-tab>Comments</v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>
-              <v-container fluid>
-                <v-row></v-row>
-              </v-container>
+              <video-description></video-description>
             </v-tab-item>
             <v-tab-item>
               <v-container fluid>
                 <comment
                   v-for="comment in comments"
-                  v-show="commentsLoaded"
                   :key="comment.url"
                   :comment="comment"
                 ></comment>
@@ -67,6 +67,7 @@
 import VideoPlayer from '~/components/VideoPlayer'
 import VideoThumbs from '~/components/VideoThumbs'
 import Comment from '~/components/Comment'
+import VideoDescription from '~/components/VideoDescription'
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -76,6 +77,7 @@ export default {
     VideoPlayer,
     VideoThumbs,
     Comment,
+    VideoDescription,
   },
   data() {
     return {
@@ -105,29 +107,21 @@ export default {
   },
 
   async mounted() {
-    const videos = [
-      {
-        name: 'Video 1',
-        channel: 'Channel 1',
-        views: 1235,
-        uploadedDate: '4 days ago',
-        thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-        url: '/watch?vi=123',
-      },
-      {
-        name: 'Video 2',
-        channel: 'Channel 2',
-        views: 1235,
-        uploadedDate: '4 days ago',
-        thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-        url: '/watch?vi=123',
-      },
-    ]
+    const videos = {
+      name: 'Video 1',
+      channel: 'Channel 1',
+      views: 1235,
+      uploadedDate: '4 days ago',
+      thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
+      url: '/watch/123',
+      channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
+      channelURL: '/channel/123',
+    }
 
     await wait(5000)
 
-    this.next = videos
-    this.related = videos
+    this.next = Array(5).fill(videos)
+    this.related = this.next
   },
 
   middleware({ route, error }) {
@@ -145,7 +139,7 @@ export default {
         channel: 'Channel name',
         profileURL: '/profile?id=1234',
         profile: 'User 1',
-        url: '/watch?v=123&comment=1234',
+        url: '/watch/123?comment=1234',
         date: '4 days ago',
         content:
           "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",

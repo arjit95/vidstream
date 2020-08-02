@@ -2,7 +2,7 @@
   <v-container align="center" justify="center" fluid>
     <v-row justify="center">
       <v-col md="4">
-        <v-card class="mx-auto lighten-1" color="cardBg" outlined>
+        <v-card class="mx-auto" outlined>
           <v-list-item>
             <v-list-item-avatar
               ><nuxt-link to="/"
@@ -36,7 +36,7 @@
         </v-card>
       </v-col>
       <v-col md="4" offset-md="1">
-        <v-card class="mx-auto lighten-1" color="cardBg" outlined>
+        <v-card class="mx-auto" outlined>
           <v-list-item>
             <v-list-item-avatar
               ><nuxt-link to="/"

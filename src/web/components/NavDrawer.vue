@@ -5,7 +5,8 @@
     :expand-on-hover="$vuetify.breakpoint.mdAndUp"
     stateless
     :mini-variant="$vuetify.breakpoint.mdAndUp"
-    absolute
+    fixed
+    :app="$vuetify.breakpoint.mdAndUp"
   >
     <v-list dense nav>
       <v-list-item two-line class="px-0">
