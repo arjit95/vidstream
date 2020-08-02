@@ -1,19 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transcode-reducer
+  name: stream-service
 spec:
   selector:
     matchLabels:
-      app: transcode-reducer
+      app: stream-service
   template:
     metadata:
       labels:
-        app: transcode-reducer
+        app: stream-service
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: transcode-reducer:v1
+          image: registry.gitlab.com/arjit95/vidstream/stream-service:v1
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -43,5 +45,22 @@ spec:
       volumes:
       - name: pv0001
         persistentVolumeClaim:
-            claimName: upload-pvc
-            readOnly: false
+          claimName: upload-pvc
+          readOnly: false
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stream-service
+spec:
+  type: ClusterIP
+  selector:
+    app: stream-service
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: tcp
+    port: 9222
+    targetPort: 9222

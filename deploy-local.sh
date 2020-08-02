@@ -9,3 +9,4 @@ helm install \
     nfs-server stable/nfs-server-provisioner
 
 kubectl apply -f deploy/kubectl/pv.yml
+kubectl apply -f deploy/kubectl/pvc.yml
