@@ -1,6 +1,6 @@
 const http = require('http');
 
-const queue = require('./lib/queue');
+const queue = require('../common/node/queue');
 
 const port = process.env.PORT || 8080;
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
@@ -18,13 +18,11 @@ const server = http.createServer(function(req, res) {
 });
 
 server.listen(port, '0.0.0.0', async function() {
-    queueService = await queue.newBuilder(process.env.QUEUE_SERVICE);
-
-    const fileService = await require('./lib/file').newBuilder();
+    queueService = await queue.newBuilder(process.env.QUEUE_SERVICE, process.env.QUEUE_USERNAME, process.env.QUEUE_PASSWORD);
     queueService.assert(CONVERT_QUEUE);
     queueService.assert(TRANSCODE_QUEUE);
 
-    queueService.consume(TRANSCODE_QUEUE, require('./api/transcoder')(queueService, fileService));
+    queueService.consume(TRANSCODE_QUEUE, require('./api/transcoder')(queueService));
 });
 
 

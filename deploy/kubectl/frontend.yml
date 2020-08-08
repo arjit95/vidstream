@@ -1,34 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: web
 spec:
   selector:
     matchLabels:
-      app: api
+      app: web
   template:
     metadata:
       labels:
-        app: api
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        app: web
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
         - name: server
-          image: registry.gitlab.com/arjit95/vidstream/vidstream-api:v1
+          image: registry.gitlab.com/arjit95/vidstream/vidstream-web:v1
           ports:
           - containerPort: 8080
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/_healthz"
+              path: "/healthz"
               port: 8080
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/_healthz"
+              path: "/healthz"
               port: 8080
           envFrom:
           - configMapRef:
@@ -40,12 +36,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-service
+  name: web
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
-    app: api
+    app: web
   ports:
   - name: http
     port: 80
     targetPort: 8080
+    nodePort: 32767

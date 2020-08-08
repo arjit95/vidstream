@@ -2,19 +2,29 @@ apiVersion: skaffold/v2beta5
 kind: Config
 build:
   artifacts:
-    - image: vidstream-api
+    - image: registry.gitlab.com/arjit95/vidstream/vidstream-api
       context: src/api
-    - image: upload-service
-      context: src/uploadservice
-    - image: transcode-service
-      context: src/transcodemaster
-    - image: transcode-worker
-      context: src/transcodeworker
-    - image: transcode-reducer
-      context: src/transcodereducer
-    - image: stream-service
-      context: src/streamservice
-    - image: vidstream-web
+    - image: registry.gitlab.com/arjit95/vidstream/upload-service
+      context: src
+      docker: 
+        dockerfile: uploadservice/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/transcode-service
+      context: src
+      docker: 
+        dockerfile: transcodemaster/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/transcode-worker
+      context: src
+      docker: 
+        dockerfile: transcodeworker/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/transcode-reducer
+      context: src
+      docker: 
+        dockerfile: transcodereducer/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/stream-service
+      context: src/streamservice    
+    - image: registry.gitlab.com/arjit95/vidstream/analytics-service
+      context: src/analytics
+    - image: registry.gitlab.com/arjit95/vidstream/vidstream-web
       context: src/web
   tagPolicy:
     envTemplate:
@@ -23,10 +33,11 @@ deploy:
   kubectl:
     manifests:
       - deploy/kubectl/configmap.yml
+      - deploy/kubectl/secrets.yml
       - deploy/kubectl/uploadservice.yml
       - deploy/kubectl/streamservice.yml
-      - deploy/kubectl/transcodemaster.yml
-      - deploy/kubectl/transcodeworker.yml
-      - deploy/kubectl/transcodereducer.yml
+      - deploy/kubectl/transcoder/master.yml
+      - deploy/kubectl/transcoder/worker.yml
+      - deploy/kubectl/transcoder/reducer.yml
       - deploy/kubectl/api.yml
-      - deploy/kubectl/web.yml
+      - deploy/kubectl/frontend.yml

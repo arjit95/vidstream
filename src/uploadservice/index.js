@@ -6,10 +6,8 @@ const crypto = require('crypto');
 const Busboy = require('busboy');
 const http = require('http');
 
-const Queue = require('./queue');
-const File = require('./file');
-
-let queueService, fileService;
+const Queue = require('../common/node/queue');
+let queueService;
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
 const TRANSCODE_QUEUE = process.env.TRANSCODE_QUEUE || 'transcode_queue';
@@ -93,10 +91,11 @@ const port = process.env.PORT || 8080;
 server.listen(port, '0.0.0.0', async function() {
     console.log("Server running on " + port);
 
-    queueService = await Queue.newBuilder(process.env.QUEUE_SERVICE);
-    fileService = await File.newBuilder();
+    queueService = await Queue.newBuilder(process.env.QUEUE_SERVICE, process.env.QUEUE_USERNAME, process.env.QUEUE_PASSWORD);
+    if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR);
+    }
 
-    await fileService.assertDirectory(UPLOAD_DIR);
     queueService.assert(TRANSCODE_QUEUE);
 });
 

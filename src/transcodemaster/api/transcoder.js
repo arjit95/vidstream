@@ -1,6 +1,8 @@
 const path = require('path');
+const fs = require('fs');
 
-const {FFMpeg, FFProbe, Executor} = require('../ffutils');
+const {FFMpeg, FFProbe} = require('../ffutils');
+const Executor = require('../../common/node/executor');
 
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
@@ -23,8 +25,14 @@ const getUniqueName = function(existingNames, name) {
     return name;
 };
 
-module.exports = function(queueInstance, fsUtils) {
-    fsUtils.assertDirectory(CONVERTED_DIR);
+const assertDir = function(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath);
+  }
+};
+
+module.exports = function(queueInstance) {
+    assertDir(CONVERTED_DIR);
  
     return async function(message) {
         const fileName = message.name;
@@ -39,7 +47,7 @@ module.exports = function(queueInstance, fsUtils) {
 
         const extname = path.extname(fileName);
         const baseUploadURL = path.resolve(CONVERTED_DIR, path.basename(fileName, extname));
-        fsUtils.assertDirectory(baseUploadURL);
+        assertDir(baseUploadURL);
 
         let jobs = [];
         for (let applicableResolution of applicableResolutions) {

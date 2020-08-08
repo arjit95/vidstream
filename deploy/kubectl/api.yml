@@ -10,12 +10,10 @@ spec:
     metadata:
       labels:
         app: api
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       containers:
         - name: server
-          image: vidstream-api:v1
+          image: registry.gitlab.com/arjit95/vidstream/vidstream-api:v1
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -40,7 +38,7 @@ kind: Service
 metadata:
   name: api-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: api
   ports:

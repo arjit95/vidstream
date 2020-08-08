@@ -1,13 +1,19 @@
 FROM node:14-alpine3.12
 
+RUN apk add --no-cache ffmpeg
+
+# Create common directory
+WORKDIR /usr/src/common/node/
+ADD common/node/package.json .
+ADD common/node/package-lock.json .
+RUN npm install --only=production
+ADD common/node/ /usr/src/common/node
+
 # Create app directory
 WORKDIR /usr/src/app
-
-RUN apk add --no-cache ffmpeg
-ADD package.json .
-ADD package-lock.json .
+ADD transcodemaster/package.json .
+ADD transcodemaster/package-lock.json .
 RUN npm install --only=production
+ADD transcodemaster/ .
 
-ADD . .
-
-CMD [ "node", "--inspect=0.0.0.0:9222", "index.js" ]
+ENTRYPOINT [ "node", "index.js" ]

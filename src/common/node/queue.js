@@ -73,14 +73,22 @@ class RabbitMQ extends MessageQueue {
         }, {noAck: false});
     }
 
-    static async newBuilder(url) {
+    static async newBuilder(url, username, password) {
         let connection;
+        const u = new URL(url);
 
         while(true) {
             try {
-                connection = await amqp.connect(url);
+                connection = await amqp.connect({
+                    protocol: u.protocol.substring(0, u.protocol.length - 1),
+                    hostname: u.hostname,
+                    username,
+                    password,
+                    port: u.port
+                });
                 break;
             } catch(err) {
+		console.error('Error occurred, retrying', err);
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }

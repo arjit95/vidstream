@@ -1,8 +1,8 @@
 const http = require('http');
 
-const queue = require('./lib/queue');
+const queue = require('../common/node/queue');
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
-const Executor = require('./lib/executor');
+const Executor = require('../common/node/executor');
 
 const port = process.env.PORT || 8080;
 
@@ -43,7 +43,7 @@ async function encode(message) {
 }
 
 async function start() {
-    queueService = await queue.newBuilder(process.env.QUEUE_SERVICE);
+    queueService = await queue.newBuilder(process.env.QUEUE_SERVICE, process.env.QUEUE_USERNAME, process.env.QUEUE_PASSWORD);
 
     queueService.assert(CONVERT_QUEUE);
     queueService.consume(CONVERT_QUEUE, encode);

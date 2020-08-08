@@ -1,6 +1,6 @@
 const path = require('path');
 
-const Executor = require('../executor');
+const Executor = require('../../../common/node/executor');
 
 class FFMpeg {
     constructor(execPath) {

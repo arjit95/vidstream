@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "0.6.0",
     "videojs-hls-quality-selector": "^1.1.1"
   }
 }

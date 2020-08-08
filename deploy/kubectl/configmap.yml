@@ -7,9 +7,11 @@ data:
     # JAEGER_SERVICE_ADDR: jaeger-query.istio-system:16686
     API_SERVICE_ADDR: http://api-service:8080
     UPLOAD_SERVICE_ADDR: http://upload-service:8080
-    QUEUE_SERVICE: amqp://test:test@rabbitmq:5672
+    QUEUE_SERVICE: amqp://rabbitmq:5672
     STREAM_SERVICE_ADDR: http://stream-service:8080
     DB_SERVICE: mysql:3306
+    ELASTICSEARCH_ADDR: elasticsearch-arjit95.cloud.okteto.net
+    LOGGER_SERVICE_ADDR: tcp://fluentd-service:24224
 
 ---
 
