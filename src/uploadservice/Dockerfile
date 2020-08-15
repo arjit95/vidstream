@@ -1,17 +1,21 @@
-FROM node:14-alpine3.12
-
-# Create common directory
-WORKDIR /usr/src/common/node/
-ADD common/node/package.json .
-ADD common/node/package-lock.json .
-RUN npm install --only=production
-ADD common/node/ /usr/src/common/node
+FROM node:14-alpine3.12 as builder
 
 # Create app directory
 WORKDIR /usr/src/app
-ADD uploadservice/package.json .
-ADD uploadservice/package-lock.json .
+COPY uploadservice/package.json .
+COPY uploadservice/package-lock.json .
 RUN npm install --only=production
-ADD uploadservice/ .
 
-ENTRYPOINT [ "node", "index.js" ]
+# Create common directory
+WORKDIR /usr/src/common/node/
+COPY common/node/package.json .
+COPY common/node/package-lock.json .
+RUN npm install --only=production
+
+FROM gcr.io/distroless/nodejs:14
+COPY --from=builder /usr/src /usr/src
+COPY uploadservice/ /usr/src/app
+COPY common/node/ /usr/src/common/node
+
+WORKDIR /usr/src/app
+CMD [ "index.js" ]

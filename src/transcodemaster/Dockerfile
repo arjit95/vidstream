@@ -1,19 +1,24 @@
-FROM node:14-alpine3.12
+FROM node:14-alpine3.12 as builder
 
 RUN apk add --no-cache ffmpeg
 
-# Create common directory
-WORKDIR /usr/src/common/node/
-ADD common/node/package.json .
-ADD common/node/package-lock.json .
-RUN npm install --only=production
-ADD common/node/ /usr/src/common/node
-
 # Create app directory
 WORKDIR /usr/src/app
-ADD transcodemaster/package.json .
-ADD transcodemaster/package-lock.json .
+COPY transcodemaster/package.json .
+COPY transcodemaster/package-lock.json .
 RUN npm install --only=production
-ADD transcodemaster/ .
 
-ENTRYPOINT [ "node", "index.js" ]
+# Create common directory
+WORKDIR /usr/src/common/node/
+COPY common/node/package.json .
+COPY common/node/package-lock.json .
+RUN npm install --only=production
+
+FROM gcr.io/distroless/nodejs:14
+COPY --from=builder /usr/src /usr/src
+COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY transcodemaster/ /usr/src/app
+COPY common/node/ /usr/src/common/node
+
+WORKDIR /usr/src/app
+CMD [ "index.js" ]

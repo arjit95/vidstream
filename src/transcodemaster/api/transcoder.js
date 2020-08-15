@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const {FFMpeg, FFProbe} = require('../ffutils');
-const Executor = require('../../common/node/executor');
+const {Executor} = require('../../common/node/utils/index');
 
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';

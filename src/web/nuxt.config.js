@@ -57,7 +57,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: [],
+  modules: ['@nuxtjs/axios'],
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -100,7 +100,7 @@ export default {
     host: '0.0.0.0',
   },
 
-  env: {
-    apiURL: process.env.API_SERVICE_ADDR || 'http://localhost:3000',
+  axios: {
+    baseURL: process.env.API_SERVICE_ADDR || 'http://localhost:3000',
   },
 }

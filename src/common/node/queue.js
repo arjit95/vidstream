@@ -88,7 +88,8 @@ class RabbitMQ extends MessageQueue {
                 });
                 break;
             } catch(err) {
-		console.error('Error occurred, retrying', err);
+                console.log('Cannot connect to rabbitmq');
+                console.error(err);
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }

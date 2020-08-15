@@ -31,7 +31,7 @@
             />
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="accent">LOGIN</v-btn>
+            <v-btn text color="accent" @click="doLogin">LOGIN</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -71,7 +71,7 @@
             />
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="secondary">REGISTER</v-btn>
+            <v-btn text color="secondary" @click="doRegister">REGISTER</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -85,8 +85,6 @@ a {
 }
 </style>
 <script>
-const Cookie = process.client ? require('js-cookie') : undefined
-
 export default {
   layout: 'simple',
   name: 'Login',
@@ -105,11 +103,23 @@ export default {
     }
   },
   methods: {
-    doLogin() {
-      const accessToken = 'someStringGotFromApiServiceWithAjax'
-      this.$store.auth.commit('setAuth', accessToken) // mutating to store for client rendering
-      Cookie.set('token', accessToken) // saving token in cookie for server rendering
-      this.$router.push('/')
+    async doRegister() {
+      const response = await this.$sdk.Auth.register(this.register)
+      if (response.error) {
+        return alert(response.error)
+      }
+
+      alert('Register')
+    },
+
+    async doLogin() {
+      const response = await this.$sdk.Auth.login(this.login)
+      if (response.error) {
+        return alert(response.error)
+      }
+
+      this.$store.auth.commit('setAuth', response.token)
+      // this.$router.push('/')
     },
   },
 }

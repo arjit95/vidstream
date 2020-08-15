@@ -29,6 +29,8 @@ spec:
           envFrom:
           - configMapRef:
                 name: network-config
+          - configMapRef:
+                name: cors-config
           env:
           - name: PORT
             value: "8080"
@@ -45,3 +47,4 @@ spec:
   - name: http
     port: 80
     targetPort: 8080
+    nodePort: 32767

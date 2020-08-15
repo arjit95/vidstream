@@ -4,7 +4,7 @@ const http = require('http');
 
 const queue = require('../common/node/queue');
 const REDUCE_QUEUE = process.env.REDUCE_QUEUE;
-const Executor = require('../common/node/executor');
+const {Executor} = require('../common/node/utils');
 const port = process.env.PORT || 8080;
 
 const HLS_BASE_URL = process.env.HLS_BASE_URL || '/api/stream/raw';

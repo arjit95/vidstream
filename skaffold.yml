@@ -4,6 +4,8 @@ build:
   artifacts:
     - image: registry.gitlab.com/arjit95/vidstream/vidstream-api
       context: src/api
+    - image: registry.gitlab.com/arjit95/vidstream/stream-service
+      context: src/streamservice
     - image: registry.gitlab.com/arjit95/vidstream/upload-service
       context: src
       docker: 
@@ -20,12 +22,18 @@ build:
       context: src
       docker: 
         dockerfile: transcodereducer/Dockerfile
-    - image: registry.gitlab.com/arjit95/vidstream/stream-service
-      context: src/streamservice    
-    - image: registry.gitlab.com/arjit95/vidstream/analytics-service
-      context: src/analytics
+    - image: registry.gitlab.com/arjit95/vidstream/metrics-service
+      context: src
+      docker: 
+        dockerfile: metrics/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/auth-service
+      context: src
+      docker: 
+        dockerfile: auth/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/vidstream-web
       context: src/web
+  local:
+    push: false
   tagPolicy:
     envTemplate:
         template: "{{.IMAGE_NAME}}:v1"
@@ -34,10 +42,14 @@ deploy:
     manifests:
       - deploy/kubectl/configmap.yml
       - deploy/kubectl/secrets.yml
+      - deploy/kubectl/elasticsearch.yml
+      - deploy/kubectl/mongo.yml
       - deploy/kubectl/uploadservice.yml
       - deploy/kubectl/streamservice.yml
       - deploy/kubectl/transcoder/master.yml
       - deploy/kubectl/transcoder/worker.yml
       - deploy/kubectl/transcoder/reducer.yml
+      - deploy/kubectl/metrics.yml
       - deploy/kubectl/api.yml
+      - deploy/kubectl/auth.yml
       - deploy/kubectl/frontend.yml

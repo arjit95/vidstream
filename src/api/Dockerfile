@@ -1,38 +1,14 @@
-############################
-# STEP 1 build executable binary
-############################
-# golang debian buster 1.14.1 linux/amd64
-# https://github.com/docker-library/golang/blob/master/1.14/buster/Dockerfile
-FROM golang@sha256:1e9c36b3fd7d7f9ab95835fb1ed898293ec0917e44c7e7d2766b4a2d9aa43da6 as builder
+FROM node:14-alpine3.12 as builder
 
-# Ensure ca-certficates are up to date
-RUN update-ca-certificates
+# Create app directory
+WORKDIR /usr/src/app
 
-ENV GOPATH=
+COPY package.json .
+COPY package-lock.json .
+RUN npm install --only=production
 
-# use modules
-COPY go.mod .
-
-ENV GO111MODULE=on
-RUN go mod download
+FROM gcr.io/distroless/nodejs:14
+COPY --from=builder /usr/src/app /usr/src/app
+WORKDIR /usr/src/app
 COPY . .
-
-# Build the static binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-      -ldflags='-w -s -extldflags "-static"' -a \
-      -o /go/bin/app .
-
-############################
-# STEP 2 build a small image
-############################
-# using static nonroot image
-# user:group is nobody:nobody, uid:gid = 65534:65534
-FROM gcr.io/distroless/static@sha256:c6d5981545ce1406d33e61434c61e9452dad93ecd8397c41e89036ef977a88f4
-
-# Copy our static executable
-COPY --from=builder /go/bin /go/bin
-
-WORKDIR /go/bin
-
-# Run the app binary.
-ENTRYPOINT ["/go/bin/app"]
+CMD [ "index.js" ]

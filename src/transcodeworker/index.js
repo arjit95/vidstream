@@ -2,7 +2,7 @@ const http = require('http');
 
 const queue = require('../common/node/queue');
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
-const Executor = require('../common/node/executor');
+const {Executor} = require('../common/node/utils');
 
 const port = process.env.PORT || 8080;
 
@@ -30,6 +30,11 @@ let enqueued = debounce(5000, function(context) {
     queueService.enqueue(process.env.REDUCE_QUEUE, {context});
 });
 
+/**
+ * Executes the command received from queue pipeline
+ * @param {Object} message
+ * @param {string} message.command The command to execute 
+ */
 async function encode(message) {
     enqueued.stop();
     try {
@@ -42,6 +47,10 @@ async function encode(message) {
     enqueued.start(message.context);
 }
 
+/**
+ * Starts the worker process, and attaches queue message
+ * processor.
+ */
 async function start() {
     queueService = await queue.newBuilder(process.env.QUEUE_SERVICE, process.env.QUEUE_USERNAME, process.env.QUEUE_PASSWORD);
 
