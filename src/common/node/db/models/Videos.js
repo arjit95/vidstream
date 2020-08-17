@@ -8,6 +8,6 @@ module.exports = {
      * @returns {Promise<mongoose.Model<mongoose.Document>>}
      */
     async init(db) {
-        return db.model('Videos', Video);
+        return db.model('videos', Video);
     }
 };

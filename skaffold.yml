@@ -36,6 +36,8 @@ build:
         dockerfile: auth/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/vidstream-web
       context: src/web
+    - image: registry.gitlab.com/arjit95/vidstream/spark-jobs
+      context: src/spark
   local:
     push: false
   tagPolicy:
@@ -58,3 +60,6 @@ deploy:
       - deploy/kubectl/api.yml
       - deploy/kubectl/auth.yml
       - deploy/kubectl/frontend.yml
+      - deploy/kubectl/spark/serviceaccount.yml
+      - deploy/kubectl/spark/recommender.yml
+      - deploy/kubectl/spark/trends.yml

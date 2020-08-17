@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const adapter = require('./adapter');
-const { Users, Videos, Comments, Channels } = require('./models');
+const { Users, Videos, Comments, Channels, Trending } = require('./models');
 
 /**
  * @typedef {Object} DBObj
@@ -8,12 +8,14 @@ const { Users, Videos, Comments, Channels } = require('./models');
  * @property {mongoose.Model<mongoose.Document>} Comments
  * @property {mongoose.Model<mongoose.Document>} Videos
  * @property {mongoose.Model<mongoose.Document>} Channels
+ * @property {mongoose.Model<mongoose.Document>} Trending
  */
 const dbObj = {
     Users: null,
     Comments: null,
     Videos: null,
-    Channels: null
+    Channels: null,
+    Trending: null
 };
 
 /**
@@ -30,6 +32,7 @@ module.exports.init = async () => {
         dbObj.Videos = await Videos.init(instance);
         dbObj.Comments = await Comments.init(instance);
         dbObj.Channels = await Channels.init(instance);
+        dbObj.Trending = await Trending.init(instance);
     } catch(err) {
         console.error(err);
         throw new Error('Cannot connect to mongoose instance');

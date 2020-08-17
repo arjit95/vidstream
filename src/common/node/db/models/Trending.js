@@ -1,13 +1,13 @@
-const {Channel} = require('../schema');
+const {Comment} = require('../schema');
 const mongoose = require('mongoose');
 
 module.exports = {
     /**
-     * Creates channel model 
+     * Creates trending model 
      * @param {mongoose.Connection} db Mongoose connection instance
      * @returns {Promise<mongoose.Model<mongoose.Document>>}
      */
     async init(db) {
-        return db.model('channels', Channel);
+        return db.model('trending', Comment);
     }
 };
