@@ -14,7 +14,7 @@ const localAuth = async (username, password) => {
         throw new Error('Invalid username/password');
     }
 
-    const token = jwt.sign({user: {usernmae: user.username, id: user.id}}, JWT_TOKEN_SECRET);
+    const token = jwt.sign({user: {username: user.username, id: user._id}}, JWT_TOKEN_SECRET);
     return token;
 };
 
@@ -25,7 +25,7 @@ router.post('/local', [
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
+          return res.status(400).json({ error: errors.array() });
         }
 
         const {username, password} = req.body;

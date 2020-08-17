@@ -7,6 +7,14 @@ module.export = {
             "user_id": {
                 "type": "keyword"
             },
+            "genres": {
+                "type": "dense_vector",
+                "dims": 5 
+            },
+            "tags": {
+                "type": "dense_vector",
+                "dims": 5 
+            },
             "model_factor": {
                 "type": "dense_vector",
                 "dims" : 20

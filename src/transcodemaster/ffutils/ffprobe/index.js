@@ -9,7 +9,11 @@ const ffprobeMeta = {
 class FFProbe {
     static getMetadata() {
         return `${Helpers.mergeCommandObj(ffprobeMeta)}`;
-    }    
+    }
+
+    static getDuration(metadata) {
+        return parseFloat(metadata.streams.find(({duration}) => duration).duration);
+    }
 }
 
 module.exports = FFProbe;

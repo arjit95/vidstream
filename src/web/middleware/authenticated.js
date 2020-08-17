@@ -1,6 +1,8 @@
-export default function ({ store, redirect }) {
-  // If the user is not authenticated
-  if (!store.state.auth.token) {
+const cookieparser = require('cookieparser')
+
+export default function ({ req, redirect }) {
+  const parsed = cookieparser.parse(req.headers.cookie || '')
+  if (!parsed.token) {
     return redirect('/login')
   }
 }

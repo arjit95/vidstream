@@ -1,25 +1,42 @@
 const mongoose = require('mongoose');
 const getDate = () => new Date().toISOString();
 const User = require('./User');
-const Channel = require('./Channel');
 
 const Schema = new mongoose.Schema({
+    _id: {
+        required: true,
+        type: String
+    },
     title: { // Title of the video
         required: true,
         type: String
     },
-    channel: Channel,
+    description: {
+        type: String
+    },
+    channel: {
+        type: String,
+        required: true
+    },
     views: {
         type: Number,
         default: 0
     },
-    user: User,
     uploaded: {
         type: Date,
         default: getDate
     },
     tags: [String],
-    genres: [String]
+    genres: [String],
+    listing: {
+        type: String,
+        enum: ['private', 'public', 'unlisted'],
+        default: 'public'
+    },
+    uploading: {
+        type: Boolean,
+        default: true
+    }
 });
 
 module.exports = Schema;

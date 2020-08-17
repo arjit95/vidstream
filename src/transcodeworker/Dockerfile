@@ -1,4 +1,4 @@
-FROM node:14-alpine3.12 as builder
+FROM node:14-alpine3.12
 
 RUN apk add --no-cache ffmpeg
 
@@ -19,13 +19,8 @@ COPY common/node/package.json .
 COPY common/node/package-lock.json .
 RUN npm install --only=production
 
-FROM gcr.io/distroless/nodejs:14
-COPY --from=builder /usr/src /usr/src
-COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
-COPY --from=builder /usr/bin/mt /usr/bin/mt
-
 COPY transcodeworker/ /usr/src/app
 COPY common/node/ /usr/src/common/node
 
 WORKDIR /usr/src/app
-CMD [ "index.js" ]
+ENTRYPOINT [ "node", "index.js" ]

@@ -12,5 +12,5 @@ This guide assumes you have a running kubernetes cluster and have > 8GB RAM.
 #### TODO
 - Connect client ui to services
 - Add spark jobs for calculating trending videos, user recommendations.
-- Add elasticsearch for searching through videos
+- ~~Add elasticsearch for searching through videos~~
 - Build basic user flows involving database

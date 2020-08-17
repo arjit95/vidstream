@@ -76,6 +76,16 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-snackbar v-model="snackbar" :timeout="timeout" top center>
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="accent" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -91,6 +101,9 @@ export default {
   middleware: 'notAuthenticated',
   data() {
     return {
+      snackbar: false,
+      timeout: 2000,
+      text: null,
       login: {
         username: '',
         password: '',
@@ -102,24 +115,29 @@ export default {
       },
     }
   },
+
   methods: {
+    showError(message) {
+      this.text = message
+      this.snackbar = true
+    },
+
     async doRegister() {
       const response = await this.$sdk.Auth.register(this.register)
       if (response.error) {
-        return alert(response.error)
+        return this.showError(response.error)
       }
 
-      alert('Register')
+      this.$router.push('/')
     },
 
     async doLogin() {
       const response = await this.$sdk.Auth.login(this.login)
       if (response.error) {
-        return alert(response.error)
+        return this.showError(response.error)
       }
 
-      this.$store.auth.commit('setAuth', response.token)
-      // this.$router.push('/')
+      this.$router.push('/')
     },
   },
 }

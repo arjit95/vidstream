@@ -4,8 +4,8 @@ build:
   artifacts:
     - image: registry.gitlab.com/arjit95/vidstream/vidstream-api
       context: src/api
-    - image: registry.gitlab.com/arjit95/vidstream/stream-service
-      context: src/streamservice
+    - image: registry.gitlab.com/arjit95/vidstream/assets-service
+      context: src/assetsservice
     - image: registry.gitlab.com/arjit95/vidstream/upload-service
       context: src
       docker: 
@@ -18,6 +18,10 @@ build:
       context: src
       docker: 
         dockerfile: transcodeworker/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/metadata-service
+      context: src
+      docker: 
+        dockerfile: metadata/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/transcode-reducer
       context: src
       docker: 
@@ -45,7 +49,8 @@ deploy:
       - deploy/kubectl/elasticsearch.yml
       - deploy/kubectl/mongo.yml
       - deploy/kubectl/uploadservice.yml
-      - deploy/kubectl/streamservice.yml
+      - deploy/kubectl/assetsservice.yml
+      - deploy/kubectl/metadataservice.yml
       - deploy/kubectl/transcoder/master.yml
       - deploy/kubectl/transcoder/worker.yml
       - deploy/kubectl/transcoder/reducer.yml

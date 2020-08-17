@@ -4,14 +4,15 @@ kind: ConfigMap
 metadata:
     name: network-config
 data:
-    API_SERVICE_ADDR: http://api-service:8080
-    UPLOAD_SERVICE_ADDR: http://upload-service:8080
+    API_SERVICE_ADDR: http://localhost:32767
     QUEUE_SERVICE: amqp://rabbitmq:5672
-    STREAM_SERVICE_ADDR: http://stream-service:8080
     DB_SERVICE_ADDR: mongodb://mongodb:27017
-    ELASTICSEARCH_ADDR: https://elasticsearch:9200
+    ELASTICSEARCH_ADDR: http://elasticsearch:9200
     LOGGER_SERVICE_ADDR: tcp://fluentd-service:24224
+    ASSETS_SERVICE_ADDR: http://assets-service:8080
+    UPLOAD_SERVICE_ADDR: http://upload-service:8080
     AUTH_SERVICE_ADDR: http://auth-service:8080
+    METADATA_SERVICE_ADDR: http://metadata-service:8080
     METRICS_SERVICE_ADDR: http://metrics-service:8080
 ---
 
@@ -30,6 +31,7 @@ metadata:
 data:
     UPLOAD_DIR: /data/uploads
     CONVERTED_DIR: /data/converted
+    ASSETS_DIR: /data/assets
     DB_NAME: vidstream
 
 ---

@@ -19,16 +19,23 @@ const createEntries = async function(username, password, email) {
     const metricsInstance = await metrics.init();
     const dbInstance = await db.init();
 
-    const {metadata} = await metricsInstance.Users.create({name: username, username});
+    const {metadata} = await metricsInstance.Users.create({name: username, username})
     const userID = metadata._id;
-    return dbInstance.Users.create({
+    const response = await dbInstance.Users.create({
         name: username,
         username,
         password: hash,
-        id: userID,
+        _id: userID,
         email: email,
         source: 'local'
-    }).exec();
+    });
+
+    await dbInstance.Channels.create({
+        title: username,
+        user: userID
+    });
+
+    return response;
 }
 
 router.post('/local', [
@@ -49,9 +56,10 @@ router.post('/local', [
         }
     
         const user = await createEntries(req.body.username, req.body.password, req.body.email);
-        const token = await jwt.sign({user: {usernmae: user.username, id: user.id}}, JWT_TOKEN_SECRET);
+        const token = await jwt.sign({user: {username: user.username, id: user._id}}, JWT_TOKEN_SECRET);
         return res.status(200).json({token});
     } catch (err) {
+        console.error(err.stack);
         console.error(`Error occurred while completing registration request: ${err.message}`);
         res.status(500).json({error: 'Cannot complete your request'});
     }

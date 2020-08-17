@@ -15,6 +15,26 @@ const dbObj = {
 };
 
 /**
+ * 
+ * @param {import('./models/Model')} instance
+ * @param {import('@elastic/elasticsearch').Client} client
+ */
+async function createIndex(instance, client) {
+    const response = await client.indices.exists({
+        index: instance.index
+    });
+
+    if (response.statusCode === 200) {
+        return;
+    }
+
+    await client.indices.create({
+      index: instance.index,
+      body: instance.schema
+    });
+}
+
+/**
  * Initializes the metrics server
  * @returns {Promise<ElasticObj>}
  */
@@ -23,10 +43,14 @@ module.exports.init = async () => {
         return dbObj;
     }
 
-    const instance = await adapter.getInstance();
-    dbObj.Users = new Users(instance);
-    dbObj.Videos = new Videos(instance);
-    dbObj.Watch = new Watch(instance);
+    const client = await adapter.getInstance();
+    dbObj.Users = new Users(client);
+    dbObj.Videos = new Videos(client);
+    dbObj.Watch = new Watch(client);
+
+    await createIndex(dbObj.Users, client);
+    await createIndex(dbObj.Videos, client);
+    await createIndex(dbObj.Watch, client);
 
     return dbObj;
 }

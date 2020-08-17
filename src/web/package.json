@@ -17,6 +17,7 @@
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.19",
     "nuxt": "^2.14.0",
+    "nuxt-env": "^0.1.0",
     "video.js": "^7.8.4",
     "videojs-contrib-quality-levels": "^2.0.9",
     "videojs-hls-quality-selector": "^1.1.1",

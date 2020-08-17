@@ -1,6 +1,7 @@
 const {Client} = require('@elastic/elasticsearch');
 const Schema = require('../schema/User');
 const Model = require('./Model');
+const utils = require('../../utils');
 
 /**
  * Allows to manage User index in elasticsearch database 
@@ -14,7 +15,7 @@ class Users extends Model {
      */
     constructor(client) {
         super(client);
-        this.index = 'Users';
+        this.index = 'users';
         this.schema = Schema;
     }
 
@@ -27,6 +28,7 @@ class Users extends Model {
     async create(userInfo) {
         const response = await this.client.create({
             index: this.index,
+            id: utils.Common.generateUniqueId(),
             body: {
                 username: userInfo.username,
                 name: userInfo.name

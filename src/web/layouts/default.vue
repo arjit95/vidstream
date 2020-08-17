@@ -64,8 +64,19 @@
         <nuxt />
       </v-responsive>
     </v-main>
+
+    <v-snackbar v-model="errorDisplay" timeout="2000" top right>
+      {{ errorText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="accent" text v-bind="attrs" @click="errorDisplay = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
+
 <style lang="scss">
 #app a {
   color: inherit;
@@ -110,6 +121,8 @@ export default {
     isLoading: false,
     drawer: null,
     isSearchShown: false,
+    errorText: null,
+    errorDisplay: false,
     items: [
       { icon: 'mdi-trending-up', title: 'Most Popular' },
       { icon: 'mdi-youtube-subscription', title: 'Subscriptions' },
@@ -150,6 +163,9 @@ export default {
         event.state
           ? this.$refs.overlay.classList.remove('lights-off')
           : this.$refs.overlay.classList.add('lights-off')
+      } else if (event.action === 'error') {
+        this.errorDisplay = true
+        this.errorText = event.message
       }
     },
     toggleSearch() {

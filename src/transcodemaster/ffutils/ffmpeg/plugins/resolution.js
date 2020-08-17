@@ -12,6 +12,10 @@ const audioConfig = {
     },
 };
 
+const posterConfig = {
+    'vframes': 1
+};
+
 const subtitleConfig = {
     common: {
         "y": "",
@@ -114,10 +118,6 @@ class Video extends Base {
 }
 
 class Audio extends Base {
-    constructor() {
-        super();
-    }
-
     getCommand() {
         const config = Object.assign({}, audioConfig.common, this.params);
         return Helpers.mergeCommandObj(config);
@@ -131,10 +131,18 @@ class Subtitle extends Audio {
     }
 }
 
+class Poster extends Base {
+    getCommand() {
+        const config = Object.assign({}, posterConfig, this.params);
+        return Helpers.mergeCommandObj(config);
+    }
+}
+
 const Resolution = {};
 Resolution.Video = Video;
 Resolution.Audio = Audio;
 Resolution.Subtitle = Subtitle;
+Resolution.Poster = Poster;
 Resolution.DefaultResolutions = [1440, 1080, 720, 480, 360, 240];
 
 module.exports = Resolution;

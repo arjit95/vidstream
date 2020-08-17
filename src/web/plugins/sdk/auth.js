@@ -1,22 +1,38 @@
 export default class {
-  constructor({ store, $axios }) {
+  constructor({ store }, api) {
     this.store = store
-    this.$axios = $axios
+    this.api = api
   }
 
-  login({ username, password }) {
-    return this.$axios.post('/api/auth/login/local', {
-      username,
-      password,
-    })
+  async login({ username, password }) {
+    try {
+      const response = await this.api.post('/api/auth/login/local', {
+        username,
+        password,
+      })
+
+      this.store.commit('auth/setAuth', response.data.token)
+      return { error: null }
+    } catch (err) {
+      return { error: err.response.data.error }
+    }
   }
 
-  register({ username, password, email }) {
-    return this.$axios.post('/api/auth/register/local', {
-      username,
-      password,
-      email,
-    })
+  async register({ username, password, email }) {
+    try {
+      const response = await this.api.post('/api/auth/register/local', {
+        username,
+        password,
+        email,
+      })
+
+      if (response.status === 200) {
+        this.store.commit('auth/setAuth', response.data.token)
+        return { error: null }
+      }
+    } catch (err) {
+      return { error: err.response.data.error }
+    }
   }
 
   isLoggedIn() {

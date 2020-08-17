@@ -95,13 +95,22 @@ export default {
       related: [],
       comments: [],
       commentsLoaded: false,
-      async onVideoPlayerReady(player) {
-        await wait(2000)
+
+      onVideoPlayerReady(player) {
+        const vi = this.$route.params.vi
+        const apiURL = this.$env.API_URL
+
+        player.poster(`${apiURL}/api/assets/video/image/${vi}/poster.png`)
         player.src({
-          src:
-            'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+          src: `${apiURL}/api/assets/video?stream=${vi}/video.m3u8`,
           type: 'application/x-mpegURL',
         })
+
+        player.vttThumbnails({
+          src: `${apiURL}/api/assets/video/image/${vi}/thumb.vtt`,
+        })
+
+        return this.$sdk.Video.getInfo(vi) // TODO: consume this later
       },
     }
   },

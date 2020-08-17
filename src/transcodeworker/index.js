@@ -1,4 +1,5 @@
 const http = require('http');
+const fs = require('fs');
 
 const queue = require('../common/node/queue');
 const CONVERT_QUEUE = process.env.CONVERT_QUEUE;
@@ -8,43 +9,29 @@ const port = process.env.PORT || 8080;
 
 let queueService;
 
-function debounce(timeout, cb) {
-    let timer, self = this;
-    let debounced = {
-        stop: function() {
-            clearTimeout(timer);
-            timer = null;
-        },
-
-        start: function() {
-            let args = arguments;
-            timer = setTimeout(() => cb.apply(self, args), timeout);
-        }
-    };
-
-    return debounced;
-}
-
-// Send message after 5s if there are no more videos
-let enqueued = debounce(5000, function(context) {
-    queueService.enqueue(process.env.REDUCE_QUEUE, {context});
-});
-
 /**
  * Executes the command received from queue pipeline
  * @param {Object} message
- * @param {string} message.command The command to execute 
+ * @param {string} message.command The command to execute
+ * @param {object} message.context Context related to job
  */
 async function encode(message) {
-    enqueued.stop();
     try {
         await Executor.exec(message.command);
+
+        if (message.fileName && fs.existsSync(message.fileName + '.tmp')) {
+            fs.unlinkSync(message.fileName + '.tmp');            
+        }
     } catch(err) {
-        console.dir(message);
+        console.log(err);
         return;
     }
-    
-    enqueued.start(message.context);
+
+    const isPending = fs.readdirSync(message.context.target).some(file => file.endsWith('.tmp'));
+    if (!isPending) {
+        console.log(`All jobs completed forwarding: ${process.env.REDUCE_QUEUE}`);
+        queueService.enqueue(process.env.REDUCE_QUEUE, {context: message.context});
+    }
 }
 
 /**

@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const getDate = () => new Date().toISOString();
 
 const Schema = new mongoose.Schema({
+    _id: {
+        type: String,
+        required: true,
+    },
     name: { // Name of the user
         type: String,
         required: true
-    },
-    id: {  // Id for the user, should match elastic search
-        type: String,
-        required: true 
     },
     joined: {  // Date when user registered
         type: Date,
@@ -28,12 +28,6 @@ const Schema = new mongoose.Schema({
         required: true
     },
     source: String, // Account source local/google etc.
-    meta: {
-        subscribers: {
-            type: Number,
-            default: 0
-        }
-    },
     roles: {
         type: [String],
         default: null

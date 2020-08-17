@@ -1,4 +1,4 @@
-const cookieparser = process.server ? require('cookieparser') : undefined
+const Cookies = process.client ? require('js-cookie') : undefined
 
 export const state = () => {
   return {
@@ -6,21 +6,10 @@ export const state = () => {
   }
 }
 export const mutations = {
-  setAuth(state, auth) {
-    state.token = auth
-  },
-}
-export const actions = {
-  nuxtServerInit({ commit }, { req }) {
-    let token = null
-    if (req.headers.cookie) {
-      const parsed = cookieparser.parse(req.headers.cookie)
-      try {
-        token = JSON.parse(parsed.token)
-      } catch (err) {
-        // No valid cookie found
-      }
+  setAuth(state, token) {
+    state.token = token
+    if (typeof Cookies !== 'undefined') {
+      Cookies.set('token', token)
     }
-    commit('auth/setAuth', token)
   },
 }

@@ -57,7 +57,17 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/axios'],
+  modules: [
+    '@nuxtjs/axios',
+    [
+      'nuxt-env',
+      {
+        keys: [
+          { key: 'API_URL', default: process.env.API_SERVICE_ADDR }, // Specify a default value
+        ],
+      },
+    ],
+  ],
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -66,6 +76,9 @@ export default {
     customVariables: ['~/assets/variables.scss'],
     treeShake: true,
     theme: {
+      options: {
+        customProperties: true,
+      },
       dark: true,
       themes: {
         dark: {
@@ -98,9 +111,5 @@ export default {
   server: {
     port: process.env.PORT || 3000,
     host: '0.0.0.0',
-  },
-
-  axios: {
-    baseURL: process.env.API_SERVICE_ADDR || 'http://localhost:3000',
   },
 }

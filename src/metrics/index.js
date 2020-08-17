@@ -93,6 +93,6 @@ start()
     })
     .catch((err) => {
         console.error('Cannot start metrics service');
-        console.error(err);
+        console.error(JSON.stringify(err, null, 4));
         process.exit(1);
     });

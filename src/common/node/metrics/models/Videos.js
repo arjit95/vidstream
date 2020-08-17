@@ -1,6 +1,7 @@
 const {Client} = require('@elastic/elasticsearch');
 const Schema = require('../schema/Video');
 const Model = require('./Model');
+const utils = require('../../utils');
 
 /**
  * Allows to manage Videos index in elasticsearch database 
@@ -13,7 +14,7 @@ class Videos extends Model {
      */
     constructor(client) {
         super(client);
-        this.index = 'Videos';
+        this.index = 'videos';
         this.schema = Schema;
     }
 
@@ -27,6 +28,7 @@ class Videos extends Model {
     async create(videoInfo) {
         const response = await this.client.create({
             index: this.index,
+            id: utils.Common.generateUniqueId(),
             body: {
                 title: videoInfo.title,
                 genres: videoInfo.genres,

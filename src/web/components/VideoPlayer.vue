@@ -102,6 +102,14 @@
     z-index: 12;
     background-color: rgba(43, 51, 63, 0.9);
   }
+
+  .vjs-vtt-thumbnail-display {
+    position: absolute;
+    bottom: 60px;
+    width: 120px !important;
+    height: 60px !important;
+    margin-left: -60px !important;
+  }
 }
 
 .player-container:fullscreen {
@@ -259,7 +267,6 @@ class PlayerUtils {
 
     this.info.addEventListener('click', clickHandler)
     this.video.addEventListener('mousemove', this.hideInfoScreen.bind(this))
-    this.info.addEventListener('mousemove', this.hideInfoScreen.bind(this))
 
     player.on('playing', () => {
       this.info.classList.add('d-none')
@@ -329,12 +336,22 @@ export default {
       })
 
       utils.addListeners()
+    })
+
+    this.player.on('loadeddata', () => {
       this.isLoading = false
     })
 
-    Promise.resolve(this.onReady(this.player)).then(() => {
-      this.player.hlsQualitySelector()
-    })
+    Promise.resolve(this.onReady(this.player))
+      .then((response) => {
+        this.player.hlsQualitySelector()
+      })
+      .catch((err) => {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: err.message,
+        })
+      })
   },
 
   beforeDestroy() {

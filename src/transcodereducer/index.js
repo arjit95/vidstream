@@ -7,7 +7,7 @@ const REDUCE_QUEUE = process.env.REDUCE_QUEUE;
 const {Executor} = require('../common/node/utils');
 const port = process.env.PORT || 8080;
 
-const HLS_BASE_URL = process.env.HLS_BASE_URL || '/api/stream/raw';
+const HLS_BASE_URL = process.env.HLS_BASE_URL || '/api/assets/video';
 
 let queueService;
 
@@ -32,7 +32,7 @@ function getSplitCommand(videoDir, resolutions, context, duration = 6) {
     for (let audioFile of audioFiles) {
         const dirName = path.basename(audioFile.fileName, '.mp4');
         const dirPath = path.join(videoDir, dirName);
-        const filePath = path.join(videoDir, audioFile.fileName);
+        const filePath = audioFile.fileName;
 
         command += `'in=${filePath},stream=audio,init_segment=${path.join(dirPath, 'init.mp4')},`;
         command += `segment_template=${path.join(dirPath, '$Number$.m4s')},playlist_name=${path.join(dirPath, 'playlist.m3u8')},hls_name=${audioFile.language.toUpperCase()},hls_group_id=audio' `;
@@ -42,7 +42,7 @@ function getSplitCommand(videoDir, resolutions, context, duration = 6) {
     for (let subtitleFile of subtitleFiles) {
         const dirName = path.basename(subtitleFile.fileName, '.vtt');
         const dirPath = path.join(videoDir, dirName);
-        const filePath = path.join(videoDir, subtitleFile.fileName);
+        const filePath = subtitleFile.fileName;
 
         command += `'in=${filePath},stream=text,`;
         command += `segment_template=${path.join(dirPath, '$Number$.vtt')},playlist_name=${path.join(dirPath, 'main.m3u8')},hls_name=${subtitleFile.language.toUpperCase()},hls_group_id=text' `;
@@ -50,7 +50,7 @@ function getSplitCommand(videoDir, resolutions, context, duration = 6) {
 
     const videoId = path.basename(videoDir);
     command += `--segment_duration ${duration} --hls_master_playlist_output ${path.resolve(videoDir, "video.m3u8")} `;
-    command += `--hls_base_url ${HLS_BASE_URL}?path=${videoId}/`;
+    command += `--hls_base_url ${HLS_BASE_URL}?stream=${videoId}/`;
 
     return command;
 }
@@ -60,15 +60,11 @@ async function reduce({context}) {
     context.jobs.forEach((job) => {
         if (job.type !== 'video') return;
 
-        const regex = /"(.*?)"/g;
-        const output = [...job.command.matchAll(regex)];
-
-        const filePath = output[output.length - 1][1]; 
-        const parts = filePath.split('_');
+        const parts = job.fileName.split('_');
         const resolution = parts[parts.length - 2]; // filename_resolution_part.mp4
         resolutions[resolution] = resolutions[resolution] || [];
 
-        resolutions[resolution].push(filePath);
+        resolutions[resolution].push(job.fileName);
     });
 
     const binary = Executor.getBinary('ffmpeg');
@@ -106,9 +102,9 @@ async function reduce({context}) {
     }
 
     for (let job of context.jobs) {
-        if (job.type === 'video' || job.type === 'thumbnail') continue;
+        if (['video', 'thumbnail', 'poster'].includes(job.type)) continue;
 
-        const filePath = path.join(context.target, job.fileName);
+        const filePath = job.fileName;
         fs.unlinkSync(filePath);
     }
 }
@@ -167,4 +163,5 @@ const server = http.createServer(function(req, res) {
             break;
     }
 });
-server.listen(port, start);
+
+start().then(() => server.listen(port));

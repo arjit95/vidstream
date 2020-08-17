@@ -7,10 +7,7 @@ spec:
   - ReadWriteMany
   capacity:
     storage: 1Gi
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: upload-pvc
   storageClassName: nfs
   hostPath:
-    path: /data/nfs
+    path: /home/arjit/nfs
   persistentVolumeReclaimPolicy: Delete

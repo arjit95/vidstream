@@ -1,29 +1,26 @@
-const path = require('path');
-const fs = require('fs');
-const { pipeline } = require('stream');
+const util = require('util');
+const pipeline = util.promisify(require('stream').pipeline);
 
-const crypto = require('crypto');
 const Busboy = require('busboy');
 const http = require('http');
+const url = require('url');
 
 const Queue = require('../common/node/queue');
 let queueService;
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
 const TRANSCODE_QUEUE = process.env.TRANSCODE_QUEUE || 'transcode_queue';
 
-function makeid(len) {
-    let text = "";
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  
-    for (let i = 0; i < len; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-  
-    return text;
-}
+const User = require('./user');
+const Video = require('./video');
 
-function upload(req, res) {
-    let savedFileName, parser;
+/**
+ * Single wrapper around the upload utils
+ * @param {http.IncomingMessage} req 
+ * @param {http.ServerResponse} res 
+ * @param {import('./upload.d').MethodResponse} uploadCb
+ */
+async function upload(req, res, uploadCb) {
+    let parser;
     
     try {
         parser = new Busboy({headers: req.headers});
@@ -34,34 +31,40 @@ function upload(req, res) {
         return;
     }
 
-    parser.on('file', function(field, file, filename) {
-        const ext = path.extname(filename);
-        savedFileName = crypto.createHash('md5').update((filename + Date.now().toString().substring(5) + makeid(5))).digest('hex');
-        savedFileName = savedFileName.substring(savedFileName.length - 10) + ext; 
-        console.info("Generated file " + savedFileName);
+    const context = {
+        queue: queueService,
+        fields: {},
+        req
+    };
 
-        pipeline(
-            file,
-            fs.createWriteStream(path.resolve(UPLOAD_DIR, savedFileName)),
-            (err) => {
-                if (err) {
-                    res.writeHead(500);
-                    res.write('Unable to save file');
-                    fs.unlinkSync(savedFileName);
-                    res.end();
-                    console.log(pumpErr);
-                }
-            }
-        );
+    parser.on('field', function(name, value) {
+        context.fields[name] = value;
     });
 
-    parser.on('finish', function() {
-        if (res.headersSent) {
-            return;
+    let error;
+    parser.on('file', async function(field, file, filename) {
+        const ws = uploadCb.onStream({...context, filename});
+        pipeline(file, ws).catch(err => error = err);
+    });
+
+    parser.on('finish', async function() {
+        try {
+            if (error) {
+                throw error;
+            }
+            
+            await uploadCb.validate?.(context);
+            await uploadCb.onFinish?.(context);
+        } catch(err) {
+            if (typeof uploadCb.onError === 'function') {
+                await uploadCb.onError(context)
+            }
+
+            res.statusCode = 500;
+            res.write(err.message);
+            return res.end();
         }
 
-        console.debug('Upload completed');
-        queueService.enqueue(TRANSCODE_QUEUE, {name: savedFileName});
         res.statusCode = 200;
         res.end();
     });
@@ -70,21 +73,28 @@ function upload(req, res) {
 }
 
 const server = http.createServer(function(req, res) {
-    switch(req.url) {
-        case '/api/upload/echo':
-        case '/_healthz':
-            res.statusCode = 200;
-            res.write('ok');
-            res.end();
-            break;
-        case '/api/upload':
-            upload(req, res);
-            break;
-        default:
-            res.statusCode = 404;
-            res.write('not found');
-            res.end();
+    const userFn = {
+        '/api/upload/video': Video.upload,
+        '/api/upload/user/profile': User.profile,
+        '/api/upload/user/channel': User.channel,
+        '/api/upload/user/channel/banner': User.channelBanner
+    };
+
+    const pathname = url.parse(req.url, true).pathname
+    if (pathname === '/_healthz') {
+        res.statusCode = 200;
+        res.write('ok');
+        return res.end();
     }
+
+    if (userFn[pathname]) {
+        const method = userFn[pathname];
+        return upload(req, res, method());
+    }
+
+    res.statusCode = 404;
+    res.write('not found');
+    res.end();
 });
 
 const port = process.env.PORT || 8080;
@@ -92,10 +102,6 @@ server.listen(port, '0.0.0.0', async function() {
     console.log("Server running on " + port);
 
     queueService = await Queue.newBuilder(process.env.QUEUE_SERVICE, process.env.QUEUE_USERNAME, process.env.QUEUE_PASSWORD);
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR);
-    }
-
     queueService.assert(TRANSCODE_QUEUE);
 });
 
@@ -106,7 +112,6 @@ function exitHandler() {
             queueService.disconnect();
         }
     } catch (err) {}
-    
 
     process.exit();
 }
