@@ -5,12 +5,12 @@ export default {
    ** Nuxt rendering mode
    ** See https://nuxtjs.org/api/configuration-mode
    */
-  mode: 'universal',
+  mode: 'spa',
   /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
-  target: 'server',
+  target: 'static',
   /*
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head
@@ -57,17 +57,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: [
-    '@nuxtjs/axios',
-    [
-      'nuxt-env',
-      {
-        keys: [
-          { key: 'API_URL', default: process.env.API_SERVICE_ADDR }, // Specify a default value
-        ],
-      },
-    ],
-  ],
+  modules: ['@nuxtjs/axios', '@nuxtjs/apollo'],
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -111,5 +101,20 @@ export default {
   server: {
     port: process.env.PORT || 3000,
     host: '0.0.0.0',
+  },
+
+  publicRuntimeConfig: {
+    apiURL: process.env.API_SERVICE_ADDR,
+  },
+
+  privateRuntimeConfig: {
+    apiURL: process.env.API_SERVICE_ADDR,
+  },
+
+  apollo: {
+    clientConfigs: {
+      default: '~/plugins/sdk/config/metadata.js',
+      auth: '~/plugins/sdk/config/auth.js',
+    },
   },
 }

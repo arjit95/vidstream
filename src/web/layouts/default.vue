@@ -1,6 +1,6 @@
 <template>
   <v-app :is-dark="darkMode">
-    <nav-drawer :items="items"></nav-drawer>
+    <nav-drawer></nav-drawer>
 
     <v-app-bar class="app-bar" clipped-left app fixed elevate-on-scroll dense>
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
@@ -51,6 +51,32 @@
                   </v-list-item-action>
                   <v-list-item-title>Dark Mode</v-list-item-title>
                 </v-list-item>
+                <div v-if="this.$store.state.auth.token">
+                  <v-list-item
+                    v-for="link in registeredNavLinks"
+                    :key="link.title"
+                    link
+                    @click="link.click"
+                  >
+                    <v-list-item-action>
+                      <v-icon> {{ link.icon }} </v-icon>
+                    </v-list-item-action>
+                    <v-list-item-title> {{ link.title }} </v-list-item-title>
+                  </v-list-item>
+                </div>
+                <div v-else>
+                  <v-list-item
+                    v-for="link in anonNavLinks"
+                    :key="link.title"
+                    link
+                    @click="link.click"
+                  >
+                    <v-list-item-action>
+                      <v-icon> {{ link.icon }} </v-icon>
+                    </v-list-item-action>
+                    <v-list-item-title> {{ link.title }} </v-list-item-title>
+                  </v-list-item>
+                </div>
               </v-list>
             </v-card>
           </v-menu>
@@ -108,29 +134,38 @@
 import _ from 'lodash'
 import NavDrawer from '~/components/NavDrawer'
 
-const Cookie = process.client ? require('js-cookie') : undefined
 export default {
   name: 'App',
   components: {
     NavDrawer,
   },
-  data: () => ({
-    searchQuery: null,
-    search: null,
-    searchResults: [],
-    isLoading: false,
-    drawer: null,
-    isSearchShown: false,
-    errorText: null,
-    errorDisplay: false,
-    items: [
-      { icon: 'mdi-trending-up', title: 'Most Popular' },
-      { icon: 'mdi-youtube-subscription', title: 'Subscriptions' },
-      { icon: 'mdi-history', title: 'History' },
-      { icon: 'mdi-playlist-play', title: 'Playlists' },
-      { icon: 'mdi-clock', title: 'Watch Later' },
-    ],
-  }),
+  middleware: 'tokenRefresh',
+  data() {
+    return {
+      searchQuery: null,
+      search: null,
+      searchResults: [],
+      isLoading: false,
+      drawer: null,
+      isSearchShown: false,
+      errorText: null,
+      errorDisplay: false,
+      registeredNavLinks: [
+        {
+          title: 'Logout',
+          click: this.doLogout,
+          icon: 'mdi-exit-to-app',
+        },
+      ],
+      anonNavLinks: [
+        {
+          title: 'Login',
+          click: () => this.$router.push('/login'),
+          icon: 'mdi-account',
+        },
+      ],
+    }
+  },
   computed: {
     darkMode: {
       get() {
@@ -171,9 +206,9 @@ export default {
     toggleSearch() {
       this.isSearchShown = !this.isSearchShown
     },
-    doLogout() {
-      Cookie.remove('token')
-      this.$store.commit('auth/setAuth', null)
+    async doLogout() {
+      await this.$sdk.Auth.logout()
+      this.$router.push('/')
     },
     toggleDrawer() {
       this.drawer = !this.drawer

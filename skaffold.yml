@@ -3,9 +3,13 @@ kind: Config
 build:
   artifacts:
     - image: registry.gitlab.com/arjit95/vidstream/vidstream-api
-      context: src/api
+      context: src
+      docker:
+        dockerfile: api/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/assets-service
-      context: src/assetsservice
+      context: src
+      docker:
+        dockerfile: assetsservice/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/upload-service
       context: src
       docker: 
@@ -34,8 +38,6 @@ build:
       context: src
       docker: 
         dockerfile: auth/Dockerfile
-    - image: registry.gitlab.com/arjit95/vidstream/vidstream-web
-      context: src/web
     - image: registry.gitlab.com/arjit95/vidstream/spark-jobs
       context: src/spark
   local:
@@ -49,7 +51,7 @@ deploy:
       - deploy/kubectl/configmap.yml
       - deploy/kubectl/secrets.yml
       - deploy/kubectl/elasticsearch.yml
-      - deploy/kubectl/mongo.yml
+      - deploy/kubectl/mysql.yml
       - deploy/kubectl/uploadservice.yml
       - deploy/kubectl/assetsservice.yml
       - deploy/kubectl/metadataservice.yml
@@ -59,7 +61,6 @@ deploy:
       - deploy/kubectl/metrics.yml
       - deploy/kubectl/api.yml
       - deploy/kubectl/auth.yml
-      - deploy/kubectl/frontend.yml
       - deploy/kubectl/spark/serviceaccount.yml
       - deploy/kubectl/spark/recommender.yml
       - deploy/kubectl/spark/trends.yml

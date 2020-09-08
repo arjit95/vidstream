@@ -1,0 +1,11 @@
+{
+    "plugins": [
+      ["module-resolver", {
+        "root": ["./src"],
+        "alias": {
+          "@me/common": "../common/node/src"
+        },
+        "logLevel": "info"
+      }]
+    ]
+  }

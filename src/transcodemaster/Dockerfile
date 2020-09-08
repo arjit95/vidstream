@@ -1,21 +1,23 @@
+FROM node:14-alpine3.12 as builder
+
+COPY common/node/package.json common/node/yarn.lock /usr/src/common/node/
+RUN yarn --cwd /usr/src/common/node --frozen-lockfile install
+
+COPY transcodemaster/package.json transcodemaster/yarn.lock /usr/src/app/
+RUN yarn --cwd /usr/src/app/ --frozen-lockfile install
+
+WORKDIR /usr/src
+COPY tsconfig.json .
+COPY common/node common/node/
+COPY transcodemaster/ app/
+
+RUN yarn --cwd app/ build --transpileOnly --format cjs --target node
+RUN yarn --cwd app/ install --production --offline --frozen-lockfile
+RUN rm -rf app/src
+
 FROM node:14-alpine3.12
 
-RUN apk add --no-cache ffmpeg
+WORKDIR /usr/src
+COPY --from=builder /usr/src/app .
 
-# Create app directory
-WORKDIR /usr/src/app
-COPY transcodemaster/package.json .
-COPY transcodemaster/package-lock.json .
-RUN npm install --only=production
-
-# Create common directory
-WORKDIR /usr/src/common/node/
-COPY common/node/package.json .
-COPY common/node/package-lock.json .
-RUN npm install --only=production
-
-COPY transcodemaster/ /usr/src/app
-COPY common/node/ /usr/src/common/node
-
-WORKDIR /usr/src/app
-ENTRYPOINT [ "node", "index.js" ]
+CMD [ "node", "dist/index.js" ]

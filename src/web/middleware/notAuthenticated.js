@@ -1,8 +1,19 @@
-const cookieparser = require('cookieparser')
+export default async function ({ store, $sdk, redirect }) {
+  const expiry = store.state.auth.expiry
+  const now = Date.now()
+  if (expiry && expiry > now) {
+    redirect('/')
+    return
+  }
 
-export default function ({ req, redirect }) {
-  const parsed = cookieparser.parse(req.headers.cookie || '')
-  if (parsed.token) {
-    return redirect('/')
+  if (store.state.app.userInfo.isLoggedIn) {
+    redirect('/')
+    return
+  }
+
+  // Successful refresh
+  const { error } = await $sdk.Auth.refresh()
+  if (!error) {
+    return redirect('/login')
   }
 }

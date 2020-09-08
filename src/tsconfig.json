@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+      "module": "ESNext",
+      "target": "ESNext",
+      "lib": ["dom", "esnext"],
+      "importHelpers": true,
+      "declaration": true,
+      "sourceMap": true,
+      "strict": true,
+      "noUnusedLocals": false,
+      "noUnusedParameters": false,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "moduleResolution": "node",
+      "jsx": "react",
+      "esModuleInterop": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true
+    }
+}  

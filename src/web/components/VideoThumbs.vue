@@ -95,6 +95,10 @@ export default {
       default: false,
       type: Boolean,
     },
+    loading: {
+      default: true,
+      type: Boolean,
+    },
   },
   data: () => {
     return {
@@ -104,7 +108,7 @@ export default {
   computed: {
     isLoaded: {
       get() {
-        return this._isLoaded || this.videos.length > 0
+        return this._isLoaded || this.videos.length > 0 || !this.loading
       },
 
       set(val) {
@@ -114,7 +118,7 @@ export default {
   },
   watch: {
     videos() {
-      this.isLoading = this.videos.length === 0
+      this._isLoaded = this.videos.length > 0
     },
   },
 }

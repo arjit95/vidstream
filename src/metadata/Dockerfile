@@ -1,21 +1,23 @@
 FROM node:14-alpine3.12 as builder
 
-# Create app directory
-WORKDIR /usr/src/app
-COPY metadata/package.json .
-COPY metadata/package-lock.json .
-RUN npm install --only=production
+COPY common/node/package.json common/node/yarn.lock /usr/src/common/node/
+RUN yarn --cwd /usr/src/common/node --frozen-lockfile install
 
-# Create common directory
-WORKDIR /usr/src/common/node/
-COPY common/node/package.json .
-COPY common/node/package-lock.json .
-RUN npm install --only=production
+COPY metadata/package.json metadata/yarn.lock /usr/src/app/
+RUN yarn --cwd /usr/src/app/ --frozen-lockfile install
 
-FROM gcr.io/distroless/nodejs:14
-COPY --from=builder /usr/src /usr/src
-COPY metadata/ /usr/src/app
-COPY common/node/ /usr/src/common/node
+WORKDIR /usr/src
+COPY tsconfig.json .
+COPY common/node common/node/
+COPY metadata/ app/
 
-WORKDIR /usr/src/app
-CMD [ "index.js" ]
+RUN yarn --cwd app/ build --transpileOnly --format cjs --target node
+RUN yarn --cwd app/ install --production --offline --frozen-lockfile
+RUN rm -rf app/src
+
+FROM node:14-alpine3.12
+
+WORKDIR /usr/src
+COPY --from=builder /usr/src/app .
+
+CMD [ "node", "dist/index.js" ]

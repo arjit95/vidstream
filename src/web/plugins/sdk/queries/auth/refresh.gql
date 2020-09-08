@@ -1,0 +1,8 @@
+query refreshToken($token: String!) {
+  refresh(token: $token) {
+    token
+    expiry
+    name
+    username
+  }
+}

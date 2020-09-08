@@ -76,20 +76,24 @@ export default {
     channels: [],
   }),
 
-  async mounted() {
-    // populate channels
-    const channels = await this.$sdk.Channel.getUserChannels()
-    if (channels.error) {
-      this.$nuxt.$emit('childEvent', {
-        action: 'error',
-        message: channels.error,
-      })
-    } else {
-      this.channels = channels
-    }
+  mounted() {
+    this.init()
   },
 
   methods: {
+    async init() {
+      // populate channels
+      const channels = await this.$sdk.Metadata.getUserChannels()
+      if (channels.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: channels.error,
+        })
+      } else {
+        this.channels = channels
+      }
+    },
+
     async validate() {
       this.$refs.form.validate()
 

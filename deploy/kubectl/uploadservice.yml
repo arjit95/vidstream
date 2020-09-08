@@ -14,8 +14,6 @@ spec:
       containers:
         - name: server
           image: registry.gitlab.com/arjit95/vidstream/upload-service:v1
-          ports:
-          - containerPort: 8080
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
@@ -28,26 +26,9 @@ spec:
               port: 8080
           envFrom:
           - configMapRef:
-              name: network-config
-          - configMapRef:
-              name: storage-config
-          - configMapRef:
-              name: queue-config
+              name: vidstream-config
           - secretRef:
-              name: network-secret
-          env:
-          - name: PORT
-            value: "8080"
-          - name: QUEUE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: queue-secret
-                key: username
-          - name: QUEUE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: queue-secret
-                key: password
+              name: vidstream-secret
           volumeMounts:
           - name: pv0001
             mountPath: /data

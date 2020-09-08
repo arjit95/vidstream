@@ -1,15 +1,12 @@
-const Cookies = process.client ? require('js-cookie') : undefined
-
 export const state = () => {
   return {
     token: null,
+    expiry: null,
   }
 }
 export const mutations = {
-  setAuth(state, token) {
+  setAuth(state, { token, expiry }) {
     state.token = token
-    if (typeof Cookies !== 'undefined') {
-      Cookies.set('token', token)
-    }
+    state.expiry = expiry
   },
 }

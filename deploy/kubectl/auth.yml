@@ -14,8 +14,6 @@ spec:
       containers:
         - name: server
           image: registry.gitlab.com/arjit95/vidstream/auth-service:v1
-          ports:
-          - containerPort: 8080
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
@@ -27,17 +25,10 @@ spec:
               path: "/_healthz"
               port: 8080
           envFrom:
-          - configMapRef:
-                name: network-config
-          - configMapRef:
-                name: storage-config
-          - configMapRef:
-                name: queue-config
-          - secretRef:
-                name: network-secret
-          env:
-          - name: PORT
-            value: "8080"
+            - configMapRef:
+                name: vidstream-config
+            - secretRef:
+                name: vidstream-secret
 
 ---
 apiVersion: v1
@@ -52,6 +43,3 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-  - name: tcp
-    port: 9222
-    targetPort: 9222

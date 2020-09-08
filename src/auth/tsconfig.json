@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "baseUrl": "./src",
+    "paths": {
+      "@me/common/*": ["../../common/node/src/*"]
+    },
+    "noEmit": true
+  },
+  "references": [
+    {"path": "../common/node"}
+  ]
+}

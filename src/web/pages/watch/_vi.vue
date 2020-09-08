@@ -98,7 +98,7 @@ export default {
 
       onVideoPlayerReady(player) {
         const vi = this.$route.params.vi
-        const apiURL = this.$env.API_URL
+        const apiURL = this.$config.apiURL
 
         player.poster(`${apiURL}/api/assets/video/image/${vi}/poster.png`)
         player.src({

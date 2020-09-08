@@ -14,8 +14,6 @@ spec:
       containers:
         - name: server
           image: registry.gitlab.com/arjit95/vidstream/vidstream-api:v1
-          ports:
-          - containerPort: 8080
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
@@ -28,12 +26,7 @@ spec:
               port: 8080
           envFrom:
           - configMapRef:
-                name: network-config
-          - configMapRef:
-                name: cors-config
-          env:
-          - name: PORT
-            value: "8080"
+              name: vidstream-config
 ---
 apiVersion: v1
 kind: Service
@@ -45,6 +38,6 @@ spec:
     app: api
   ports:
   - name: http
-    port: 80
+    port: 8080
     targetPort: 8080
     nodePort: 32767
