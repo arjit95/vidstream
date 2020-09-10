@@ -26,8 +26,12 @@ async function main() {
     res.send('ok');
   });
 
-  app.get('/api/auth/logout', function(_: Request, res: Response) {
-    res.clearCookie('refresh_token');
+  app.get('/api/auth/logout', function(req: Request, res: Response) {
+    console.log(req.cookies['refresh_token']);
+    if (req.cookies['refresh_token']) {
+      res.clearCookie('refresh_token');
+    }
+
     res.end();
   });
 

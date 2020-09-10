@@ -1,18 +1,6 @@
 {
     "sharded": false,
     "tables": {
-      "comments_seq": {
-        "type": "sequence"
-      },
-      "comment_likes_seq": {
-        "type": "sequence"
-      },
-      "video_likes_seq": {
-        "type": "sequence"
-      },
-      "subscriptions_seq": {
-        "type": "sequence"
-      },
       "trending_seq": {
         "type": "sequence"
       }

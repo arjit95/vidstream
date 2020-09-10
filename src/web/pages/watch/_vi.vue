@@ -4,6 +4,7 @@
       ref="videoPlayer"
       :on-ready="onVideoPlayerReady"
       :options="videoPlayerOptions"
+      :video-info="videoInfo"
     ></video-player>
     <v-row class="flex-row">
       <v-col cols="12">
@@ -28,7 +29,7 @@
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>
-              <video-description></video-description>
+              <video-description :video-info="videoInfo"></video-description>
             </v-tab-item>
             <v-tab-item>
               <v-container fluid>
@@ -79,6 +80,11 @@ export default {
     Comment,
     VideoDescription,
   },
+
+  async asyncData({ $sdk, params }) {
+    return { videoInfo: await $sdk.Video.getInfo(params.vi) }
+  },
+
   data() {
     return {
       tab: null,
@@ -109,8 +115,6 @@ export default {
         player.vttThumbnails({
           src: `${apiURL}/api/assets/video/image/${vi}/thumb.vtt`,
         })
-
-        return this.$sdk.Video.getInfo(vi) // TODO: consume this later
       },
     }
   },

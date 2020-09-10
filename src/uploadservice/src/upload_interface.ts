@@ -11,7 +11,7 @@ export interface UploadContext {
 
 export interface RequestHandler {
   onStream(context: UploadContext): WriteStream | null;
-  onError(context: UploadContext): Promise<void>;
+  onError(): Promise<void>;
   onFinish?(context: UploadContext): Promise<void>;
   validate?(context: UploadContext): Promise<void>;
 }

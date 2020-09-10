@@ -1,11 +1,11 @@
 import { Column, PrimaryColumn, Entity, BaseEntity, Index } from 'typeorm';
-import {ObjectType, Field, Int} from 'type-graphql';
+import { ObjectType, Field } from 'type-graphql';
 
 @Entity({ name: 'users' })
 @ObjectType()
 export class User extends BaseEntity {
   @Index('user_index')
-  @PrimaryColumn('varchar', { length: 24, nullable: false })
+  @PrimaryColumn('varchar', { length: 14, nullable: false })
   @Field()
   username!: string;
 
@@ -23,11 +23,9 @@ export class User extends BaseEntity {
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
   joined?: Date;
 
-  @Column('text', {nullable: true})
+  @Column('text', { nullable: true })
   @Field()
   description?: string;
 
-  @Column('smallint', { default: () => 1, nullable: false })
-  @Field(() => Int)
-  channel_count!: number;
+  static itemType = '01';
 }

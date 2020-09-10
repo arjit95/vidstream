@@ -1,23 +1,21 @@
 CREATE TABLE `users` (
-    `username` varchar(24) NOT NULL PRIMARY KEY,
+    `username` varchar(14) NOT NULL PRIMARY KEY,
     `name` varchar(150) NOT NULL,
     `password` varchar(128) NOT NULL,
     `email` varchar(50) NOT NULL,
     `joined` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `description` text,
-    `channel_count` smallint NOT NULL DEFAULT 1,
 
     INDEX `user_index` (`username`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `channels` (
-    `id` varchar(128) NOT NULL PRIMARY KEY,
+    `id` varchar(36) NOT NULL PRIMARY KEY,
     `title` varchar(128) NOT NULL,
-    `username` varchar(24) NOT NULL,
+    `username` varchar(14) NOT NULL,
     `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `subscribers` bigint NOT NULL DEFAULT 0,
     `description` text,
-    `video_count` mediumint NOT NULL DEFAULT 0,
 
     CONSTRAINT `FK_4d05b2b1f37b07db352912523dd`
         FOREIGN KEY (`username`)
@@ -29,11 +27,11 @@ CREATE TABLE `channels` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `videos` (
-    `id` varchar(128) NOT NULL PRIMARY KEY,
+    `id` varchar(36) NOT NULL PRIMARY KEY,
     `title` varchar(128) NOT NULL,
     `description` text,
-    `channel_id` varchar(128) NOT NULL,
-    `username` varchar(24) NOT NULL,
+    `channel_id` varchar(36) NOT NULL,
+    `username` varchar(14) NOT NULL,
     `uploaded_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `listing` smallint NOT NULL,
     `tags` json,
@@ -59,11 +57,11 @@ CREATE TABLE `videos` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `comments` (
-    `id` bigint NOT NULL PRIMARY KEY,
-    `username` varchar(24) NOT NULL,
+    `id` varchar(36) NOT NULL PRIMARY KEY,
+    `username` varchar(14) NOT NULL,
     `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `content` text NOT NULL,
-    `video_id` varchar(128) NOT NULL,
+    `video_id` varchar(36) NOT NULL,
     `parent_id` bigint,
     `likes` int NOT NULL DEFAULT 0,
     `dislikes` int NOT NULL DEFAULT 0,
@@ -90,11 +88,11 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `comment_likes` (
-    `id` bigint NOT NULL PRIMARY KEY,
-    `username` varchar(24) NOT NULL,
+    `id` varchar(36) NOT NULL PRIMARY KEY,
+    `username` varchar(14) NOT NULL,
     `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `liked` tinyint NOT NULL DEFAULT 1,
-    `comment_id` bigint NOT NULL,
+    `comment_id` varchar(36) NOT NULL,
 
     CONSTRAINT `FK_37ac2185fa26913b1b9acbe6747`
         FOREIGN KEY (`username`)
@@ -110,10 +108,10 @@ CREATE TABLE `comment_likes` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `video_likes` (
-    `id` bigint NOT NULL PRIMARY KEY,
-    `username` varchar(24) NOT NULL,
+    `id` varchar(36) NOT NULL PRIMARY KEY,
+    `username` varchar(14) NOT NULL,
     `timestamp`  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    `video_id` varchar(128) NOT NULL,
+    `video_id` varchar(36) NOT NULL,
     `liked` tinyint NOT NULL DEFAULT 1,
 
     CONSTRAINT `FK_d9e0e3d41c92383afd3ca61440a`
@@ -130,10 +128,10 @@ CREATE TABLE `video_likes` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE `subscriptions` (
-    `id` bigint NOT NULL PRIMARY KEY, 
-    `username` varchar(24) NOT NULL,
+    `id` varchar(36) NOT NULL PRIMARY KEY, 
+    `username` varchar(14) NOT NULL,
     `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP,
-    `channel_id` varchar(128) NOT NULL,
+    `channel_id` varchar(36) NOT NULL,
 
     CONSTRAINT `FK_cb0d911d3eec036a09331a13b4b`
         FOREIGN KEY (`username`)
@@ -152,7 +150,7 @@ CREATE TABLE trending (
     `id` bigint NOT NULL PRIMARY KEY,
     `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `views` bigint NOT NULL,
-    `video_id` varchar(128) NOT NULL,
+    `video_id` varchar(36) NOT NULL,
 
     CONSTRAINT `FK_404b8052912046ec081c9e25ff6`
         FOREIGN KEY (`video_id`)

@@ -1,4 +1,5 @@
-import ChannelQuery from '~/plugins/sdk/queries/metadata/channels'
+import ChannelsQuery from '~/plugins/sdk/queries/metadata/channels'
+import VideosQuery from '~/plugins/sdk/queries/metadata/videos'
 
 export default class {
   constructor({ store }, api) {
@@ -13,7 +14,7 @@ export default class {
         : { username: this.store.state.app.userInfo.username }
 
       const response = await this.api.query({
-        query: ChannelQuery,
+        query: ChannelsQuery,
         variables: payload,
       })
 
@@ -21,7 +22,7 @@ export default class {
         throw response.errors[0].message
       }
 
-      return response.data
+      return response.data.channels
     } catch (error) {
       return { error }
     }
@@ -29,24 +30,16 @@ export default class {
 
   async getUserVideos(channelId, username) {
     try {
-      let channels
-
-      if (channelId) {
-        channels = Array.isArray(channelId) ? channelId : [channelId]
-      } else {
-        channels = await this.getUserChannels(username)
-        if (channels.error) {
-          return channels
-        }
-        channels = channels.map(({ id }) => id)
-      }
-
-      const data = await this.api.post('/api/metadata/user/videos', {
-        token: this.store.state.auth.token,
-        channels,
+      const response = await this.api.query({
+        query: VideosQuery,
+        variables: { channelId, username },
       })
 
-      return data
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.videos
     } catch (error) {
       return { error }
     }

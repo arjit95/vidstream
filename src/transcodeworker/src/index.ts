@@ -19,6 +19,7 @@ async function encode(message: QueueMessage<Job>) {
       fs.unlinkSync(message.fileName + '.tmp');
     }
   } catch (err) {
+    console.dir(message);
     console.log(err);
     return;
   }

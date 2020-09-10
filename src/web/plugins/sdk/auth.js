@@ -19,7 +19,11 @@ export default class {
   setUserInfo(data) {
     const { token, expiry, ...metadata } = data
     this.store.commit('auth/setAuth', { token, expiry })
-    this.store.commit('app/setUserInfo', { ...metadata, isLoggedIn: true })
+
+    // Do not store empty metadata
+    if (Object.keys(metadata).length) {
+      this.store.commit('app/setUserInfo', { ...metadata, isLoggedIn: true })
+    }
   }
 
   async logout() {

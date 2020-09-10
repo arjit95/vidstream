@@ -16,8 +16,8 @@ export type Job = {
 export type QueueContext<T> = {
   jobs: Array<T>;
   source: string;
-  target: string
-}
+  target: string;
+};
 
 export type QueueMessage<T> = T & {
   context: QueueContext<T>;
@@ -82,11 +82,12 @@ export class Queue extends MessageQueue {
         try {
           const content = JSON.parse(msg.content.toString());
           await callback(content);
-          self.channel.ack(msg);
         } catch (err) {
           console.log(err);
           console.log('Unable to parse json');
           console.log(msg.content.toString());
+        } finally {
+          self.channel.ack(msg);
         }
       },
       { noAck: false }

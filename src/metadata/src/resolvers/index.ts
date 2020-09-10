@@ -1,6 +1,6 @@
 import { Resolver, Query, Arg, Int } from 'type-graphql';
 import { User, Video, Channel } from '@me/common/db/models';
-import { Common } from '@me/common/utils/common';
+import { IdGen } from '@me/common/utils/IdGen';
 import { Channels, Videos } from '../types';
 
 @Resolver(User)
@@ -36,13 +36,26 @@ export class ChannelResolver {
 
     return response;
   }
+
+  @Query(() => Channel)
+  channel(@Arg('id') id: string): Promise<Channel | undefined> {
+    const username = IdGen.decode(id).split('-')[0];
+    return Channel.findOne({
+      where: {
+        id,
+        user: {
+          username,
+        },
+      },
+    });
+  }
 }
 
 @Resolver(Video)
 export class VideoResolver {
   @Query(() => Video, { nullable: true })
   video(@Arg('id') id: string): Promise<Video | undefined> {
-    const [username] = Common.decodeUniqueId(id).split(':');
+    const username = IdGen.decode(id).split('-')[0];
     return Video.findOne({ id, user: { username } });
   }
 
@@ -50,20 +63,28 @@ export class VideoResolver {
   async videos(
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
-    @Arg('username', { defaultValue: '' }) username: string,
-    @Arg('channelId', { defaultValue: '' }) channelId: string
+    @Arg('channelId', { nullable: true }) channelId?: string,
+    @Arg('username', {nullable: true}) username?: string
   ): Promise<Videos> {
     limit = Math.max(50, limit);
 
-    if (!(channelId && username)) {
-      throw new Error('Please supply username or channel id');
+    if ( !(username || channelId)) {
+      throw new Error('Please supply channel or username');
     }
 
-    username = username || Common.decodeUniqueId(channelId).split(':')[0];
+    if (channelId && !username) {
+      username = IdGen.decode(channelId).split('-')[0];
+    }
 
-    const query = username
-      ? { user: { username } }
-      : { channel: { id: channelId } };
+    let query: {user: {username?: string}, id? : string} = {
+      user: {
+        username
+      }
+    };
+
+    if (channelId) {
+      query.id = channelId;
+    }
 
     const [videos, total] = await Video.findAndCount({
       where: query,

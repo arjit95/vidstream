@@ -12,7 +12,7 @@ import bcrypt from 'bcrypt';
 import { User } from '@me/common/db/models/User';
 import { Channel } from '@me/common/db/models/Channel';
 import { Metrics } from '@me/common/metrics';
-import { Common } from '@me/common/utils/common';
+import { IdGen } from '@me/common/utils/IdGen';
 import { Auth, AuthToken, DecodedToken } from '@me/common/utils/auth';
 import { Response, Request } from 'express';
 
@@ -41,17 +41,17 @@ const createEntries = async function(
   user.password = hash;
   user.username = username;
   user.email = email;
-  user.channel_count = 1;
-  await user.save();
-
+  
   const channel = new Channel();
   channel.title = username;
   channel.user = user;
-  channel.id = Common.generateUniqueId(
-    `${user.username}:${user.channel_count}`
+  
+  channel.id = IdGen.encode(
+    `${user.username}-${Channel.itemType}-${Date.now()}`
   );
+    
+  await user.save();
   await channel.save();
-
   return user;
 };
 
@@ -60,8 +60,8 @@ class AuthResponse extends AuthToken {
   @Field()
   username!: string;
 
-  @Field()
-  name!: string;
+  @Field({ nullable: true })
+  name?: string;
 }
 
 @Resolver(User)
@@ -77,7 +77,6 @@ export class UserResolver {
     const token = await Auth.generateToken({
       username: user.username,
       email: user.email,
-      name: user.name,
     });
 
     ctx.res.cookie('refresh_token', token.refreshToken, {
@@ -112,7 +111,10 @@ export class UserResolver {
       }
     }
 
-    const response = Auth.generateToken(data);
+    const response = Auth.generateToken({
+      username: data.username,
+      email: data.email,
+    });
     if (data.exp - Date.now() < 60 * 60) {
       // if less time is available use the new refresh token
       ctx.res.cookie('refresh_token', response.refreshToken, {
@@ -124,7 +126,6 @@ export class UserResolver {
     const instance = new AuthResponse();
     instance.token = response.token;
     instance.expiry = response.expiry;
-    instance.name = data.name;
     instance.username = data.username;
     instance.expiry = response.expiry;
 
@@ -150,7 +151,6 @@ export class UserResolver {
     const token = Auth.generateToken({
       username: user.username,
       email: user.email,
-      name: user.name,
     });
 
     ctx.res.cookie('refresh_token', token.refreshToken, {

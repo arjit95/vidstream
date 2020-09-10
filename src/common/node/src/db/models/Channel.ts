@@ -1,5 +1,13 @@
-import { Column, PrimaryColumn, Entity, ManyToOne, Index, JoinColumn, BaseEntity } from 'typeorm';
-import {ObjectType, Field, Int} from 'type-graphql';
+import {
+  Column,
+  PrimaryColumn,
+  Entity,
+  ManyToOne,
+  Index,
+  JoinColumn,
+  BaseEntity,
+} from 'typeorm';
+import { ObjectType, Field, Int } from 'type-graphql';
 
 import { User } from './User';
 
@@ -7,7 +15,7 @@ import { User } from './User';
 @ObjectType()
 export class Channel extends BaseEntity {
   @Index('channel_id_pk')
-  @PrimaryColumn('varchar', { length: 128, nullable: false })
+  @PrimaryColumn('varchar', { length: 36, nullable: false })
   @Field()
   id!: string;
 
@@ -17,14 +25,14 @@ export class Channel extends BaseEntity {
 
   @ManyToOne(
     () => User,
-    (user) => user.username,
+    user => user.username,
     {
       onDelete: 'CASCADE',
       eager: true,
-      nullable: false
+      nullable: false,
     }
   )
-  @JoinColumn({name: 'username'})
+  @JoinColumn({ name: 'username' })
   @Field(() => User)
   user!: User;
 
@@ -34,13 +42,11 @@ export class Channel extends BaseEntity {
 
   @Column('bigint', { default: () => 0, nullable: false })
   @Field(() => Int)
-  subscribers!: number;
+  subscribers!: bigint;
 
   @Column('text', { nullable: true })
-  @Field({nullable: true})
+  @Field({ nullable: true })
   description?: string;
 
-  @Column('mediumint', { default: () => 0, nullable: false })
-  @Field(() => Int)
-  video_count!: number;
+  static itemType = '02';
 }

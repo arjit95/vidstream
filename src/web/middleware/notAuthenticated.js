@@ -6,8 +6,7 @@ export default async function ({ store, $sdk, redirect }) {
     return
   }
 
-  if (store.state.app.userInfo.isLoggedIn) {
-    redirect('/')
+  if (!store.state.app.userInfo.isLoggedIn) {
     return
   }
 

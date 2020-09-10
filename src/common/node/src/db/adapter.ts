@@ -1,14 +1,20 @@
 import { Connection, createConnection } from 'typeorm';
-import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as Models from './models';
 
 export class Adapter {
   private static connection: Connection;
 
-  private static async shouldCreateTables(schemas: Function[]): Promise<boolean> {    
-    const tables = schemas.map(schema => Adapter.connection.getMetadata(schema).tableName);
+  private static async shouldCreateTables(
+    schemas: Function[]
+  ): Promise<boolean> {
+    const tables = schemas.map(
+      schema => Adapter.connection.getMetadata(schema).tableName
+    );
     const queryRunner = Adapter.connection.createQueryRunner();
-    const exists = await Promise.all(tables.map(table => queryRunner.hasTable(table)));
+    const exists = await Promise.all(
+      tables.map(table => queryRunner.hasTable(table))
+    );
     const shouldCreate = !exists.every(exist => exist); // Skip if all table exists
 
     return shouldCreate;
@@ -16,7 +22,7 @@ export class Adapter {
 
   static async createConnection(): Promise<void> {
     if (Adapter.connection) {
-      return
+      return;
     }
 
     const entities = [
@@ -27,7 +33,7 @@ export class Adapter {
       Models.Comment,
       Models.CommentLike,
       Models.Subscription,
-      Models.Trending
+      Models.Trending,
     ];
 
     Adapter.connection = await createConnection({
@@ -39,11 +45,11 @@ export class Adapter {
       database: process.env.CONFIG_DB_NAME,
       logging: true,
       entities,
-      namingStrategy: new SnakeNamingStrategy()
+      namingStrategy: new SnakeNamingStrategy(),
     });
 
     if (await Adapter.shouldCreateTables(entities)) {
-      await Adapter.connection.synchronize()
+      await Adapter.connection.synchronize();
     }
   }
 }

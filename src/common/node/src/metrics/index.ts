@@ -8,7 +8,7 @@ export type ElasticObj = {
   Users: Users;
   Videos: Videos;
   Watch: Watch;
-}
+};
 
 async function createIndex(instance: Model, client: Client): Promise<void> {
   const response = await client.indices.exists({

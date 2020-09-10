@@ -1,11 +1,10 @@
 import { ObjectType, Field } from 'type-graphql';
-import {sign, verify} from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 
 export type TokenInfo = {
   username: string;
   email: string;
-  name: string;
-}
+};
 
 export type DecodedToken = TokenInfo & {
   iat: number;
@@ -17,7 +16,7 @@ export class AuthToken {
   @Field()
   token!: string;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   refreshToken?: string;
 
   @Field()
@@ -25,19 +24,28 @@ export class AuthToken {
 }
 
 export class Auth {
-  static async getUserFromToken(token: string): Promise<TokenInfo> {    
+  static async getUserFromToken(token: string): Promise<TokenInfo> {
     return Auth.decodeToken(token);
   }
 
-  static generateToken(data: TokenInfo, doNotLogout: boolean = true): AuthToken {
+  static generateToken(
+    data: TokenInfo,
+    doNotLogout: boolean = true
+  ): AuthToken {
     const authToken = new AuthToken();
     authToken.token = sign(data, process.env.SECRET_JWT_TOKEN, {
-      expiresIn: '15m'
+      expiresIn: '15m',
     });
 
-    authToken.refreshToken = sign(data, process.env.SECRET_JWT_TOKEN, !doNotLogout ? {
-      expiresIn: '7 days'
-    } : {});
+    authToken.refreshToken = sign(
+      data,
+      process.env.SECRET_JWT_TOKEN,
+      !doNotLogout
+        ? {
+            expiresIn: '7 days',
+          }
+        : {}
+    );
 
     const date = new Date();
     date.setUTCSeconds(date.getUTCSeconds() + 15 * 60);

@@ -6,7 +6,10 @@ export interface ExecutorArgs {
 }
 
 export class Executor {
-  static exec(args: string, options: ExecutorArgs = {shell: true}): Promise<string> {
+  static exec(
+    args: string,
+    options: ExecutorArgs = { shell: true }
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       options.shell = typeof options.shell === 'boolean' ? options.shell : true;
 

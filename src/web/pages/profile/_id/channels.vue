@@ -15,9 +15,7 @@
               {{ channel.title }}
             </nuxt-link>
           </div>
-          <div class="text-caption">
-            {{ channel.views }} Viewers • {{ channel.videos }} Video(s)
-          </div>
+          <div class="text-caption">{{ channel.subscribers }} Subscribers</div>
           <div class="text-subtitle-2 channel-description">
             {{ channel.description }}
           </div>
@@ -64,10 +62,9 @@ export default {
       }
 
       const apiURL = this.$config.apiURL
-      for (const channel of response) {
+      for (const channel of response.result) {
         Object.assign(channel, {
           banner: `${apiURL}/api/assets/channel/banner?id${channel.id}`,
-          views: channel.viewCount,
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         })

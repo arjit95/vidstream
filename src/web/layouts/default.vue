@@ -208,7 +208,7 @@ export default {
     },
     async doLogout() {
       await this.$sdk.Auth.logout()
-      this.$router.push('/')
+      window.location.href = '/'
     },
     toggleDrawer() {
       this.drawer = !this.drawer

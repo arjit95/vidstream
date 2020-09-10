@@ -1,21 +1,25 @@
+import VideoQuery from '~/plugins/sdk/queries/metadata/video'
+
 export default class {
   constructor({ store }, api) {
     this.store = store
     this.api = api
   }
 
-  async getInfo(videoId) {
+  async getInfo(id) {
     try {
-      const result = await this.api.post(
-        `/api/metadata/video/info/${videoId}`,
-        {
-          token: this.store.state.auth.token,
-        }
-      )
+      const response = await this.api.query({
+        query: VideoQuery,
+        variables: { id },
+      })
 
-      return result
-    } catch (err) {
-      return { error: err.response.data.error }
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.video
+    } catch (error) {
+      return { error }
     }
   }
 }

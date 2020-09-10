@@ -52,7 +52,12 @@ export default {
       drawer: false,
       generalItems: [
         {
-          icon: 'mdi-youtube-subscription',
+          icon: 'mdi-home',
+          title: 'Home',
+          href: '/',
+        },
+        {
+          icon: 'mdi-history',
           title: 'Recently Added',
           href: '/recents',
         },
@@ -65,7 +70,7 @@ export default {
       user,
       userItems: [
         {
-          icon: 'mdi-youtube-subscription',
+          icon: 'mdi-view-dashboard',
           title: 'Dashboard',
           href: `/profile/${user.username}`,
         },
@@ -83,6 +88,11 @@ export default {
           icon: 'mdi-clock',
           title: 'Channels',
           href: `/profile/${user.username}/channels`,
+        },
+        {
+          icon: 'mdi-upload',
+          title: 'Upload',
+          href: '/upload',
         },
       ],
     }

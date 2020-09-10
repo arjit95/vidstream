@@ -1,6 +1,6 @@
 import { Client } from '@elastic/elasticsearch';
 import Model from './Model';
-import {VideoSchema as Schema} from '../schema/Video';
+import { VideoSchema as Schema } from '../schema/Video';
 
 export interface VideoCreate {
   title: string;

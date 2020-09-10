@@ -23,9 +23,9 @@
           >
             <v-col class="video-meta" md="8">
               <v-col id="video-name">
-                <p class="channel">Nature</p>
-                <p class="title">Big Buck bunny trailer</p>
-                <p class="views">3.2M Views</p>
+                <p class="channel">{{ info.genres }}</p>
+                <p class="title">{{ videoInfo.title }}</p>
+                <p class="views">{{ info.views }} Views</p>
               </v-col>
               <v-col class="video-stats d-flex flex-row">
                 <v-tooltip slot="append" top>
@@ -34,7 +34,7 @@
                       <v-icon slot="activator" @click="like" v-on="on"
                         >mdi-thumb-up-outline</v-icon
                       >
-                      <small>987</small>
+                      <small>{{ info.likes }}</small>
                     </span>
                   </template>
                   <span>Like</span>
@@ -45,7 +45,7 @@
                       <v-icon slot="activator" @click="dislike" v-on="on"
                         >mdi-thumb-down-outline</v-icon
                       >
-                      <small>1238</small>
+                      <small>{{ info.dislikes }}</small>
                     </span>
                   </template>
                   <span>Dislike</span>
@@ -246,6 +246,7 @@ import 'videojs-hls-quality-selector'
 import 'videojs-vtt-thumbnails'
 import 'video.js/dist/video-js.css'
 import _ from 'lodash'
+import humanize from 'humanize-plus'
 
 class PlayerUtils {
   constructor({ player, info, video }) {
@@ -309,6 +310,16 @@ export default {
       type: Function,
       default: () => {},
     },
+    videoInfo: {
+      type: Object,
+      default: () => ({
+        title: '',
+        views: 0,
+        likes: 0,
+        dislikes: 0,
+        genres: [],
+      }),
+    },
   },
   data() {
     return {
@@ -316,6 +327,17 @@ export default {
       isLoading: true,
       lights: true,
     }
+  },
+  computed: {
+    info() {
+      return {
+        title: this.videoInfo.title,
+        views: humanize.compactInteger(this.videoInfo.views),
+        likes: humanize.compactInteger(this.videoInfo.likes),
+        dislikes: humanize.compactInteger(this.videoInfo.dislikes),
+        genres: humanize.titleCase(humanize.oxford(this.videoInfo.genres)),
+      }
+    },
   },
 
   mounted() {
@@ -343,14 +365,14 @@ export default {
     })
 
     Promise.resolve(this.onReady(this.player))
-      .then((response) => {
-        this.player.hlsQualitySelector()
-      })
       .catch((err) => {
         this.$nuxt.$emit('childEvent', {
           action: 'error',
           message: err.message,
         })
+      })
+      .finally(() => {
+        this.player.hlsQualitySelector()
       })
   },
 

@@ -4,6 +4,7 @@ query getUserChannels($username: String!, $limit: Int = 10, $skip: Int = 0 ) {
     result {
       id
       title
+      subscribers
     }
   }
 }

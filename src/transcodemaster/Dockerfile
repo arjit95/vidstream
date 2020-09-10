@@ -17,6 +17,7 @@ RUN rm -rf app/src
 
 FROM node:14-alpine3.12
 
+RUN apk add --no-cache ffmpeg
 WORKDIR /usr/src
 COPY --from=builder /usr/src/app .
 

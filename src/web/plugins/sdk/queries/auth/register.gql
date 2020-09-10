@@ -3,5 +3,7 @@ mutation registerUser($username: String!, $password: String!, $email: String!) {
     token
     refreshToken
     expiry
+    username
+    name
   }
 }

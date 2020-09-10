@@ -1,7 +1,7 @@
 import path from 'path';
 import fs, { WriteStream } from 'fs';
 
-import { Common, Auth } from '@me/common/utils';
+import { IdGen, Auth } from '@me/common/utils';
 import { User, Channel, Video as VideoModel } from '@me/common/db/models';
 import { Metrics } from '@me/common/metrics';
 
@@ -46,11 +46,9 @@ export class Video implements RequestHandler {
     }
 
     const ext = path.extname(filename);
-    this.Channel.video_count = this.Channel.video_count + 1;
 
-    const decodedChannelId: string = Common.decodeUniqueId(this.Channel.id);
-    const generatedFileName: string = `${decodedChannelId}:${this.Channel.video_count}`;
-    this.savedFileName = Common.generateUniqueId(generatedFileName);
+    const generatedFileName: string = `${this.User.username}-${VideoModel.itemType}-${Date.now()}`;
+    this.savedFileName = IdGen.encode(generatedFileName);
     this.savedFileName = this.savedFileName + ext;
     this.fileNames.push(this.savedFileName);
 
@@ -73,15 +71,16 @@ export class Video implements RequestHandler {
 
     for (let name of this.fileNames) {
       const genres = body.genres.split(',').map(genre => genre.trim());
+      const id = path.basename(name, path.extname(name))
       await metrics.Videos.create({
         userID: this.User.username,
         genres,
         title: body.title,
-        id: name,
+        id,
       });
 
       const video = new VideoModel();
-      video.id = name;
+      video.id = id;
       video.title = body.title;
       video.description = body.description;
       video.genres = genres;
@@ -94,8 +93,6 @@ export class Video implements RequestHandler {
 
       context.queue.enqueue(process.env.TRANSCODE_QUEUE, { fileName: name });
     }
-
-    await this.Channel.save();
   }
 
   async validate(context: UploadContext): Promise<void> {

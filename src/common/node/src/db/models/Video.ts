@@ -1,5 +1,13 @@
-import { PrimaryColumn, Column, ManyToOne, Index, Entity, JoinColumn, BaseEntity } from 'typeorm';
-import {ObjectType, Field, Int} from 'type-graphql';
+import {
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  Index,
+  Entity,
+  JoinColumn,
+  BaseEntity,
+} from 'typeorm';
+import { ObjectType, Field, Int } from 'type-graphql';
 
 import { Channel } from './Channel';
 import { User } from './User';
@@ -8,7 +16,7 @@ import { User } from './User';
 @ObjectType()
 export class Video extends BaseEntity {
   @Index('video_pk')
-  @PrimaryColumn('varchar', { length: 128, nullable: false })
+  @PrimaryColumn('varchar', { length: 36, nullable: false })
   @Field()
   id!: string;
 
@@ -16,32 +24,29 @@ export class Video extends BaseEntity {
   @Field()
   title!: string;
 
-  @Column('text', {nullable: true})
-  @Field({nullable: true})
+  @Column('text', { nullable: true })
+  @Field({ nullable: true })
   description?: string;
 
-  @ManyToOne(
-    () => Channel,
-    {
-      onDelete: 'CASCADE',
-      eager: true,
-      nullable: false
-    }
-  )
-  @JoinColumn({name: 'channel_id'})
-  @Field(() => Channel, {nullable: false})
+  @ManyToOne(() => Channel, {
+    onDelete: 'CASCADE',
+    eager: true,
+    nullable: false,
+  })
+  @JoinColumn({ name: 'channel_id' })
+  @Field(() => Channel, { nullable: false })
   channel!: Channel;
 
   @ManyToOne(
     () => User,
-    (user) => user.username,
+    user => user.username,
     {
       onDelete: 'CASCADE',
       eager: true,
-      nullable: false
+      nullable: false,
     }
   )
-  @JoinColumn({name: 'username'})
+  @JoinColumn({ name: 'username' })
   @Field(() => User)
   user!: User;
 
@@ -52,11 +57,11 @@ export class Video extends BaseEntity {
   @Column('smallint', { nullable: false })
   listing!: number;
 
-  @Column('json', {nullable: true})
+  @Column('json', { nullable: true })
   @Field(() => [String])
   tags?: Array<string>;
 
-  @Column('json', {nullable: true})
+  @Column('json', { nullable: true })
   @Field(() => [String])
   genres?: string[];
 
@@ -75,4 +80,6 @@ export class Video extends BaseEntity {
   @Column('tinyint', { default: () => 1, nullable: false })
   @Field(() => Int)
   uploading!: number;
+
+  static itemType = '03';
 }

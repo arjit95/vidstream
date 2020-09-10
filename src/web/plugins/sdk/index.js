@@ -12,7 +12,7 @@ export default (context, inject) => {
     Assets: new Assets(context, api),
     Auth: new Auth(context, apollo.auth, api),
     Metadata: new Metadata(context, apollo.defaultClient),
-    Video: new Video(context, api),
+    Video: new Video(context, apollo.defaultClient),
   }
 
   inject('sdk', sdk)

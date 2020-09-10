@@ -1,6 +1,6 @@
 import { Client } from '@elastic/elasticsearch';
 import Model from './Model';
-import {UserSchema as Schema} from '../schema/User';
+import { UserSchema as Schema } from '../schema/User';
 
 export interface UserCreate {
   name: string;

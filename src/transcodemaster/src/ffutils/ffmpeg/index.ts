@@ -82,7 +82,7 @@ export class FFMpeg {
   }
 
   build() {
-    let plugins: Array<Array<Plugin>> = this.splittedPlugins
+    let plugins: Array<Array<Plugin>> = this.splittedPlugins.length
       ? this.splittedPlugins
       : [this.plugins];
 

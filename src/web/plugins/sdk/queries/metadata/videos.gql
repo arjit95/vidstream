@@ -1,0 +1,15 @@
+query getVideos($username: String, $channelId: String, $limit: Int = 10, $skip: Int = 0 ) {
+  videos(username: $username, channelId: $channelId, limit: $limit, skip: $skip) {
+    total
+    result {
+      id
+      title
+      uploaded_at
+      views
+      channel {
+        id
+        title
+      }
+    }
+  }
+}

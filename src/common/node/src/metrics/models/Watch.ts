@@ -1,8 +1,8 @@
 import { Client } from '@elastic/elasticsearch';
 import Model from './Model';
-import { Common as CommonUtils } from '../../utils';
+import { IdGen } from '../../utils';
 import { VideoCreate } from './Videos';
-import {WatchSchema as Schema} from '../schema/Watch';
+import { WatchSchema as Schema } from '../schema/Watch';
 
 /**
  * Allows to manage Watch index in elasticsearch database
@@ -10,6 +10,8 @@ import {WatchSchema as Schema} from '../schema/Watch';
  * @classdesc Manages watch index in elasticsearch
  */
 export class Watch extends Model {
+  static itemType = '09';
+
   constructor(client: Client) {
     super(client);
     this.index = 'watch';
@@ -17,9 +19,11 @@ export class Watch extends Model {
   }
 
   async create(videoInfo: VideoCreate) {
+    const id = IdGen.encode(`${videoInfo.userID}-${Watch.itemType}-${Date.now()}`);
+
     const response = await this.client.create({
       index: this.index,
-      id: CommonUtils.generateUniqueId(videoInfo.id + Date.now().toString()),
+      id,
       body: {
         title: videoInfo.title,
         genres: videoInfo.genres,

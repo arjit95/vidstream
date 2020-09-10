@@ -48,18 +48,18 @@ export default {
       }
 
       const API_URL = this.$config.apiURL
-      this.videos = response.map((video) => ({
+      this.videos = response.result.map((video) => ({
         name: video.title,
-        channel: video.channel,
+        channel: video.channel.title,
         views: video.views,
         uploadedDate:
-          Humanize(Date.now() - new Date(video.uploaded).getTime(), {
+          Humanize(Date.now() - new Date(video.uploaded_at).getTime(), {
             largest: 1,
           }) + ' ago',
         thumb: `${API_URL}/api/assets/video/image/${video.id}/poster.png`,
         channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
         url: `/watch/${video.id}`,
-        channelURL: `/channel/${video.channelId}`,
+        channelURL: `/channel/${video.channel.id}`,
       }))
 
       this.loading = false

@@ -23,7 +23,6 @@ class FileUploader {
   res: http.ServerResponse;
   parser: busboy.Busboy;
   context: UploadContext;
-  error?: Error;
 
   constructor(
     req: http.IncomingMessage,
@@ -33,7 +32,7 @@ class FileUploader {
     this.req = req;
     this.res = res;
     this.handler = handler;
-    this.parser = new busboy(this.req);
+    this.parser = new busboy({headers: req.headers});
 
     this.context = {
       queue: queueService,
@@ -42,18 +41,24 @@ class FileUploader {
     };
 
     this.parser.on('field', this.onField.bind(this));
-    this.parser.on('file', this.onField.bind(this));
+    this.parser.on('file', this.onFile.bind(this));
     this.parser.on('finish', this.onFinish.bind(this));
+    this.parser.on('error', this.onError.bind(this));
+    this.req.pipe(this.parser);
   }
 
   onField(name: string, value: any) {
     this.context.fields[name] = value;
   }
 
-  onError(error: Error) {
+  async onError(error: Error) {
     console.log(error.message);
+
+    this.req.unpipe(this.parser);
+    this.parser.removeAllListeners();
+
     if (typeof this.handler.onError === 'function') {
-      this.onError(error);
+      await this.handler.onError();
     }
 
     if (!this.res.headersSent) {
@@ -65,10 +70,6 @@ class FileUploader {
 
   async onFinish() {
     try {
-      if (this.error) {
-        throw this.error;
-      }
-
       await this.handler.onFinish?.(this.context);
     } catch (err) {
       this.onError(err);
@@ -79,25 +80,26 @@ class FileUploader {
     this.res.end();
   }
 
-  async onFile(_: string, file: fs.ReadStream, filename: string) {
+  async onFile(_: string, file: fs.ReadStream, filename: string): Promise<void> {
     try {
       await this.handler.validate?.(this.context);
     } catch (err) {
-      this.error = err;
+      this.parser.emit('error', err);
+      file.destroy();
       return;
     }
 
     const ws = this.handler.onStream({ ...this.context, filename });
     if (ws == null) {
-      this.error = new Error('Cannot store file');
+      const error = new Error('Cannot store file');
+      this.parser.emit('error', error);
+      file.destroy(error);
       return;
     }
 
-    Pipeline(file, ws).catch(err => (this.error = err));
-  }
-
-  start() {
-    this.req.pipe(this.parser);
+    return Pipeline(file, ws).catch(err => {
+      this.parser.emit('error', err);
+    });
   }
 }
 
@@ -123,11 +125,12 @@ const server = http.createServer(function(
   res: http.ServerResponse
 ) {
   if (!req.url) {
-    return;
+    res.statusCode = 404;
+    return res.end();
   }
 
   const pathname = url.parse(req.url, true).pathname;
-  if (pathname === '/_healthz' || !pathname) {
+  if (pathname === '/_healthz' || !pathname || req.method !== 'POST') {
     res.statusCode = 200;
     res.write('ok');
     return res.end();
@@ -135,8 +138,8 @@ const server = http.createServer(function(
 
   const handler: RequestHandler | null = getRequestHandler(pathname);
   if (handler) {
-    const uploader = new FileUploader(req, res, handler);
-    uploader.start();
+    console.log('Found handler');
+    new FileUploader(req, res, handler);
     return;
   }
 

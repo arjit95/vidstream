@@ -7,7 +7,7 @@ import {
   BaseEntity,
   PrimaryColumn,
 } from 'typeorm';
-import {Field, ObjectType, ID, Int} from 'type-graphql';
+import { Field, ObjectType, Int } from 'type-graphql';
 
 import { User } from './User';
 import { Video } from './Video';
@@ -15,19 +15,16 @@ import { Video } from './Video';
 @Entity({ name: 'comments' })
 @ObjectType()
 export class Comment extends BaseEntity {
-  @PrimaryColumn({type: 'bigint', generated: process.env.CONFIG_ENABLE_SHARDING !== '1'})
-  @Field(() => ID)
-  readonly id!: number;
+  @PrimaryColumn('varchar', { length: 36, nullable: false })
+  @Field()
+  id!: string;
 
-  @ManyToOne(
-    () => User,
-    {
-      onDelete: 'CASCADE',
-      eager: true,
-      nullable: false
-    }
-  )
-  @JoinColumn({name: 'username'})
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+    eager: true,
+    nullable: false,
+  })
+  @JoinColumn({ name: 'username' })
   @Field(() => User)
   user!: User;
 
@@ -40,35 +37,31 @@ export class Comment extends BaseEntity {
   content!: string;
 
   @Index('comment_video_id_pk')
-  @ManyToOne(
-    () => Video,
-    {
-      onDelete: 'CASCADE',
-      eager: true,
-      nullable: false
-    }
-  )
-  @JoinColumn({name: 'video_id'})
+  @ManyToOne(() => Video, {
+    onDelete: 'CASCADE',
+    eager: true,
+    nullable: false,
+  })
+  @JoinColumn({ name: 'video_id' })
   @Field(() => Video)
   video!: Video;
 
-  @ManyToOne(
-    () => Comment,
-    {
-      onDelete: 'CASCADE',
-      eager: true,
-      nullable: true
-    }
-  )
-  @JoinColumn({name: 'parent_id'})
-  @Field(() => Comment, {nullable: true})
+  @ManyToOne(() => Comment, {
+    onDelete: 'CASCADE',
+    eager: true,
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parent_id' })
+  @Field(() => Comment, { nullable: true })
   parent?: Comment;
 
   @Column('integer', { default: () => 0, nullable: false })
-  @Field(() => Int, {nullable: true})
+  @Field(() => Int, { nullable: true })
   likes!: number;
 
   @Column('integer', { default: () => 0, nullable: false })
-  @Field(() => Int, {nullable: false})
+  @Field(() => Int, { nullable: false })
   dislikes!: number;
+
+  static itemType = '04';
 }

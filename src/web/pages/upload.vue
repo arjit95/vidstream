@@ -33,8 +33,8 @@
                 persistent-hint
               ></v-select>
               <chip-input
-                ref="genreInput"
-                label="Genre"
+                ref="categoryInput"
+                label="Categories"
                 :items="genres"
               ></chip-input>
               <v-btn :disabled="!valid" color="accent" @click="validate">
@@ -90,7 +90,7 @@ export default {
           message: channels.error,
         })
       } else {
-        this.channels = channels
+        this.channels = channels.result
       }
     },
 
@@ -100,7 +100,7 @@ export default {
       const formData = new FormData()
       formData.append('token', this.$store.state.auth.token)
       formData.append('tags', this.$refs.tagInput.select.join(','))
-      formData.append('genres', this.$refs.genreInput.select.join(','))
+      formData.append('genres', this.$refs.categoryInput.select.join(','))
       formData.append('title', this.video.name)
       formData.append('description', this.video.description)
       formData.append('channel', this.video.channel)
@@ -108,7 +108,12 @@ export default {
 
       const response = await this.$sdk.Assets.uploadVideo(formData)
       if (response.error) {
-        alert(response.error)
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      } else {
+        this.$router.push('/')
       }
     },
   },
