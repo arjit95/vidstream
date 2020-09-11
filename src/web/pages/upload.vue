@@ -37,7 +37,12 @@
                 label="Categories"
                 :items="genres"
               ></chip-input>
-              <v-btn :disabled="!valid" color="accent" @click="validate">
+              <v-btn
+                :disabled="!valid"
+                color="accent"
+                :loading="isUploadInProgress"
+                @click="validate"
+              >
                 Upload
               </v-btn>
             </v-form>
@@ -74,6 +79,7 @@ export default {
     },
     genres: ['entertainment', 'technology'],
     channels: [],
+    isUploadInProgress: false,
   }),
 
   mounted() {
@@ -97,6 +103,8 @@ export default {
     async validate() {
       this.$refs.form.validate()
 
+      this.isUploadInProgress = true
+
       const formData = new FormData()
       formData.append('token', this.$store.state.auth.token)
       formData.append('tags', this.$refs.tagInput.select.join(','))
@@ -107,6 +115,8 @@ export default {
       formData.append('file', this.video.file)
 
       const response = await this.$sdk.Assets.uploadVideo(formData)
+      this.isUploadInProgress = false
+
       if (response.error) {
         this.$nuxt.$emit('childEvent', {
           action: 'error',
