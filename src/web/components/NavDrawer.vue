@@ -85,11 +85,6 @@ export default {
           href: `/profile/${user.username}/playlists`,
         },
         {
-          icon: 'mdi-clock',
-          title: 'Channels',
-          href: `/profile/${user.username}/channels`,
-        },
-        {
           icon: 'mdi-upload',
           title: 'Upload',
           href: '/upload',
