@@ -1,0 +1,12 @@
+query getChannel($id: String!) {
+  channel(id: $id) {
+      id
+      title
+      subscribers
+      user {
+        username
+        name
+      }
+      description
+  }
+}

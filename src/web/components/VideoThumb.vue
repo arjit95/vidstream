@@ -1,25 +1,25 @@
 <template>
   <div :class="containerClass">
-    <nuxt-link :to="video.url">
+    <nuxt-link :to="url">
       <v-avatar :class="dense ? 'video-thumb dense' : 'video-thumb'">
-        <v-img :src="video.thumb"></v-img>
+        <v-img :src="thumb"></v-img>
       </v-avatar>
     </nuxt-link>
     <v-row>
-      <nuxt-link :to="video.channelURL">
+      <nuxt-link :to="channelURL">
         <v-avatar v-if="horizontal" class="mt-4 ml-4">
-          <v-img :src="video.channelThumb"></v-img>
+          <v-img :src="channelThumb"></v-img>
         </v-avatar>
       </nuxt-link>
       <v-col :class="vertical ? 'pt-0 ml-4' : ''">
         <div class="text-subtitle-2">
-          <nuxt-link :to="video.url">{{ video.name }}</nuxt-link>
+          <nuxt-link :to="url">{{ video.title }}</nuxt-link>
         </div>
         <div class="text-caption">
-          <nuxt-link :to="video.channelURL">{{ video.channel }}</nuxt-link>
+          <nuxt-link :to="channelURL">{{ video.channel.title }}</nuxt-link>
         </div>
         <div class="text-caption">
-          {{ video.views }} views | {{ video.uploadedDate }}
+          {{ video.views }} views | {{ uploadedDate }}
         </div>
       </v-col>
     </v-row>
@@ -48,6 +48,8 @@
 }
 </style>
 <script>
+import Humanize from 'humanize-duration'
+
 export default {
   name: 'VideoThumb',
   props: {
@@ -55,14 +57,13 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: 'Video name',
-          channel: 'Channel name',
-          views: 1234,
-          uploadedDate: '4 days ago',
-          thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-          channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-          channelURL: '/channel/123',
-          url: '/watch/123',
+          title: 'Video name',
+          channel: {
+            title: 'Channel name',
+            id: '',
+          },
+          views: 0,
+          uploaded_at: new Date(),
         }
       },
     },
@@ -84,6 +85,25 @@ export default {
       return `d-inline-flex thumb-container ${
         this.horizontal ? 'flex-column' : 'flex-row'
       }`
+    },
+    thumb() {
+      return `${this.$config.apiURL}/api/assets/video/image/${this.video.id}/poster.png`
+    },
+    channelThumb() {
+      return `${this.$config.apiURL}/api/assets/channel?id=${this.video.channel.id}`
+    },
+    url() {
+      return `/watch/${this.video.id}`
+    },
+    channelURL() {
+      return `/channel/${this.video.channel.id}`
+    },
+    uploadedDate() {
+      return (
+        Humanize(Date.now() - new Date(this.video.uploaded_at).getTime(), {
+          largest: 1,
+        }) + ' ago'
+      )
     },
   },
 }

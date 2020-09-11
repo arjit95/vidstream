@@ -32,7 +32,7 @@
         </v-col>
         <v-col v-if="profile" cols="3" class="d-flex align-end justify-end">
           <v-avatar color="accent" class="avatar" size="128">
-            <v-img :src="profile"></v-img>
+            <v-img :src="profile" height="128" width="128" />
           </v-avatar>
         </v-col>
       </v-row>

@@ -64,11 +64,11 @@ export class VideoResolver {
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
     @Arg('channelId', { nullable: true }) channelId?: string,
-    @Arg('username', {nullable: true}) username?: string
+    @Arg('username', { nullable: true }) username?: string
   ): Promise<Videos> {
     limit = Math.max(50, limit);
 
-    if ( !(username || channelId)) {
+    if (!(username || channelId)) {
       throw new Error('Please supply channel or username');
     }
 
@@ -76,14 +76,14 @@ export class VideoResolver {
       username = IdGen.decode(channelId).split('-')[0];
     }
 
-    let query: {user: {username?: string}, id? : string} = {
+    let query: { user: { username?: string }; channel?: { id: string } } = {
       user: {
-        username
-      }
+        username,
+      },
     };
 
     if (channelId) {
-      query.id = channelId;
+      query.channel = { id: channelId };
     }
 
     const [videos, total] = await Video.findAndCount({

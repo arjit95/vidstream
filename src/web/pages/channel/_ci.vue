@@ -1,6 +1,12 @@
 <template>
   <v-container class="pt-0" fluid>
-    <banner></banner>
+    <banner
+      :title="channel.title"
+      :subtitle1="channel.created_at"
+      :body="channel.description || undefined"
+      :banner-bg="`${apiURL}/api/assets/channel/banner?id=${channel.id}`"
+      :profile="`${apiURL}/api/assets/channel?id=${channel.id}`"
+    ></banner>
     <v-container>
       <v-tabs
         v-model="tab"
@@ -13,7 +19,11 @@
       <v-tabs-items v-model="tab" class="pt-4" style="background: transparent;">
         <v-tab-item class="mx-2">
           <div class="text-body-1 mb-2">Recently Uploaded</div>
-          <video-thumbs class="ms-n1" :videos="next" horizontal></video-thumbs>
+          <video-thumbs
+            class="ms-n1"
+            :videos="recents"
+            horizontal
+          ></video-thumbs>
           <nuxt-link to="/">
             <v-btn color="accent" outlined>View More</v-btn>
           </nuxt-link>
@@ -29,37 +39,31 @@ import Banner from '~/components/Banner'
 export default {
   name: 'Channel',
   components: { VideoThumbs, Banner },
+
+  async asyncData({ $sdk, params, redirect, $config }) {
+    const channelId = params.ci
+    const channel = await $sdk.Metadata.getChannel(channelId)
+    if (channel.error) {
+      return { channel: null }
+    }
+
+    return { channel }
+  },
   data() {
     return {
       tab: null,
-      generalItems: [
-        {
-          icon: 'mdi-youtube-subscription',
-          title: 'Recently Added',
-          href: '/recents',
-        },
-        {
-          icon: 'mdi-trending-up',
-          title: 'Trending',
-          href: '/trending',
-        },
-      ],
-      next: [],
+      recents: [],
     }
   },
-  mounted() {
-    const videos = {
-      name: 'Video 1',
-      channel: 'Channel 1',
-      views: 1235,
-      uploadedDate: '4 days ago',
-      thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      url: '/watch/123',
-      channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      channelURL: '/channel/123',
+
+  async mounted() {
+    const channelId = this.$route.params.ci
+    const recents = await this.$sdk.Metadata.getUserVideos(channelId)
+    if (recents.error) {
+      return
     }
 
-    this.next = Array(5).fill(videos)
+    this.recents = recents.result
   },
 }
 </script>

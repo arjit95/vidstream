@@ -2,7 +2,7 @@
   <v-container class="pt-0" fluid>
     <banner
       :title="user.name"
-      :subtitle1="user.created_at"
+      :subtitle1="'Joined ' + user.created_at"
       :body="user.description || undefined"
       :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
       :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
@@ -60,6 +60,7 @@ export default {
   mounted() {
     this.init()
   },
+
   methods: {
     async init() {
       const username = this.$route.params.id
@@ -71,21 +72,7 @@ export default {
         })
       }
 
-      const API_URL = this.$config.apiURL
-      this.videos = response.result.map((video) => ({
-        name: video.title,
-        channel: video.channel.title,
-        views: video.views,
-        uploadedDate:
-          Humanize(Date.now() - new Date(video.uploaded_at).getTime(), {
-            largest: 1,
-          }) + ' ago',
-        thumb: `${API_URL}/api/assets/video/image/${video.id}/poster.png`,
-        channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-        url: `/watch/${video.id}`,
-        channelURL: `/channel/${video.channel.id}`,
-      }))
-
+      this.videos = response.result
       this.loading = false
     },
   },

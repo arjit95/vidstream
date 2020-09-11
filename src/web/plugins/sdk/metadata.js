@@ -1,6 +1,7 @@
 import ChannelsQuery from '~/plugins/sdk/queries/metadata/channels'
 import VideosQuery from '~/plugins/sdk/queries/metadata/videos'
 import UserQuery from '~/plugins/sdk/queries/metadata/user'
+import ChannelQuery from '~/plugins/sdk/queries/metadata/channel'
 
 export default class {
   constructor({ store }, api) {
@@ -24,6 +25,23 @@ export default class {
       }
 
       return response.data.channels
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async getChannel(id) {
+    try {
+      const response = await this.api.query({
+        query: ChannelQuery,
+        variables: { id },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.channel
     } catch (error) {
       return { error }
     }
