@@ -17,12 +17,12 @@ export default class {
    * @property {string} data.username
    */
   setUserInfo(data) {
-    const { token, expiry, ...metadata } = data
+    const { token, expiry, username, name } = data
     this.store.commit('auth/setAuth', { token, expiry })
 
     // Do not store empty metadata
-    if (Object.keys(metadata).length) {
-      this.store.commit('app/setUserInfo', { ...metadata, isLoggedIn: true })
+    if (username && name) {
+      this.store.commit('app/setUserInfo', { username, name, isLoggedIn: true })
     }
   }
 

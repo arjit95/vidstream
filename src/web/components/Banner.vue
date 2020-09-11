@@ -1,5 +1,5 @@
 <template>
-  <v-row class="banner-container" :style="coverBackground">
+  <v-row class="banner-container" :style="{ background: background }">
     <v-container>
       <v-row style="height: 100%;">
         <v-col cols="8">
@@ -93,17 +93,9 @@ export default {
       default: () => [],
     },
   },
-  data() {
-    return {
-      coverBackground: {
-        type: String,
-        default: '',
-      },
-    }
-  },
-  watch: {
-    bannerBg() {
-      this.coverBackground = `background: linear-gradient(rgba(0, 0, 0, 0.45),
+  computed: {
+    background() {
+      return `linear-gradient(rgba(0, 0, 0, 0.45),
         rgba(0, 0, 0, 0.45)),
         url('${this.bannerBg}')`
     },

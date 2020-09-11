@@ -60,32 +60,6 @@
     </v-container>
   </v-container>
 </template>
-
-<style lang="scss" scoped>
-.banner-container {
-  position: relative;
-  height: 50vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-    url(https://picsum.photos/1366/768?random);
-}
-
-.avatar {
-  margin-bottom: -90px;
-  z-index: 99;
-}
-
-.channel-header {
-  margin-top: 64px;
-}
-
-.channel-description {
-  display: block;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  overflow: hidden;
-  max-height: 3.4em;
-}
-</style>
 <script>
 export default {
   name: 'UserPlaylists',

@@ -2,13 +2,10 @@ export class IdGen {
   private static validChars =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._';
 
-  static encode(
-    str: string,
-    validChars: string = IdGen.validChars
-  ) {
+  static encode(str: string, validChars: string = IdGen.validChars) {
     const charLength: bigint = BigInt(validChars.length);
 
-    let values: string[] = str.split('').map((ch) => {
+    let values: string[] = str.split('').map(ch => {
       const entry = validChars.indexOf(ch);
       return entry < 10 ? `${validChars.length + entry}` : `${entry}`;
     });

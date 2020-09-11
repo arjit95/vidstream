@@ -1,6 +1,13 @@
 <template>
   <v-container class="pt-0" fluid>
-    <banner></banner>
+    <banner
+      :title="user.name"
+      :subtitle1="user.created_at"
+      :body="user.description || undefined"
+      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
+      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
+    >
+    </banner>
     <v-container>
       <div class="channel-header text-body-1 mb-6">Recently Uploaded</div>
       <video-thumbs
@@ -20,11 +27,28 @@ import Banner from '~/components/Banner'
 export default {
   name: 'UserProfile',
   components: { VideoThumbs, Banner },
+
+  async asyncData({ $sdk, params, redirect }) {
+    const user = await $sdk.Metadata.getUser(params.id)
+    if (user.error) {
+      redirect('/404')
+      return
+    }
+
+    user.created_at =
+      Humanize(Date.now() - new Date(user.joined).getTime(), {
+        largest: 1,
+      }) + ' ago'
+
+    return { user }
+  },
+
   data() {
     return {
       videos: [],
       loading: true,
       username: this.$route.params.id,
+      apiURL: this.$config.apiURL,
     }
   },
   beforeCreate() {

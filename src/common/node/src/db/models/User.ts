@@ -21,10 +21,11 @@ export class User extends BaseEntity {
   email!: string;
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @Field()
   joined?: Date;
 
   @Column('text', { nullable: true })
-  @Field()
+  @Field({ nullable: true })
   description?: string;
 
   static itemType = '01';

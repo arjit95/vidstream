@@ -1,48 +1,42 @@
 <template>
   <v-container class="pt-0" fluid>
-    <banner></banner>
+    <banner
+      :title="user.name"
+      :subtitle1="user.created_at"
+      :body="user.description || undefined"
+      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
+      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
+    />
     <v-container>
-      <div class="channel-header text-body-1 mb-6">Channel list</div>
-      <v-card v-for="channel in channels" :key="channel.title" max-width="344">
-        <v-img
-          height="160"
-          src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-        >
-        </v-img>
-        <v-card-text>
-          <div class="text-body-1">
-            <nuxt-link :to="'/channel/' + channel.id">
-              {{ channel.title }}
-            </nuxt-link>
-          </div>
-          <div class="text-caption">{{ channel.subscribers }} Subscribers</div>
-          <div class="text-subtitle-2 channel-description">
-            {{ channel.description }}
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" text>Subscribe</v-btn>
-        </v-card-actions>
-      </v-card>
+      <div class="text-body-1 mb-6">Channel list</div>
+      <channel-card :channels="channels" />
     </v-container>
   </v-container>
 </template>
-
-<style lang="scss" scoped>
-.channel-description {
-  display: block;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  overflow: hidden;
-  max-height: 3.4em;
-}
-</style>
 <script>
+import Humanize from 'humanize-duration'
 import Banner from '~/components/Banner'
+import ChannelCard from '~/components/ChannelCard'
 
 export default {
   name: 'Channels',
-  components: { Banner },
+  components: { Banner, ChannelCard },
+
+  async asyncData({ $sdk, params, redirect }) {
+    const user = await $sdk.Metadata.getUser(params.id)
+    if (user.error) {
+      redirect('/404')
+      return
+    }
+
+    user.created_at =
+      Humanize(Date.now() - new Date(user.joined).getTime(), {
+        largest: 1,
+      }) + ' ago'
+
+    return { user }
+  },
+
   data() {
     return {
       channels: [],
@@ -65,8 +59,6 @@ export default {
       for (const channel of response.result) {
         Object.assign(channel, {
           banner: `${apiURL}/api/assets/channel/banner?id${channel.id}`,
-          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         })
 
         this.channels.push(channel)

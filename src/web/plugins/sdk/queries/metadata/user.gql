@@ -1,0 +1,8 @@
+query getUser($username: String!) {
+  user(username: $username) {
+    username
+    name
+    joined
+    description
+  }
+}

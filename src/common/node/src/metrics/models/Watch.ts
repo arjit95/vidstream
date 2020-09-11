@@ -19,7 +19,9 @@ export class Watch extends Model {
   }
 
   async create(videoInfo: VideoCreate) {
-    const id = IdGen.encode(`${videoInfo.userID}-${Watch.itemType}-${Date.now()}`);
+    const id = IdGen.encode(
+      `${videoInfo.userID}-${Watch.itemType}-${Date.now()}`
+    );
 
     const response = await this.client.create({
       index: this.index,

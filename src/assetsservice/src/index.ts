@@ -4,8 +4,9 @@ import requestHandler from './requestHandler';
 
 const ASSETS_DIR = process.env.ASSETS_DIR || './assets';
 const profileDirectory = resolve(ASSETS_DIR, 'profiles');
+const profileBanners = resolve(ASSETS_DIR, 'profile-banners');
 const channelDirectory = resolve(ASSETS_DIR, 'channels');
-const channelBanner = resolve(ASSETS_DIR, 'channelBanners');
+const channelBanner = resolve(ASSETS_DIR, 'channel-banners');
 
 const fastify = Fastify({ logger: true });
 
@@ -17,6 +18,12 @@ fastify.get(
   '/api/assets/user/profile',
   requestHandler(profileDirectory, ['id'])
 );
+
+fastify.get(
+  '/api/assets/user/profile/banner',
+  requestHandler(profileBanners, ['id'])
+);
+
 fastify.get('/api/assets/channel', requestHandler(channelDirectory, ['id']));
 fastify.get(
   '/api/assets/channel/banner',
