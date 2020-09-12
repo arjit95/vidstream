@@ -40,7 +40,7 @@ export class VideoLike extends BaseEntity {
 
   @Column('tinyint', { default: () => 1, nullable: false })
   @Field()
-  liked?: number;
+  liked!: number;
 
   static itemType = '07';
 }

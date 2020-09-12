@@ -40,7 +40,7 @@ export class CommentLike extends BaseEntity {
 
   @Column('tinyint', { default: () => 1, nullable: false })
   @Field()
-  liked?: number;
+  liked!: number;
 
   static itemType = '05';
 }

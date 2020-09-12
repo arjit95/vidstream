@@ -39,23 +39,15 @@
           "column": "video_id",
           "name": "unicode_loose_md5"
         }
-      ],
-      "auto_increment": {
-        "column": "id",
-        "sequence": "comments_seq"
-      }
+      ]
     },
     "comment_likes": {
       "column_vindexes": [
         {
-          "column": "video_id",
+          "column": "comment_id",
           "name": "unicode_loose_md5"
         }
-      ],
-      "auto_increment": {
-        "column": "id",
-        "sequence": "comment_likes_seq"
-      }
+      ]
     },
     "video_likes": {
       "column_vindexes": [
@@ -63,11 +55,7 @@
           "column": "video_id",
           "name": "unicode_loose_md5"
         }
-      ],
-      "auto_increment": {
-        "column": "id",
-        "sequence": "video_likes_seq"
-      }
+      ]
     },
     "subscriptions": {
       "column_vindexes": [
@@ -75,11 +63,7 @@
           "column": "username",
           "name": "unicode_loose_md5"
         }
-      ],
-      "auto_increment": {
-        "column": "id",
-        "sequence": "subscriptions_seq"
-      }
+      ]
     },
     "trending": {
       "column_vindexes": [
