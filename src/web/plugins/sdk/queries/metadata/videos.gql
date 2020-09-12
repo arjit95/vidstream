@@ -1,5 +1,5 @@
-query getVideos($username: String, $channelId: String, $limit: Int = 10, $skip: Int = 0 ) {
-  videos(username: $username, channelId: $channelId, limit: $limit, skip: $skip) {
+query getVideos($username: String, $channel_id: String, $pagination: PaginatedInput ) {
+  videos(username: $username, channel_id: $channel_id, pagination: $pagination) {
     total
     result {
       id

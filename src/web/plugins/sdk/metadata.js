@@ -51,7 +51,7 @@ export default class {
     try {
       const response = await this.api.query({
         query: VideosQuery,
-        variables: { channelId, username },
+        variables: { channel_id: channelId, username },
       })
 
       if (response.errors) {

@@ -1,5 +1,5 @@
-query getUserChannels($username: String!, $limit: Int = 10, $skip: Int = 0 ) {
-  channels(username: $username, limit: $limit, skip: $skip) {
+query getUserChannels($username: String!, $pagination: PaginatedInput) {
+  channels(username: $username, pagination: $pagination) {
     total
     result {
       id
