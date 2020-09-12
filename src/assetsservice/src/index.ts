@@ -1,6 +1,9 @@
 import { fastify as Fastify } from 'fastify';
 import { resolve } from 'path';
 import requestHandler from './requestHandler';
+import {Adapter as DBAdapter} from '@me/common/db/adapter';
+import {Metrics} from '@me/common/metrics';
+import videoDelete from './videoDeleteHandler';
 
 const ASSETS_DIR = process.env.ASSETS_DIR || './assets';
 const profileDirectory = resolve(ASSETS_DIR, 'profiles');
@@ -10,7 +13,7 @@ const channelBanner = resolve(ASSETS_DIR, 'channel-banners');
 
 const fastify = Fastify({ logger: true });
 
-fastify.get('/_healthz', { logLevel: 'trace' }, async () => {
+fastify.get('/_healthz', { logLevel: 'debug' }, async () => {
   return 'ok';
 });
 
@@ -38,8 +41,13 @@ fastify.get(
   requestHandler(process.env.CONFIG_CONVERTED_DIRECTORY, [], ['id', 'type'])
 );
 
+fastify.register(videoDelete);
+
 const start = async () => {
   const port = parseInt(process.env.CONFIG_HTTP_PORT);
+  await DBAdapter.createConnection();
+  await Metrics.getInstance();
+
   await fastify.listen(port, '0.0.0.0');
 };
 
