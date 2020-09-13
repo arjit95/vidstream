@@ -1,0 +1,5 @@
+query Subscriptions($pagination: PaginatedInput, $id: String!) {
+    getSubscriptions(pagination: $pagination, id: $id) {
+        total
+    }
+}

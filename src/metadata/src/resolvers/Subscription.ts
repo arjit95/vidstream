@@ -6,13 +6,15 @@ import {
   Authorized,
   UnauthorizedError,
   Query,
+  FieldResolver,
+  Root,
 } from 'type-graphql';
 import { Subscription } from '@me/common/db/models/Subscription';
 import { Context } from '../context';
-import { User, Channel } from '@me/common/db/models';
+import { User, Channel, Video } from '@me/common/db/models';
 import { IdGen } from '@me/common/utils/IdGen';
 import { getManager } from 'typeorm';
-import { PaginatedInput, Subscriptions } from '..//types';
+import { PaginatedInput, Subscriptions, Videos } from '../types';
 
 @Resolver(Subscription)
 export class SubscriptionResolver {
@@ -21,18 +23,23 @@ export class SubscriptionResolver {
   async getSubscriptions(
     @Arg('pagination', { nullable: true, defaultValue: { skip: 0, take: 50 } })
     pagination: PaginatedInput,
-    @Ctx() ctx: Context
+    @Ctx() ctx: Context,
+    @Arg('id', { nullable: true }) id?: string
   ): Promise<Subscriptions> {
     if (!ctx.user) {
       throw new UnauthorizedError();
     }
 
+    const query: { user: { username: string }; channel?: { id: string } } = {
+      user: { username: ctx.user.username },
+    };
+
+    if (id) {
+      query.channel = { id };
+    }
+
     const [subscriptions, total] = await Subscription.findAndCount({
-      where: {
-        user: {
-          username: ctx.user.username,
-        },
-      },
+      where: query,
       order: {
         timestamp: 'DESC',
       },
@@ -42,6 +49,33 @@ export class SubscriptionResolver {
 
     const response = new Subscriptions();
     response.result = subscriptions;
+    response.total = total;
+
+    return response;
+  }
+
+  @FieldResolver(() => Videos)
+  async videos(
+    @Root() subscription: Subscription,
+    @Arg('pagination', { nullable: true, defaultValue: { skip: 0, take: 50 } })
+    pagination: PaginatedInput
+  ): Promise<Videos> {
+    const username = IdGen.decode(subscription.channel.id).split('-')[0];
+    const [videos, total] = await Video.findAndCount({
+      where: {
+        user: {
+          username,
+        },
+        channel: {
+          id: subscription.channel.id,
+        },
+      },
+      take: pagination.take,
+      skip: pagination.skip,
+    });
+
+    const response = new Videos();
+    response.result = videos;
     response.total = total;
 
     return response;

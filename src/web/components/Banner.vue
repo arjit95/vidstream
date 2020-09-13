@@ -28,9 +28,12 @@
               class="ma-2"
               outlined
               color="white"
+              :disabled="action.disabled"
+              :loading="action.loading"
               @click="action.onClick"
             >
-              <v-icon dense left>action.icon</v-icon>action.text
+              <v-icon dense left>{{ action.icon }}</v-icon>
+              {{ action.text }}
             </v-btn>
           </v-row>
         </v-col>

@@ -1,0 +1,8 @@
+mutation Subscription($id: String!) {
+    addSubscription(id: $id) {
+        channel {
+            id
+            title
+        }
+    }
+}

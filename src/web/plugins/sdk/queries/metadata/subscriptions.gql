@@ -1,0 +1,20 @@
+query Subscriptions($pagination: PaginatedInput) {
+    getSubscriptions(pagination: $pagination) {
+        total
+        result {
+            channel {
+                id
+                title
+            }
+            videos {
+                total
+                result {
+                    id
+                    title
+                    uploaded_at
+                    views
+                }
+            }
+        }
+    }
+}

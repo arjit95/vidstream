@@ -9,7 +9,7 @@ export default (context, inject) => {
 
   const apollo = context.app.apolloProvider.clients
   const sdk = {
-    Assets: new Assets(context, api),
+    Assets: new Assets(context, apollo.defaultClient, api),
     Auth: new Auth(context, apollo.auth, api),
     Metadata: new Metadata(context, apollo.defaultClient),
     Video: new Video(context, apollo.defaultClient),

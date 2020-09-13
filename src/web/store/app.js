@@ -20,5 +20,6 @@ export const mutations = {
 
   removeUserInfo(state) {
     state.userInfo = { ...defaultUserInfo }
+    localStorage.setItem('logout', Date.now())
   },
 }

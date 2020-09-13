@@ -1,0 +1,3 @@
+mutation Subscription($id: String!) {
+    removeSubscription(id: $id)
+}

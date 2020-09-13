@@ -1,0 +1,15 @@
+query Videos($pagination: PaginatedInput) {
+    trending(pagination: $pagination) {
+        total
+        result {
+            id
+            title
+            uploaded_at
+            views
+            channel {
+                id
+                title
+            }
+        }
+    }
+}

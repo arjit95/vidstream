@@ -133,13 +133,34 @@
 <script>
 import _ from 'lodash'
 import NavDrawer from '~/components/NavDrawer'
+import Token from '~/plugins/Token'
 
 export default {
   name: 'App',
   components: {
     NavDrawer,
   },
-  middleware: 'tokenRefresh',
+  async middleware({ $sdk, store, error }) {
+    const token = new Token(store.state.auth.expiry, store)
+    token.setRefreshHandler(() => $sdk.Auth.refresh())
+    token.setLogoutHandler(async () => {
+      await $sdk.Auth.logout()
+      window.location.href = '/'
+    })
+
+    if (!store.state.app.userInfo.isLoggedIn) {
+      return
+    }
+
+    const err = await token.init()
+    if (err) {
+      return error({
+        statusCode: 500,
+        message: err,
+      })
+    }
+  },
+
   data() {
     return {
       searchQuery: null,

@@ -12,7 +12,10 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <video-thumbs :videos="playlist.children" horizontal></video-thumbs>
-          <nuxt-link :to="playlist.href">
+          <nuxt-link
+            v-if="playlist.total > playlist.children.length"
+            :to="playlist.href"
+          >
             <v-btn color="accent" outlined>View More</v-btn>
           </nuxt-link>
         </v-expansion-panel-content>
@@ -27,41 +30,36 @@ import VideoThumbs from '~/components/VideoThumbs'
 export default {
   name: 'Home',
   components: { VideoThumbs },
-  data: () => {
-    const video = {
-      name: 'Video name',
-      channel: 'Channel name',
-      views: 1234,
-      uploadedDate: '4 days ago',
-      thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      url: '/watch/123',
-      channelURL: '/channel/123',
+  async asyncData({ $sdk, error }) {
+    const [recents, trending] = await Promise.all([
+      $sdk.Metadata.getRecentVideos(),
+      $sdk.Metadata.getTrendingVideos(),
+    ])
+
+    if (recents.error || trending.error) {
+      return error({
+        statusCode: 500,
+        message: recents.error || trending.error,
+      })
     }
 
+    const playlists = [
+      {
+        title: 'Recently uploaded',
+        href: '/page/recent',
+        children: recents.result,
+        total: trending.total,
+      },
+      {
+        title: 'Recommended',
+        href: '/page/recommended',
+        children: trending.result,
+        total: trending.total,
+      },
+    ]
+
     return {
-      playlists: [
-        {
-          title: 'Recently uploaded',
-          href: '/page/recent',
-          children: Array(10).fill(video),
-        },
-        {
-          title: 'Recommended',
-          href: '/page/recommended',
-          children: Array(10).fill(video),
-        },
-        {
-          title: 'Subscribed 1',
-          href: '/channel/abc',
-          children: Array(4).fill(video),
-        },
-        {
-          title: 'Subscribed 1',
-          href: '/channel/abc',
-          children: Array(6).fill(video),
-        },
-      ],
+      playlists: playlists.filter(({ children }) => children.length),
     }
   },
   computed: {
@@ -69,18 +67,46 @@ export default {
       return this.playlists.map((_, i) => i)
     },
   },
-  mounted() {
+  async mounted() {
     this.$nextTick(() => {
       window.addEventListener('scroll', this.onScroll)
     })
+
+    if (this.$store.state.app.userInfo.isLoggedIn) {
+      await this.loadSubscriptions()
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
+    async loadSubscriptions() {
+      const subscriptions = await this.$sdk.Metadata.getSubscriptions()
+      if (subscriptions.error) {
+        return
+      }
+
+      const channels = subscriptions.result.map(({ channel, videos }) => {
+        return {
+          title: channel.title,
+          href: `/channel/${channel.id}/`,
+          id: channel.id,
+          children: videos.result.map((video) => {
+            video.channel = channel
+            return video
+          }),
+          total: videos.total,
+        }
+      })
+
+      this.playlists = this.playlists.concat(
+        channels.filter(({ total }) => total)
+      )
+    },
+
     onScroll() {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-        // load more contents
+        // load more content
       }
     },
   },

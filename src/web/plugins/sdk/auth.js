@@ -51,7 +51,7 @@ export default class {
       }
 
       this.setUserInfo(response.data.refresh)
-      return { error: null }
+      return { error: null, expiry: response.data.refresh.expiry }
     } catch (error) {
       return { error }
     }

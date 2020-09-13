@@ -1,22 +1,61 @@
 export default class {
-  static timer = null
+  constructor(expiry, store) {
+    this.timer = null
+    this.refreshFn = null
+    this.logoutFn = null
+    this.store = store
 
-  static async startTimer($sdk, $store) {
-    const expiry = $store.state.auth.expiry
-    const remaining = Date.now() - (expiry + 3 * 60) // Refresh before 3mins of actual expiration
+    this.expiry = expiry
+    window.onstorage = this.monitorStorage.bind(this)
+  }
+
+  async monitorStorage(event) {
+    if (event.key === 'logout') {
+      this.destroy()
+      await this.logoutFn()
+    }
+  }
+
+  setRefreshHandler(handler) {
+    this.refreshFn = handler
+  }
+
+  setLogoutHandler(handler) {
+    this.logoutFn = handler
+  }
+
+  async onExpire() {
+    const response = await this.refreshFn()
+    if (response.error) {
+      return response.error
+    }
+
+    this.expiry = response.expiry
+  }
+
+  async init() {
+    // Refresh before 3mins of actual expiration
+    const remaining =
+      typeof this.expiry === 'number'
+        ? this.expiry - 3 * 60 * 1000 - Date.now()
+        : 0
 
     if (this.timer) {
-      clearTimeout(this.timer)
-      this.timer = null
+      this.destroy()
     }
 
     if (remaining <= 0) {
-      const { error } = await $sdk.Auth.refresh()
+      const error = await this.onExpire()
       if (error) {
-        return
+        return error
       }
     }
 
-    this.timer = setTimeout(() => this.startTimer($sdk, $store), remaining)
+    this.timer = setTimeout(async () => await this.init(), remaining)
+  }
+
+  destroy() {
+    clearTimeout(this.timer)
+    this.timer = null
   }
 }
