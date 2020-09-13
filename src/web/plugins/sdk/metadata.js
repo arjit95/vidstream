@@ -5,9 +5,12 @@ import ChannelQuery from '~/plugins/sdk/queries/metadata/channel'
 import SubscriptionsQuery from '~/plugins/sdk/queries/metadata/subscriptions'
 import RecentVideosQuery from '~/plugins/sdk/queries/metadata/recents'
 import TrendingVideosQuery from '~/plugins/sdk/queries/metadata/trending'
-import AddSubscription from '~/plugins/sdk/queries/metadata/addSubscription'
-import RemoveSubscription from '~/plugins/sdk/queries/metadata/removeSubscription'
+import AddSubscription from '~/plugins/sdk/mutations/metadata/addSubscription'
+import RemoveSubscription from '~/plugins/sdk/mutations/metadata/removeSubscription'
 import IsSubscribed from '~/plugins/sdk/queries/metadata/isSubscribed'
+import EditChannel from '~/plugins/sdk/mutations/metadata/editChannel'
+import EditUser from '~/plugins/sdk/mutations/metadata/editUser'
+import MinimalSubscriptions from '~/plugins/sdk/queries/metadata/subscriptionsMin'
 
 export default class {
   constructor({ store }, api) {
@@ -158,10 +161,10 @@ export default class {
     return this.getRecentVideos(TrendingVideosQuery, 'trending')
   }
 
-  async getSubscriptions() {
+  async getSubscriptions(minimal = false) {
     try {
       const response = await this.api.query({
-        query: SubscriptionsQuery,
+        query: minimal ? MinimalSubscriptions : SubscriptionsQuery,
         context: {
           headers: {
             Authorization: `Bearer ${this.store.state.auth.token}`,
@@ -191,6 +194,50 @@ export default class {
       }
 
       return response.data.user
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async editChannelInfo(id, title, description) {
+    try {
+      const response = await this.api.mutate({
+        mutation: EditChannel,
+        variables: { channel: { id, title, description } },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        return response.errors[0].message
+      }
+
+      return response.data.editChannel
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async editUserInfo(name, description) {
+    try {
+      const response = await this.api.mutate({
+        mutation: EditUser,
+        variables: { user: { name, description } },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        return response.errors[0].message
+      }
+
+      return response.data.editUser
     } catch (error) {
       return { error }
     }

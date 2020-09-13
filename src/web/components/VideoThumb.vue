@@ -19,7 +19,7 @@
           <nuxt-link :to="channelURL">{{ video.channel.title }}</nuxt-link>
         </div>
         <div class="text-caption">
-          {{ video.views }} views | {{ uploadedDate }}
+          {{ videoViews }} views | {{ uploadedDate }}
         </div>
       </v-col>
     </v-row>
@@ -49,6 +49,7 @@
 </style>
 <script>
 import Humanize from 'humanize-duration'
+import humanize from 'humanize-plus'
 
 export default {
   name: 'VideoThumb',
@@ -104,6 +105,9 @@ export default {
           largest: 1,
         }) + ' ago'
       )
+    },
+    videoViews() {
+      return humanize.compactInteger(this.video.views)
     },
   },
 }

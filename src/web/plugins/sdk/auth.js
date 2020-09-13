@@ -1,4 +1,4 @@
-import RegisterMutation from '~/plugins/sdk/queries/auth/register'
+import Register from '~/plugins/sdk/mutations/auth/register'
 import LoginQuery from '~/plugins/sdk/queries/auth/login'
 import RefreshQuery from '~/plugins/sdk/queries/auth/refresh'
 
@@ -79,7 +79,7 @@ export default class {
   async register({ username, password, email }) {
     try {
       const response = await await this.apollo.mutate({
-        mutation: RegisterMutation,
+        mutation: Register,
         variables: { username, password, email },
         client: 'auth',
       })

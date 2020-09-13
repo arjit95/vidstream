@@ -17,9 +17,6 @@
           {{ channel.description || 'No description available' }}
         </div>
       </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" text>Subscribe</v-btn>
-      </v-card-actions>
     </v-card>
   </div>
 </template>

@@ -5,6 +5,9 @@ query getUserChannels($username: String!, $pagination: PaginatedInput) {
       id
       title
       subscribers
+      user {
+        username
+      }
     }
   }
 }

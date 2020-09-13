@@ -53,10 +53,10 @@ export default {
   },
   watch: {
     'user.name'() {
-      // TODO: Save updated user name
+      return this.updateInfo()
     },
     'user.description'() {
-      // TOOD: Save updated user description
+      return this.updateInfo()
     },
   },
 
@@ -70,6 +70,21 @@ export default {
     this.$sdk.Metadata.getUserChannels(username).then((response) => {
       this.channels = response.result
     })
+  },
+  methods: {
+    async updateInfo() {
+      const response = await this.$sdk.Metadata.editUserInfo(
+        this.user.name,
+        this.user.description
+      )
+
+      if (response.error) {
+        this.$nuxt.emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
   },
 }
 </script>

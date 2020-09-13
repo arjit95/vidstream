@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-form v-model="valid">
     <div ref="editableField" :class="editableClass" @click="edit">
       <slot></slot>
     </div>
@@ -7,11 +7,13 @@
       <v-text-field
         v-show="isEditing"
         ref="editField"
-        v-model="model"
+        v-model="editableModel"
         label="Edit"
-        counter="80"
+        counter="50"
         hint="Press Ctrl + Enter to save"
         clearable
+        maxlength="50"
+        :rules="rules"
         @blur="cancel"
         @click:clear="cancel"
         @keydown="waitForFinish($event)"
@@ -22,16 +24,18 @@
       <v-textarea
         v-show="isEditing"
         ref="editField"
-        v-model="model"
+        v-model="editableModel"
         label="Edit"
         clearable
         hint="Press Ctrl + Enter to save"
+        no-resize
+        rows="4"
         @blur="cancel"
         @click:clear="cancel"
         @keydown="waitForFinish($event)"
       ></v-textarea>
     </div>
-  </div>
+  </v-form>
 </template>
 <style scoped>
 .editable-container {
@@ -62,11 +66,19 @@ export default {
       type: Boolean,
       default: false,
     },
+    rules: {
+      type: Array,
+      default: () => [],
+    },
   },
-  data: () => ({
-    isEditing: false,
-    bModel: '',
-  }),
+  data() {
+    return {
+      isEditing: false,
+      bModel: '',
+      valid: true,
+      editableModel: this.model,
+    }
+  },
   computed: {
     editableClass() {
       return this.editable ? 'editable-container' : 'disabled'
@@ -75,13 +87,17 @@ export default {
   methods: {
     waitForFinish(e) {
       if (e.which === 13 && e.ctrlKey) {
-        this.finish()
+        if (this.valid) {
+          this.finish()
+        } else {
+          this.cancel()
+        }
       }
     },
 
     cancel() {
       this.isEditing = false
-      this.model = this.bModel
+      this.editableModel = this.bModel
       this.finish()
     },
 
@@ -94,15 +110,15 @@ export default {
       }
 
       this.isEditing = false
-      this.bModel = this.model // Update backup property
-      this.$emit('update:model', this.model)
+      this.bModel = this.editableModel // Update backup property
+      this.$emit('update:model', this.editableModel)
     },
 
     edit() {
       const firstChild = this.$refs.editableField.firstChild
       firstChild.style.display = 'none'
       this.isEditing = true
-      this.bModel = this.model
+      this.bModel = this.editableModel
 
       const textarea = this.$refs.editField.$el.querySelector('textarea,input')
       this.$nextTick(() => {

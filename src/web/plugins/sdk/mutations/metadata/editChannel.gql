@@ -1,0 +1,5 @@
+mutation Channel($channel: EditChannelInput!) {
+    editChannel(channel: $channel) {
+        id
+    }
+}

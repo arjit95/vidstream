@@ -1,0 +1,15 @@
+query Subscriptions($pagination: PaginatedInput) {
+    getSubscriptions(pagination: $pagination) {
+        total
+        result {
+            channel {
+                id
+                title
+                subscribers
+                user {
+                    username
+                }
+            }
+        }
+    }
+}

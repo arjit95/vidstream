@@ -3,8 +3,13 @@
     <v-container>
       <v-row style="height: 100%;">
         <v-col cols="8">
-          <editable-field single-line :model.sync="title" :editable="editable">
-            <p class="text-h4 mb-0">{{ title }}</p>
+          <editable-field
+            single-line
+            :model.sync="titleInput"
+            :editable="editable"
+            :rules="rules"
+          >
+            <p class="text-h4 mb-0">{{ titleInput }}</p>
           </editable-field>
           <p class="text-subtitle-2 mb-0">{{ subtitle1 }}</p>
           <p class="text-caption">
@@ -16,9 +21,9 @@
               >{{ subtitleLink.text }}</nuxt-link
             >
           </p>
-          <editable-field :model.sync="body" :editable="editable">
+          <editable-field :model.sync="bodyInput" :editable="editable">
             <p class="text-body-2">
-              {{ body || 'No Description Avaialble' }}
+              {{ bodyInput || 'No Description Avaialble' }}
             </p>
           </editable-field>
           <v-row v-if="actions.length > 0">
@@ -107,6 +112,13 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      rules: [(value) => !!value],
+      titleInput: this.title,
+      bodyInput: this.body,
+    }
+  },
   computed: {
     background() {
       return `linear-gradient(rgba(0, 0, 0, 0.45),
@@ -115,11 +127,11 @@ export default {
     },
   },
   watch: {
-    title() {
-      this.$emit('update:title', this.title)
+    titleInput(val) {
+      this.$emit('update:title', val)
     },
-    body() {
-      this.$emit('update:body', this.body)
+    bodyInput(val) {
+      this.$emit('update:body', val)
     },
   },
 }
