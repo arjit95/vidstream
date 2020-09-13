@@ -3,7 +3,9 @@
     <v-container>
       <v-row style="height: 100%;">
         <v-col cols="8">
-          <p class="text-h4 mb-0">{{ title }}</p>
+          <editable-field single-line :model.sync="title" :editable="editable">
+            <p class="text-h4 mb-0">{{ title }}</p>
+          </editable-field>
           <p class="text-subtitle-2 mb-0">{{ subtitle1 }}</p>
           <p class="text-caption">
             {{ subtitle2 }}
@@ -14,9 +16,11 @@
               >{{ subtitleLink.text }}</nuxt-link
             >
           </p>
-          <p class="text-body-2">
-            {{ body }}
-          </p>
+          <editable-field :model.sync="body" :editable="editable">
+            <p class="text-body-2">
+              {{ body || 'No Description Avaialble' }}
+            </p>
+          </editable-field>
           <v-row v-if="actions.length > 0">
             <v-btn
               v-for="action in actions"
@@ -54,8 +58,11 @@
 </style>
 
 <script>
+import EditableField from '~/components/EditableField'
+
 export default {
   name: 'Banner',
+  components: { EditableField },
   props: {
     title: {
       type: String,
@@ -92,12 +99,24 @@ export default {
       type: Array,
       default: () => [],
     },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     background() {
       return `linear-gradient(rgba(0, 0, 0, 0.45),
         rgba(0, 0, 0, 0.45)),
         url('${this.bannerBg}')`
+    },
+  },
+  watch: {
+    title() {
+      this.$emit('update:title', this.title)
+    },
+    body() {
+      this.$emit('update:body', this.body)
     },
   },
 }

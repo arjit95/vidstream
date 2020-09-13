@@ -3,6 +3,7 @@ query getChannel($id: String!) {
       id
       title
       subscribers
+      created_at
       user {
         username
         name

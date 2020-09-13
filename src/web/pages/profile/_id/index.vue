@@ -1,11 +1,12 @@
 <template>
   <v-container class="pt-0" fluid>
     <banner
-      :title="user.name"
-      :subtitle1="user.created_at"
-      :body="user.description || undefined"
+      :title.sync="user.name"
+      :subtitle1="user.createdAt"
+      :body.sync="user.description"
       :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
       :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
+      :editable="editable"
     />
     <v-container>
       <div class="text-body-1 mb-6">Channel list</div>
@@ -29,10 +30,12 @@ export default {
       return
     }
 
-    user.created_at =
-      Humanize(Date.now() - new Date(user.joined).getTime(), {
+    user.createdAt = `Joined ${Humanize(
+      Date.now() - new Date(user.joined).getTime(),
+      {
         largest: 1,
-      }) + ' ago'
+      }
+    )} ago`
 
     return { user }
   },
@@ -40,8 +43,23 @@ export default {
   data() {
     return {
       channels: [],
+      apiURL: this.$config.apiURL,
     }
   },
+  computed: {
+    editable() {
+      return this.$route.params.id === this.$store.state.app.userInfo.username
+    },
+  },
+  watch: {
+    'user.name'() {
+      // TODO: Save updated user name
+    },
+    'user.description'() {
+      // TOOD: Save updated user description
+    },
+  },
+
   mounted() {
     const username = this.$route.params.id
     if (!username) {
@@ -50,19 +68,7 @@ export default {
     }
 
     this.$sdk.Metadata.getUserChannels(username).then((response) => {
-      if (Object.prototype.hasOwnProperty.call(response, 'error')) {
-        this.$router.push('/404')
-        return
-      }
-
-      const apiURL = this.$config.apiURL
-      for (const channel of response.result) {
-        Object.assign(channel, {
-          banner: `${apiURL}/api/assets/channel/banner?id${channel.id}`,
-        })
-
-        this.channels.push(channel)
-      }
+      this.channels = response.result
     })
   },
 }
