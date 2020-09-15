@@ -49,7 +49,13 @@ const createEntries = async function(
   channel.id = IdGen.encode(
     `${user.username}-${Channel.itemType}-${Date.now()}`
   );
-    
+  
+  await metricsInstance.Channels.create({
+    id: channel.id,
+    userID: user.username,
+    title: channel.title,
+  });
+
   await user.save();
   await channel.save();
   return user;

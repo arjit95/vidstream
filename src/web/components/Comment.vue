@@ -1,24 +1,26 @@
 <template>
-  <div class="d-inline-flex flex-row mb-4 comment-container" :style="indent">
-    <v-avatar class="comment-thumb">
-      <v-img :src="comment.thumb"></v-img>
-    </v-avatar>
-    <div class="d-flex flex-column ms-3">
-      <div class="d-flex flex-row comment-info">
-        <nuxt-link :to="comment.profileURL" class="text-subtitle-2">
-          {{ comment.profile }}
+  <v-row class="mb-4" :style="indent">
+    <v-col cols="1">
+      <v-avatar class="comment-thumb">
+        <v-img :src="profileThumb"></v-img>
+      </v-avatar>
+    </v-col>
+    <v-col :cols="11 - depth" :class="!depth ? '' : `ms-${depth + 2}`">
+      <v-row class="comment-info">
+        <nuxt-link :to="profile" class="text-subtitle-2">
+          {{ comment.user.name }}
         </nuxt-link>
-        <nuxt-link :to="comment.url" class="text-caption date">
-          {{ comment.date }}
+        <nuxt-link :to="commentURL" class="text-caption date">
+          {{ date }}
         </nuxt-link>
-      </div>
-      <div class="text-body-2">{{ comment.content }}</div>
+      </v-row>
+      <v-row class="text-body-2">{{ comment.content }}</v-row>
       <v-row class="actions">
         <v-tooltip slot="append" top>
           <template #activator="{ on }">
             <span>
               <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
-              <small>987</small>
+              <small>{{ comment.likes || 0 }}</small>
             </span>
           </template>
           <span>Like</span>
@@ -27,61 +29,51 @@
           <template #activator="{ on }">
             <span>
               <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
-              <small>1238</small>
+              <small>{{ comment.dislikes || 0 }}</small>
             </span>
           </template>
           <span>Dislike</span>
         </v-tooltip>
-        <v-tooltip slot="append" top>
+        <v-tooltip v-if="depth === 0" slot="append" top>
           <template #activator="{ on }">
-            <span @click="repliesShown = !repliesShown">
+            <span @click="showReplyBox = !showReplyBox">
               <v-icon v-on="on">mdi-reply-outline</v-icon>
             </span>
           </template>
           <span>Reply</span>
         </v-tooltip>
       </v-row>
-      <v-row v-if="depth === 0">
+      <v-row v-if="depth === 0 && shouldShowReplies">
         <span class="text-subtitle-2 ms-3 show-comments" @click="showChildren">
-          {{ !shown ? 'View' : 'Hide' }} all replies
+          {{ !comment.showReplies ? 'View' : 'Hide' }} all replies
         </span>
       </v-row>
-      <v-col v-if="repliesShown" xs="12" md="8">
-        <v-row class="d-flex" justify="center">
-          <v-avatar class="comment-thumb">
-            <v-img :src="comment.thumb"></v-img>
-          </v-avatar>
-          <v-textarea class="ms-3" rows="3" no-resize></v-textarea>
-        </v-row>
-        <v-row>
-          <v-btn tile outlined color="accent" small>
-            <v-icon left>mdi-pencil</v-icon> Submit
-          </v-btn>
-        </v-row>
-      </v-col>
-      <v-row
-        v-if="shown && comment.children && comment.children.length"
-        class="mt-4"
+      <comment-box
+        v-if="showReplyBox"
+        :thumb="comment.thumb"
+        @onCommentAdd="onCommentAdd"
+      />
+      <v-col
+        v-if="comment.children && comment.showReplies && shouldShowReplies"
       >
         <comment
           v-for="child in comment.children"
-          :key="child.url"
+          :key="child.id"
           :comment="child"
           :depth="depth + 1"
-        ></comment>
-      </v-row>
+          @onCommentAdd="onCommentAdd"
+        />
+      </v-col>
       <v-row v-show="loadingChildren" justify="center" align="center">
         <v-skeleton-loader
           :loading="loadingChildren"
           class="loader"
           type="list-item-avatar-two-line"
-          :style="indent"
           min-width="100%"
-        >
-        </v-skeleton-loader>
+        />
       </v-row>
-    </div>
-  </div>
+    </v-col>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>
@@ -103,33 +95,31 @@
   margin: 8px 0px 6px 12px;
 }
 
-.comment-container {
-  width: auto;
-}
-
 .show-comments {
   color: var(--v-accent-lighten1);
   cursor: pointer;
 }
 </style>
 <script>
+import Humanize from 'humanize-duration'
+import CommentBox from '~/components/CommentBox'
+
 export default {
   name: 'Comment',
+  components: { CommentBox },
   props: {
     comment: {
       type: Object,
-      default: () => {
-        return {
-          channel: '',
-          profileURL: '',
-          profile: '',
-          url: '',
-          date: '',
-          content: '',
-          thumb: '',
-          children: [],
-        }
-      },
+      default: () => ({
+        id: '',
+        created_at: '',
+        content: '',
+        user: {
+          username: '',
+        },
+        children: undefined,
+        showReplies: false,
+      }),
     },
     depth: {
       type: Number,
@@ -138,34 +128,62 @@ export default {
   },
   data() {
     return {
-      shown: false,
-      loaded: false,
       loadingChildren: false,
-      repliesShown: false,
+      showReplyBox: false,
+      apiURL: this.$config.apiURL,
     }
   },
   computed: {
+    shouldShowReplies() {
+      return this.comment.children !== null
+    },
+
     indent() {
-      return `transform: translate(${this.depth * 5}px)`
+      if (!this.depth) {
+        return ''
+      }
+
+      return `transform: translate(-${this.depth + 5}px)`
+    },
+    profileThumb() {
+      return 'https://cdn.vuetifyjs.com/images/cards/store.jpg'
+      // return `${this.apiURL}/api/assets/user/profile?id=${this.comment.user.username}`
+    },
+    profile() {
+      return `/profile/${this.comment.user.username}`
+    },
+    commentURL() {
+      return `?comment=${this.comment.id}`
+    },
+    date() {
+      return (
+        Humanize(Date.now() - new Date(this.comment.created_at).getTime(), {
+          largest: 1,
+        }) + ' ago'
+      )
+    },
+  },
+  watch: {
+    'comment.children'() {
+      this.loadingChildren = false
+      if (this.comment.children) {
+        this.comment.showReplies = !this.comment.showReplies
+      }
     },
   },
   methods: {
-    async showChildren(event) {
-      if (this.loaded) {
-        this.shown = !this.shown
+    onCommentAdd(info) {
+      this.$emit('onCommentAdd', { ...info, id: this.comment.id })
+    },
+
+    showChildren(event) {
+      if (this.comment.children?.length) {
+        this.comment.showReplies = !this.comment.showReplies
         return
       }
 
       this.loadingChildren = true
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      const comments = Array(5).fill(this.comment)
-
-      this.comment.children = this.comment.children || []
-      this.comment.children.push(...comments)
-      this.shown = !this.shown
-      this.loaded = true
-      this.loadingChildren = false
+      this.$emit('onCommentRequest', this.comment.id)
     },
   },
 }

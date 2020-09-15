@@ -215,13 +215,17 @@ export default {
   },
   methods: {
     handleEvent(event) {
-      if (event.action === 'toggle-lights') {
-        event.state
-          ? this.$refs.overlay.classList.remove('lights-off')
-          : this.$refs.overlay.classList.add('lights-off')
-      } else if (event.action === 'error') {
-        this.errorDisplay = true
-        this.errorText = event.message
+      switch (event.action) {
+        case 'toggle-lights':
+          event.state
+            ? this.$refs.overlay.classList.remove('lights-off')
+            : this.$refs.overlay.classList.add('lights-off')
+          break
+        case 'error':
+        case 'info':
+          this.errorDisplay = true
+          this.errorText = event.message
+          break
       }
     },
     toggleSearch() {

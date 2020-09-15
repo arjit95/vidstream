@@ -1,6 +1,6 @@
 import { getInstance } from './adapter';
 
-import { Users, Videos, Watch } from './models';
+import { Users, Videos, Watch, Channels } from './models';
 import Model from './models/Model';
 import { Client } from '@elastic/elasticsearch';
 
@@ -8,6 +8,7 @@ export type ElasticObj = {
   Users: Users;
   Videos: Videos;
   Watch: Watch;
+  Channels: Channels;
 };
 
 async function createIndex(instance: Model, client: Client): Promise<void> {
@@ -38,11 +39,13 @@ export class Metrics {
       Users: new Users(client),
       Videos: new Videos(client),
       Watch: new Watch(client),
+      Channels: new Channels(client),
     };
 
     await createIndex(dbObj.Users, client);
     await createIndex(dbObj.Videos, client);
     await createIndex(dbObj.Watch, client);
+    await createIndex(dbObj.Channels, client);
 
     return dbObj;
   }

@@ -37,6 +37,19 @@ export default abstract class Model {
     return true;
   }
 
+  async edit(id: string, doc: any) {
+    const response = await this.client.update({
+      index: this.index,
+      id,
+      body: {
+        doc,
+      }
+    })
+
+    this._throwErrorIfFailed(response);
+    return true;
+  }
+
   /**
    * Creates an index in elasticsearch
    * @returns {Promise<boolean>} true if the table is created

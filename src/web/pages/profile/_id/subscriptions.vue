@@ -79,7 +79,7 @@ export default {
       )
 
       if (response.error) {
-        this.$nuxt.emit('childEvent', {
+        this.$nuxt.$emit('childEvent', {
           action: 'error',
           message: response.error,
         })

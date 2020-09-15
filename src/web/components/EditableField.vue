@@ -110,8 +110,8 @@ export default {
       }
 
       this.isEditing = false
-      this.bModel = this.editableModel // Update backup property
-      this.$emit('update:model', this.editableModel)
+      this.bModel = this.editableModel.trim() // Update backup property
+      this.$emit('update:model', this.bModel)
     },
 
     edit() {

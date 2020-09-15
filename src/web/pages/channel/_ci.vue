@@ -104,7 +104,7 @@ export default {
           unsubscribe.loading = false
 
           if (response.error) {
-            this.$nuxt.emit('childEvent', {
+            this.$nuxt.$emit('childEvent', {
               action: 'error',
               message: response.error,
             })
@@ -135,7 +135,7 @@ export default {
           const response = await this.$sdk.Metadata.addSubscription(channelId)
           subscribe.loading = false
           if (response.error) {
-            this.$nuxt.emit('childEvent', {
+            this.$nuxt.$emit('childEvent', {
               action: 'error',
               message: response.error,
             })
@@ -191,7 +191,7 @@ export default {
       )
 
       if (response.error) {
-        this.$nuxt.emit('childEvent', {
+        this.$nuxt.$emit('childEvent', {
           action: 'error',
           message: response.error,
         })

@@ -1,10 +1,9 @@
 import { Client } from '@elastic/elasticsearch';
 import Model from './Model';
-import { VideoSchema as Schema } from '../schema/Video';
+import { ChannelSchema as Schema } from '../schema/Channel';
 
-export interface VideoCreate {
+export interface ChannelCreate {
   title: string;
-  genres: Array<string>;
   userID: string;
   id: string;
   description?: string;
@@ -15,25 +14,24 @@ export interface VideoCreate {
  * @class
  * @classdesc Manages videos index in elasticsearch
  */
-export class Videos extends Model {
+export class Channels extends Model {
   constructor(client: Client) {
     super(client);
-    this.index = 'videos';
+    this.index = 'channels';
     this.schema = Schema;
   }
 
   /**
    * Creates a new video in the index
    **/
-  async create(videoInfo: VideoCreate) {
+  async create(channelInfo: ChannelCreate) {
     const response = await this.client.create({
       index: this.index,
-      id: videoInfo.id,
+      id: channelInfo.id,
       body: {
-        title: videoInfo.title,
-        genres: videoInfo.genres,
-        user_id: videoInfo.userID,
-        description: videoInfo.description,
+        title: channelInfo.title,
+        user_id: channelInfo.userID,
+        description: channelInfo.description,
       },
     });
 

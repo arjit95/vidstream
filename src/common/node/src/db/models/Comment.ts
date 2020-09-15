@@ -46,13 +46,13 @@ export class Comment extends BaseEntity {
   @Field(() => Video)
   video!: Video;
 
-  @ManyToOne(() => Comment, {
+  @ManyToOne(() => Comment, (comment) => comment.id, {
     onDelete: 'CASCADE',
     eager: true,
     nullable: true,
   })
-  @JoinColumn({ name: 'parent_id' })
-  @Field(() => Comment, { nullable: true })
+  @JoinColumn({name: 'parent_id'})
+  @Field({ nullable: true })
   parent?: Comment;
 
   @Column('integer', { default: () => 0, nullable: false })
@@ -64,4 +64,5 @@ export class Comment extends BaseEntity {
   dislikes!: number;
 
   static itemType = '04';
+  static relations = ['id', 'user', 'user.username', 'video', 'video.id', 'parent', 'parent.id', 'likes', 'dislikes']
 }

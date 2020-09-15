@@ -11,6 +11,7 @@ import { Channel } from '@me/common/db/models/Channel';
 import { User } from '@me/common/db/models/User';
 
 import { IdGen } from '@me/common/utils/IdGen';
+
 import {
   Channels,
   EditChannelInput,
@@ -86,6 +87,13 @@ export class ChannelResolver {
       `${user.username}-${Channel.itemType}-${Date.now()}`
     );
 
+    await ctx.metrics.Channels.create({
+      id: channel.id,
+      title: channel.title,
+      description: channel.description,
+      userID: user.username,
+    });
+
     await channel.save();
 
     return channel;
@@ -110,7 +118,9 @@ export class ChannelResolver {
       },
     });
 
+    await ctx.metrics.Channels.delete(channel.id);
     await channel.remove();
+
     return channel;
   }
 
@@ -135,6 +145,11 @@ export class ChannelResolver {
 
     channel.description = input.description;
     channel.title = input.title ?? channel.title;
+
+    await ctx.metrics.Channels.edit(channel.id, {
+      title: channel.title,
+      description: channel.description,
+    });
 
     await channel.save();
     return channel;

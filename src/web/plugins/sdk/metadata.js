@@ -11,6 +11,8 @@ import IsSubscribed from '~/plugins/sdk/queries/metadata/isSubscribed'
 import EditChannel from '~/plugins/sdk/mutations/metadata/editChannel'
 import EditUser from '~/plugins/sdk/mutations/metadata/editUser'
 import MinimalSubscriptions from '~/plugins/sdk/queries/metadata/subscriptionsMin'
+import CommentsQuery from '~/plugins/sdk/queries/metadata/comments'
+import AddComment from '~/plugins/sdk/mutations/metadata/addComment'
 
 export default class {
   constructor({ store }, api) {
@@ -238,6 +240,45 @@ export default class {
       }
 
       return response.data.editUser
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async getComments(videoId, parentId) {
+    try {
+      const response = await this.api.query({
+        query: CommentsQuery,
+        variables: { video_id: videoId, parent_id: parentId },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.getComments
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async addComment(videoId, content, parent = null) {
+    try {
+      const response = await this.api.mutate({
+        mutation: AddComment,
+        variables: { video_id: videoId, content, parent },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.addComment
     } catch (error) {
       return { error }
     }

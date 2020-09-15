@@ -10,6 +10,9 @@ export const VideoSchema = {
       genres: {
         type: 'text',
       },
+      description: {
+        type: 'text',
+      },
       tags: {
         type: 'text',
       },

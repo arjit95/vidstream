@@ -62,7 +62,7 @@ CREATE TABLE `comments` (
     `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `content` text NOT NULL,
     `video_id` varchar(36) NOT NULL,
-    `parent_id` bigint,
+    `parent_id` varchar(36),
     `likes` int NOT NULL DEFAULT 0,
     `dislikes` int NOT NULL DEFAULT 0,
 

@@ -23,8 +23,8 @@ export class CommentResolver {
   async addComment(
     @Arg('video_id') id: string,
     @Arg('content') content: string,
-    @Arg('parent', { nullable: true }) parent: string,
-    @Ctx() ctx: Context
+    @Ctx() ctx: Context,
+    @Arg('parent', { nullable: true }) parent?: string
   ): Promise<Comment> {
     if (!ctx.user) {
       throw new UnauthorizedError();
@@ -46,15 +46,22 @@ export class CommentResolver {
     });
 
     const comment = new Comment();
+    comment.id = IdGen.encode(
+      `${user.username}-${Comment.itemType}-${Date.now()}`
+    );
+
     comment.content = content;
     comment.likes = 0;
     comment.dislikes = 0;
     comment.user = user;
     comment.video = video;
+    if (parent) {
+      const parentComment = new Comment();
+      parentComment.id = parent 
+      comment.parent = parentComment
+    }
 
-    await comment.save();
-
-    return comment;
+    return comment.save();
   }
 
   @Authorized()
@@ -91,19 +98,23 @@ export class CommentResolver {
     @Ctx() ctx: Context,
     @Arg('parent_id', { nullable: true }) parent?: string
   ): Promise<Comments> {
-    const [comments, total] = await Comment.findAndCount({
-      where: {
-        parent: {
-          id: parent,
-        },
-        video: {
-          id: video_id,
-        },
-      },
-      order: { created_at: 'DESC' },
-      skip: pagination.skip,
-      take: pagination.take,
-    });
+    const query: { video: { id: string }; parent?: { id: string|null } } = {
+      video: { id: video_id },
+    };
+    if (parent) {
+      query.parent = { id: parent };
+    } else {
+      query.parent = { id: null };
+    }
+
+    const qb = Comment.getRepository()
+      .createQueryBuilder('t1')
+      .limit(pagination.take)
+      .skip(pagination.skip)
+      .leftJoinAndMapOne('t1.user', User, 't2', 't1.username = t2.username')
+      .where(query);
+
+    const [comments, total] = await qb.getManyAndCount();
 
     const response = new Comments();
     response.result = comments;
@@ -119,7 +130,7 @@ export class CommentResolver {
     }
 
     const ids = response.result.map(({ id }) => id);
-    const likes = await CommentLike.find({
+    const likes = !ids.length ? [] : await CommentLike.find({
       where: {
         comment: {
           id: In(ids),
@@ -128,6 +139,7 @@ export class CommentResolver {
           username: ctx.user.username,
         },
       },
+      take: ids.length,
     });
 
     const likesMap = likes.reduce((acc: { [key: string]: LikeType }, like) => {

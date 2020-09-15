@@ -32,12 +32,18 @@
               <video-description :video-info="videoInfo"></video-description>
             </v-tab-item>
             <v-tab-item>
-              <v-container fluid>
+              <v-container>
+                <comment-box
+                  :thumb="userProfile"
+                  @onCommentAdd="onCommentAdd"
+                />
                 <comment
                   v-for="comment in comments"
-                  :key="comment.url"
+                  :key="comment.id"
                   :comment="comment"
-                ></comment>
+                  @onCommentAdd="onCommentAdd"
+                  @onCommentRequest="onCommentRequest"
+                />
                 <v-row v-show="!commentsLoaded" justify="center" align="center">
                   <v-skeleton-loader
                     :loading="!commentsLoaded"
@@ -69,6 +75,7 @@ import VideoPlayer from '~/components/VideoPlayer'
 import VideoThumbs from '~/components/VideoThumbs'
 import Comment from '~/components/Comment'
 import VideoDescription from '~/components/VideoDescription'
+import CommentBox from '~/components/CommentBox'
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -79,6 +86,7 @@ export default {
     VideoThumbs,
     Comment,
     VideoDescription,
+    CommentBox,
   },
 
   async asyncData({ $sdk, params }) {
@@ -119,6 +127,12 @@ export default {
     }
   },
 
+  computed: {
+    userProfile() {
+      return this.$store.state.app.userInfo.username
+    },
+  },
+
   async mounted() {
     const videos = {
       name: 'Video 1',
@@ -143,36 +157,112 @@ export default {
       return error({ statusCode: 404, message: 'This video is unavailable.' })
     }
   },
-
   methods: {
-    loadDescription() {},
+    async getComments(id) {
+      const comments = await this.$sdk.Metadata.getComments(
+        this.videoInfo.id,
+        id
+      )
 
-    async loadComments() {
-      const content = {
-        channel: 'Channel name',
-        profileURL: '/profile?id=1234',
-        profile: 'User 1',
-        url: '/watch/123?comment=1234',
-        date: '4 days ago',
-        content:
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-        thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-        children: [],
+      if (comments.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: comments.error,
+        })
+
+        return null
       }
 
-      await wait(3000)
-      this.comments.push(...Array(5).fill(content))
+      comments.result = comments.result.map((comment) => {
+        comment.children = undefined
+        comment.showReplies = false
+        return comment
+      })
+
+      return comments
+    },
+
+    async loadComments() {
+      if (this.commentsLoaded) {
+        return
+      }
+
+      const comments = await this.getComments()
+      if (!comments) {
+        return
+      }
+
       this.commentsLoaded = true
+      this.comments = comments.result
     },
 
     loadContent(num) {
       switch (num) {
-        case 0:
-          this.loadDescription()
-          break
         case 1:
           this.loadComments()
           break
+      }
+    },
+
+    async onCommentRequest(id) {
+      const comment = this.comments.find((comment) => comment.id === id)
+      if (!comment) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: 'Oops something went wrong',
+        })
+
+        return
+      }
+
+      const comments = await this.getComments(comment.id)
+
+      if (!comments) {
+        return
+      }
+
+      comment.children = comments.result.length ? comments.result : null
+    },
+
+    async onCommentAdd(info) {
+      if (!info.value) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: 'Please enter a value',
+        })
+      }
+
+      const response = await this.$sdk.Metadata.addComment(
+        this.videoInfo.id,
+        info.value,
+        info.id
+      )
+
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+        return
+      }
+
+      response.children = undefined
+      response.showReplies = false
+
+      if (info.id) {
+        const comment = this.comments.find(({ id }) => id === info.id)
+
+        // Load comments if they are not already loaded
+        if (comment.children === undefined) {
+          await this.onCommentRequest(info.id)
+        } else {
+          comment.children = comment.children || []
+          comment.children.unshift(response)
+        }
+
+        comment.showReplies = true
+      } else {
+        this.comments.unshift(response)
       }
     },
   },

@@ -77,6 +77,7 @@ export class Video implements RequestHandler {
         genres,
         title: body.title,
         id,
+        description: body.description
       });
 
       const video = new VideoModel();

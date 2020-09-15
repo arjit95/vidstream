@@ -1,0 +1,11 @@
+mutation Comment($video_id: String!, $content: String!, $parent: String) {
+    addComment(video_id: $video_id, content: $content, parent: $parent) {
+        id
+        created_at
+        content
+        user {
+            username
+            name
+        }
+    }
+}

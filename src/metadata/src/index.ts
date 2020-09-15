@@ -11,6 +11,7 @@ import {
   CommentResolver,
 } from './resolvers';
 import { Adapter } from '@me/common/db/adapter';
+import { Metrics } from '@me/common/metrics/index';
 import { Auth } from '@me/common/utils/auth';
 import { buildSchema } from 'type-graphql';
 import { authChecker } from './auth';
@@ -30,6 +31,8 @@ async function main() {
   });
 
   const app = express();
+  const metrics = await Metrics.getInstance();
+
   const server = new ApolloServer({
     schema,
     context: ({ req }) => {
@@ -44,9 +47,9 @@ async function main() {
 
       try {
         const user = Auth.decodeToken(token);
-        return { req, user };
+        return { req, user, metrics };
       } catch (err) {
-        return { req, user: null };
+        return { req, user: null, metrics };
       }
     },
   });
