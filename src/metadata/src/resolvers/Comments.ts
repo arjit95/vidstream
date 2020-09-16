@@ -57,8 +57,8 @@ export class CommentResolver {
     comment.video = video;
     if (parent) {
       const parentComment = new Comment();
-      parentComment.id = parent 
-      comment.parent = parentComment
+      parentComment.id = parent;
+      comment.parent = parentComment;
     }
 
     return comment.save();
@@ -96,9 +96,9 @@ export class CommentResolver {
     pagination: PaginatedInput,
     @Arg('video_id') video_id: string,
     @Ctx() ctx: Context,
-    @Arg('parent_id', { nullable: true }) parent?: string
+    @Arg('parent', { nullable: true }) parent?: string
   ): Promise<Comments> {
-    const query: { video: { id: string }; parent?: { id: string|null } } = {
+    const query: { video: { id: string }; parent?: { id: string | null } } = {
       video: { id: video_id },
     };
     if (parent) {
@@ -107,13 +107,7 @@ export class CommentResolver {
       query.parent = { id: null };
     }
 
-    const qb = Comment.getRepository()
-      .createQueryBuilder('t1')
-      .limit(pagination.take)
-      .skip(pagination.skip)
-      .leftJoinAndMapOne('t1.user', User, 't2', 't1.username = t2.username')
-      .where(query);
-
+    const qb = Comment.getQuery(query, pagination.take, pagination.skip);
     const [comments, total] = await qb.getManyAndCount();
 
     const response = new Comments();
@@ -130,17 +124,19 @@ export class CommentResolver {
     }
 
     const ids = response.result.map(({ id }) => id);
-    const likes = !ids.length ? [] : await CommentLike.find({
-      where: {
-        comment: {
-          id: In(ids),
-        },
-        user: {
-          username: ctx.user.username,
-        },
-      },
-      take: ids.length,
-    });
+    const likes = !ids.length
+      ? []
+      : await CommentLike.getQuery(
+          {
+            comment: {
+              id: In(ids),
+            },
+            user: {
+              username: ctx.user.username,
+            },
+          },
+          ids.length
+        ).getMany();
 
     const likesMap = likes.reduce((acc: { [key: string]: LikeType }, like) => {
       acc[like.comment.id] = like.liked;

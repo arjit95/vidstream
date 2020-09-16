@@ -63,7 +63,7 @@ export default {
       const value = this.value.trim()
       this.$refs.form.reset()
 
-      this.$emit('onCommentAdd', {
+      this.$emit('commentAdd', {
         value,
       })
     },

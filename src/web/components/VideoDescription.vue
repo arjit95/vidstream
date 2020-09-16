@@ -21,7 +21,7 @@
         </div>
       </v-col>
       <v-col cols="3">
-        <v-btn class="mb-4" tile color="accent" outlined>
+        <v-btn v-if="canSubscribe" class="mb-4" tile color="accent" outlined>
           <v-icon left>mdi-youtube-subscription</v-icon> Subscribe
         </v-btn>
         <div class="mb-4 text-body-2">
@@ -59,7 +59,18 @@ export default {
         },
         tags: [],
         genres: [],
+        user: {
+          username: '',
+        },
       }),
+    },
+  },
+
+  computed: {
+    canSubscribe() {
+      return (
+        this.$store.state.app.userInfo.username !== this.videoInfo.user.username
+      )
     },
   },
 }

@@ -13,6 +13,8 @@ import EditUser from '~/plugins/sdk/mutations/metadata/editUser'
 import MinimalSubscriptions from '~/plugins/sdk/queries/metadata/subscriptionsMin'
 import CommentsQuery from '~/plugins/sdk/queries/metadata/comments'
 import AddComment from '~/plugins/sdk/mutations/metadata/addComment'
+import LikeVideo from '~/plugins/sdk/mutations/metadata/likeVideo'
+import LikeComment from '~/plugins/sdk/mutations/metadata/likeComment'
 
 export default class {
   constructor({ store }, api) {
@@ -249,7 +251,12 @@ export default class {
     try {
       const response = await this.api.query({
         query: CommentsQuery,
-        variables: { video_id: videoId, parent_id: parentId },
+        variables: { video_id: videoId, parent: parentId },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
       })
 
       if (response.errors) {
@@ -282,5 +289,37 @@ export default class {
     } catch (error) {
       return { error }
     }
+  }
+
+  async like(mutation, variables) {
+    try {
+      const response = await this.api.mutate({
+        mutation,
+        variables,
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        return response.errors[0].message
+      }
+
+      return response.data
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async likeVideo(id, liked) {
+    const response = await this.like(LikeVideo, { id, liked })
+    return response.error ? response : response.likeVideo
+  }
+
+  async likeComment(id, liked) {
+    const response = await this.like(LikeComment, { id, liked })
+    return response.error ? response : response.likeComment
   }
 }

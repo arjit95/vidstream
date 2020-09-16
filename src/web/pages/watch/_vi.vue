@@ -5,11 +5,13 @@
       :on-ready="onVideoPlayerReady"
       :options="videoPlayerOptions"
       :video-info="videoInfo"
+      @like="onVideoLike"
     ></video-player>
     <v-row class="flex-row">
       <v-col cols="12">
         <v-expansion-panels flat :value="0">
-          <v-expansion-panel>
+          <!-- Disabled, until we get playlists !-->
+          <v-expansion-panel v-if="false">
             <v-expansion-panel-header>
               <p class="text-subtitle-1">Up Next</p>
             </v-expansion-panel-header>
@@ -33,16 +35,14 @@
             </v-tab-item>
             <v-tab-item>
               <v-container>
-                <comment-box
-                  :thumb="userProfile"
-                  @onCommentAdd="onCommentAdd"
-                />
+                <comment-box :thumb="userProfile" @commentAdd="onCommentAdd" />
                 <comment
                   v-for="comment in comments"
                   :key="comment.id"
                   :comment="comment"
-                  @onCommentAdd="onCommentAdd"
-                  @onCommentRequest="onCommentRequest"
+                  @commentAdd="onCommentAdd"
+                  @commentRequest="onCommentRequest"
+                  @like="onCommentLike"
                 />
                 <v-row v-show="!commentsLoaded" justify="center" align="center">
                   <v-skeleton-loader
@@ -201,6 +201,31 @@ export default {
         case 1:
           this.loadComments()
           break
+      }
+    },
+
+    async onVideoLike(liked) {
+      const response = await this.$sdk.Metadata.likeVideo(
+        this.videoInfo.id,
+        liked
+      )
+
+      if (response?.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
+
+    async onCommentLike(info) {
+      const response = await this.$sdk.Metadata.likeComment(info.id, info.state)
+
+      if (response?.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
       }
     },
 

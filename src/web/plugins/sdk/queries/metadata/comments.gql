@@ -1,5 +1,5 @@
-query Comments($video_id: String!, $pagination: PaginatedInput, $parent_id: String) {
-    getComments(video_id: $video_id, pagination: $pagination, parent_id: $parent_id) {
+query Comments($video_id: String!, $pagination: PaginatedInput, $parent: String) {
+    getComments(video_id: $video_id, pagination: $pagination, parent: $parent) {
         result {
             id
             user {
@@ -10,6 +10,7 @@ query Comments($video_id: String!, $pagination: PaginatedInput, $parent_id: Stri
             likes
             dislikes
             content
+            liked
         }
         total
     }

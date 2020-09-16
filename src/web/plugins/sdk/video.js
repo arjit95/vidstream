@@ -11,6 +11,11 @@ export default class {
       const response = await this.api.query({
         query: VideoQuery,
         variables: { id },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
       })
 
       if (response.errors) {

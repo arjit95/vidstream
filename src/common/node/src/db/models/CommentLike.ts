@@ -5,6 +5,9 @@ import {
   Entity,
   JoinColumn,
   BaseEntity,
+  SelectQueryBuilder,
+  FindConditions,
+  ObjectLiteral
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
@@ -43,4 +46,20 @@ export class CommentLike extends BaseEntity {
   liked!: number;
 
   static itemType = '05';
+
+  static getQuery(where: FindConditions<CommentLike> | ObjectLiteral, take?: number, skip?: number): SelectQueryBuilder<CommentLike> {
+    let query = CommentLike.getRepository().createQueryBuilder('t1')
+    if (skip) {
+      query = query.skip(skip)
+    }
+
+    if (take) {
+      query = query.take(take);
+    }
+
+    return query
+      .leftJoinAndMapOne('t1.user', User, 't2', 't1.username = t2.username')
+      .leftJoinAndMapOne('t1.comment', Comment, 't3', 't1.comment_id = t3.id')
+      .where(where);
+  }
 }

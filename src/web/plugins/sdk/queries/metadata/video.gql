@@ -9,10 +9,14 @@ query getVideo($id: String!) {
       title
       subscribers
     }
+    user {
+      username
+    }
     likes
     dislikes
     description
     tags
     genres
+    liked
   }
 }

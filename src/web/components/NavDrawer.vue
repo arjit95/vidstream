@@ -79,11 +79,11 @@ export default {
           title: 'Subscriptions',
           href: `/profile/${user.username}/subscriptions`,
         },
-        {
-          icon: 'mdi-playlist-play',
-          title: 'Playlists',
-          href: `/profile/${user.username}/playlists`,
-        },
+        // {
+        //   icon: 'mdi-playlist-play',
+        //   title: 'Playlists',
+        //   href: `/profile/${user.username}/playlists`,
+        // },
         {
           icon: 'mdi-upload',
           title: 'Upload',

@@ -28,28 +28,12 @@
                 <p class="views">{{ info.views }} Views</p>
               </v-col>
               <v-col class="video-stats d-flex flex-row">
-                <v-tooltip slot="append" top>
-                  <template #activator="{ on }">
-                    <span>
-                      <v-icon slot="activator" @click="like" v-on="on"
-                        >mdi-thumb-up-outline</v-icon
-                      >
-                      <small>{{ info.likes }}</small>
-                    </span>
-                  </template>
-                  <span>Like</span>
-                </v-tooltip>
-                <v-tooltip slot="append" top>
-                  <template #activator="{ on }">
-                    <span>
-                      <v-icon slot="activator" @click="dislike" v-on="on"
-                        >mdi-thumb-down-outline</v-icon
-                      >
-                      <small>{{ info.dislikes }}</small>
-                    </span>
-                  </template>
-                  <span>Dislike</span>
-                </v-tooltip>
+                <like
+                  :likes="videoInfo.likes"
+                  :dislikes="videoInfo.dislikes"
+                  :liked="videoInfo.liked"
+                  @change="updateLikes"
+                />
                 <v-tooltip slot="append" top>
                   <template #activator="{ on }">
                     <span>
@@ -247,6 +231,7 @@ import 'videojs-vtt-thumbnails'
 import 'video.js/dist/video-js.css'
 import _ from 'lodash'
 import humanize from 'humanize-plus'
+import Like from '~/components/Like'
 
 class PlayerUtils {
   constructor({ player, info, video }) {
@@ -295,6 +280,9 @@ class PlayerUtils {
 
 export default {
   name: 'VideoPlayer',
+  components: {
+    Like,
+  },
   props: {
     options: {
       type: Object,
@@ -333,8 +321,6 @@ export default {
       return {
         title: this.videoInfo.title,
         views: humanize.compactInteger(this.videoInfo.views),
-        likes: humanize.compactInteger(this.videoInfo.likes),
-        dislikes: humanize.compactInteger(this.videoInfo.dislikes),
         genres: humanize.titleCase(humanize.oxford(this.videoInfo.genres)),
       }
     },
@@ -381,6 +367,10 @@ export default {
   },
 
   methods: {
+    updateLikes(state) {
+      this.$emit('like', state)
+    },
+
     toggleLights(event) {
       event.stopPropagation()
       this.lights = !this.lights

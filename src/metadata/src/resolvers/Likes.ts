@@ -6,6 +6,7 @@ import {
   Ctx,
   UnauthorizedError,
   registerEnumType,
+  ForbiddenError,
 } from 'type-graphql';
 import { VideoLike } from '@me/common/db/models/VideoLike';
 import { CommentLike } from '@me/common/db/models/CommentLike';
@@ -88,10 +89,6 @@ class LikeHelpers {
     }
 
     if (entity) {
-      if (entity.liked !== liked) {
-        throw new Error('Invalid operation');
-      }
-
       LikeHelpers.editParent(parent, liked, entity);
       entity.liked = liked;
 
@@ -155,35 +152,53 @@ export class CommentLikeResolver {
       throw new UnauthorizedError();
     }
 
-    let like = await CommentLike.findOne({
-      where: {
-        user: {
-          username: ctx.user.username,
-        },
-        comment: {
-          id,
-        },
-      },
-    });
-
-    const comment = await Comment.findOneOrFail({
-      where: {
-        user: {
-          username: IdGen.decode(id).split('-')[0],
-        },
-        id,
-      },
-    });
-
-    const user = await User.findOneOrFail({
-      where: {
+    const [commentUsername] = IdGen.decode(id).split('-');
+    let like = await CommentLike.getQuery({
+      user: {
         username: ctx.user.username,
       },
-    });
+      comment: {
+        id,
+        user: {
+          username: commentUsername,
+        },
+      },
+    }).getOne();
 
-    return LikeHelpers.createEntry(comment, user, liked, like) as Promise<
-      CommentLike | undefined
-    >;
+    const comment = like
+      ? like.comment
+      : await Comment.getQuery({
+          user: {
+            username: commentUsername,
+          },
+          id,
+        }).getOne();
+
+    if (!comment) {
+      throw new ForbiddenError();
+    }
+
+    const user = like
+      ? like.user
+      : await User.findOneOrFail({
+          where: {
+            username: ctx.user.username,
+          },
+        });
+
+    let response = (await LikeHelpers.createEntry(
+      comment,
+      user,
+      liked,
+      like
+    )) as CommentLike | undefined;
+    if (!response) {
+      response = new CommentLike();
+      response.liked = LikeType.Unliked;
+      return response;
+    }
+
+    return response;
   }
 }
 
@@ -200,6 +215,7 @@ export class VideoLikeResolver {
       throw new UnauthorizedError();
     }
 
+    const [videoUser] = IdGen.decode(id).split('-');
     let entity = await VideoLike.findOne({
       where: {
         user: {
@@ -207,24 +223,44 @@ export class VideoLikeResolver {
         },
         video: {
           id,
+          user: {
+            username: videoUser,
+          },
         },
       },
     });
 
-    const parent = await Video.findOneOrFail({
-      where: {
-        id,
-      },
-    });
+    const parent = entity
+      ? entity.video
+      : await Video.findOneOrFail({
+          where: {
+            id,
+            user: {
+              username: videoUser,
+            },
+          },
+        });
 
-    const user = await User.findOneOrFail({
-      where: {
-        username: ctx.user.username,
-      },
-    });
+    const user = entity
+      ? entity.user
+      : await User.findOneOrFail({
+          where: {
+            username: ctx.user.username,
+          },
+        });
 
-    return LikeHelpers.createEntry(parent, user, liked, entity) as Promise<
-      VideoLike | undefined
-    >;
+    let response = (await LikeHelpers.createEntry(
+      parent,
+      user,
+      liked,
+      entity
+    )) as VideoLike | undefined;
+    if (!response) {
+      response = new VideoLike();
+      response.liked = LikeType.Unliked;
+      return response;
+    }
+
+    return response;
   }
 }

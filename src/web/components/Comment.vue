@@ -16,24 +16,12 @@
       </v-row>
       <v-row class="text-body-2">{{ comment.content }}</v-row>
       <v-row class="actions">
-        <v-tooltip slot="append" top>
-          <template #activator="{ on }">
-            <span>
-              <v-icon v-on="on">mdi-thumb-up-outline</v-icon>
-              <small>{{ comment.likes || 0 }}</small>
-            </span>
-          </template>
-          <span>Like</span>
-        </v-tooltip>
-        <v-tooltip slot="append" top>
-          <template #activator="{ on }">
-            <span>
-              <v-icon v-on="on">mdi-thumb-down-outline</v-icon>
-              <small>{{ comment.dislikes || 0 }}</small>
-            </span>
-          </template>
-          <span>Dislike</span>
-        </v-tooltip>
+        <like
+          :likes="comment.likes"
+          :dislikes="comment.dislikes"
+          :liked="comment.liked"
+          @change="onCommentLike"
+        />
         <v-tooltip v-if="depth === 0" slot="append" top>
           <template #activator="{ on }">
             <span @click="showReplyBox = !showReplyBox">
@@ -44,14 +32,17 @@
         </v-tooltip>
       </v-row>
       <v-row v-if="depth === 0 && shouldShowReplies">
-        <span class="text-subtitle-2 ms-3 show-comments" @click="showChildren">
+        <span
+          class="text-subtitle-2 ms-1 mt-2 show-comments"
+          @click="showChildren"
+        >
           {{ !comment.showReplies ? 'View' : 'Hide' }} all replies
         </span>
       </v-row>
       <comment-box
         v-if="showReplyBox"
         :thumb="comment.thumb"
-        @onCommentAdd="onCommentAdd"
+        @commentAdd="onCommentAdd"
       />
       <v-col
         v-if="comment.children && comment.showReplies && shouldShowReplies"
@@ -61,7 +52,8 @@
           :key="child.id"
           :comment="child"
           :depth="depth + 1"
-          @onCommentAdd="onCommentAdd"
+          @commentAdd="onCommentAdd"
+          @like="onCommentLike"
         />
       </v-col>
       <v-row v-show="loadingChildren" justify="center" align="center">
@@ -92,7 +84,7 @@
 }
 
 .actions > * {
-  margin: 8px 0px 6px 12px;
+  margin: 8px 0px 6px 4px;
 }
 
 .show-comments {
@@ -173,7 +165,16 @@ export default {
   },
   methods: {
     onCommentAdd(info) {
-      this.$emit('onCommentAdd', { ...info, id: this.comment.id })
+      this.$emit('commentAdd', { ...info, id: this.comment.id })
+    },
+
+    onCommentLike(state) {
+      if (typeof state === 'object') {
+        this.$emit('like', state)
+        return
+      }
+
+      this.$emit('like', { state, id: this.comment.id })
     },
 
     showChildren(event) {
@@ -183,7 +184,7 @@ export default {
       }
 
       this.loadingChildren = true
-      this.$emit('onCommentRequest', this.comment.id)
+      this.$emit('commentRequest', this.comment.id)
     },
   },
 }
