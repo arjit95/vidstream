@@ -5,19 +5,38 @@ export default class {
     this.api = api
   }
 
-  async uploadVideo(payload) {
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
-
+  async upload(url, payload) {
     try {
-      await this.api.post('/api/upload/video', payload, config)
-      this.apollo.cache.reset()
+      const headers = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+
+      await this.api.post(url, payload, headers)
       return { error: null }
     } catch (err) {
       return { error: err.response.data.error }
     }
+  }
+
+  uploadVideo(payload) {
+    return this.upload('/api/upload/video', payload)
+  }
+
+  uploadUserProfile(payload) {
+    return this.upload('/api/upload/user/profile', payload)
+  }
+
+  uploadUserBanner(payload) {
+    return this.upload('/api/upload/user/profile/banner', payload)
+  }
+
+  uploadChannelProfile(payload) {
+    return this.upload('/api/upload/user/channel', payload)
+  }
+
+  uploadChannelBanner(payload) {
+    return this.upload('/api/upload/user/channel/banner', payload)
   }
 }

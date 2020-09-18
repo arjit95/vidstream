@@ -15,7 +15,7 @@ export const mutations = {
   },
 
   setUserInfo(state, info) {
-    state.userInfo = { ...info }
+    Object.assign(state.userInfo, info)
   },
 
   removeUserInfo(state) {

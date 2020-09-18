@@ -1,10 +1,8 @@
 import { resolve } from 'path';
+import {Channel} from './channel';
 
-import { Handler } from './handler';
-
-export class ChannelBanner extends Handler {
+export class ChannelBanner extends Channel {
   constructor() {
-    const assetsDir = process.env.CONFIG_ASSETS_DIRECTORY;
-    super(resolve(assetsDir, 'channel-banners'));
+    super(resolve(process.env.CONFIG_ASSETS_DIRECTORY, 'channel-banners'));
   }
 }

@@ -15,6 +15,7 @@
     "@nuxtjs/axios": "^5.12.1",
     "@nuxtjs/vuetify": "^1.11.2",
     "cookieparser": "^0.1.0",
+    "croppie": "^2.6.5",
     "humanize-duration": "^3.23.1",
     "humanize-plus": "^1.8.2",
     "js-cookie": "^2.2.1",

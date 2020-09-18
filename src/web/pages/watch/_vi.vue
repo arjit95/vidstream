@@ -77,8 +77,6 @@ import Comment from '~/components/Comment'
 import VideoDescription from '~/components/VideoDescription'
 import CommentBox from '~/components/CommentBox'
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
 export default {
   name: 'Watch',
   components: {
@@ -131,24 +129,6 @@ export default {
     userProfile() {
       return this.$store.state.app.userInfo.username
     },
-  },
-
-  async mounted() {
-    const videos = {
-      name: 'Video 1',
-      channel: 'Channel 1',
-      views: 1235,
-      uploadedDate: '4 days ago',
-      thumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      url: '/watch/123',
-      channelThumb: 'https://cdn.vuetifyjs.com/images/cards/store.jpg',
-      channelURL: '/channel/123',
-    }
-
-    await wait(5000)
-
-    this.next = Array(5).fill(videos)
-    this.related = this.next
   },
 
   middleware({ route, error }) {

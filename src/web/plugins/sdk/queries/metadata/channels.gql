@@ -8,6 +8,7 @@ query getUserChannels($username: String!, $pagination: PaginatedInput) {
       user {
         username
       }
+      description
     }
   }
 }

@@ -1,11 +1,11 @@
 <template>
-  <v-container class="pt-0" fluid>
+  <v-container class="pt-0">
     <banner
       :title.sync="user.name"
       :subtitle1="user.createdAt"
       :body.sync="user.description"
-      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
-      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
+      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}.png`"
+      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
       :editable="editable"
     />
     <v-container>

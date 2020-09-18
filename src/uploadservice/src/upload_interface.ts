@@ -2,7 +2,7 @@ import { IncomingMessage } from 'http';
 import { Queue } from '@me/common/utils/queue';
 import { WriteStream } from 'fs';
 
-export interface UploadContext {
+export type UploadContext = {
   queue: Queue;
   fields: { [key: string]: any };
   req: IncomingMessage;
@@ -14,4 +14,9 @@ export interface RequestHandler {
   onError(): Promise<void>;
   onFinish?(context: UploadContext): Promise<void>;
   validate?(context: UploadContext): Promise<void>;
+}
+
+export type UserUploadFields = {
+  id: string;
+  token: string;
 }

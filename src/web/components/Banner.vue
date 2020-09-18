@@ -1,8 +1,21 @@
 <template>
-  <v-row class="banner-container" :style="{ background: background }">
+  <v-row ref="bannerContainer" class="banner-container">
+    <image-uploader
+      class="banner"
+      :input-width="bannerWidth"
+      :input-height="bannerHeight"
+      output-width="960"
+      output-height="360"
+      overlay="rgba(0, 0, 0, 0.45)"
+      @image="uploadBanner"
+    >
+      <template #image>
+        <v-img :src="bannerBg" :width="bannerWidth" :height="bannerHeight" />
+      </template>
+    </image-uploader>
     <v-container>
       <v-row style="height: 100%;">
-        <v-col cols="8">
+        <v-col cols="8" class="description-col">
           <editable-field
             single-line
             :model.sync="titleInput"
@@ -23,7 +36,7 @@
           </p>
           <editable-field :model.sync="bodyInput" :editable="editable">
             <p class="text-body-2">
-              {{ bodyInput || 'No Description Avaialble' }}
+              {{ bodyInput || 'No Description Available' }}
             </p>
           </editable-field>
           <v-row v-if="actions.length > 0">
@@ -43,9 +56,18 @@
           </v-row>
         </v-col>
         <v-col v-if="profile" cols="3" class="d-flex align-end justify-end">
-          <v-avatar color="accent" class="avatar" size="128">
-            <v-img :src="profile" height="128" width="128" />
-          </v-avatar>
+          <image-uploader
+            input-width="128"
+            input-height="128"
+            radius="128"
+            @image="uploadImage"
+          >
+            <template #image>
+              <v-avatar color="accent" class="avatar" size="128">
+                <v-img :src="profile" height="128" width="128" />
+              </v-avatar>
+            </template>
+          </image-uploader>
         </v-col>
       </v-row>
     </v-container>
@@ -53,6 +75,14 @@
 </template>
 
 <style scoped>
+.banner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .banner-container {
   position: relative;
   height: 50vh;
@@ -63,14 +93,19 @@
   margin-bottom: -90px;
   z-index: 99;
 }
+
+.description-col p {
+  position: relative;
+}
 </style>
 
 <script>
 import EditableField from '~/components/EditableField'
+import ImageUploader from '~/components/ImageUploader'
 
 export default {
   name: 'Banner',
-  components: { EditableField },
+  components: { EditableField, ImageUploader },
   props: {
     title: {
       type: String,
@@ -117,13 +152,16 @@ export default {
       rules: [(value) => !!value],
       titleInput: this.title,
       bodyInput: this.body,
+      bannerContainerHeight: '0',
+      bannerContainerWidth: '0',
     }
   },
   computed: {
-    background() {
-      return `linear-gradient(rgba(0, 0, 0, 0.45),
-        rgba(0, 0, 0, 0.45)),
-        url('${this.bannerBg}')`
+    bannerWidth() {
+      return this.bannerContainerWidth
+    },
+    bannerHeight() {
+      return this.bannerContainerHeight
     },
   },
   watch: {
@@ -132,6 +170,32 @@ export default {
     },
     bodyInput(val) {
       this.$emit('update:body', val)
+    },
+  },
+  mounted() {
+    this.$nextTick(this.updateBCWidth)
+    window.addEventListener('resize', this.updateBCWidth)
+  },
+  destroy() {
+    window.removeEventListener('resize', this.updateBCWidth)
+  },
+  methods: {
+    updateBCWidth() {
+      const container = this.$refs.bannerContainer
+      if (!container) {
+        return
+      }
+
+      this.bannerContainerWidth = container.clientWidth.toString()
+      this.bannerContainerHeight = container.clientHeight.toString()
+    },
+    uploadImage(value) {
+      this.profile = URL.createObjectURL(value.scaled)
+      this.$emit('profileChange', value.original)
+    },
+    uploadBanner(value) {
+      this.bannerBg = URL.createObjectURL(value.scaled)
+      this.$emit('bannerChange', value.original)
     },
   },
 }

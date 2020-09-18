@@ -5,7 +5,7 @@ import {Adapter as DBAdapter} from '@me/common/db/adapter';
 import {Metrics} from '@me/common/metrics';
 import videoDelete from './videoDeleteHandler';
 
-const ASSETS_DIR = process.env.ASSETS_DIR || './assets';
+const ASSETS_DIR = process.env.CONFIG_ASSETS_DIRECTORY;
 const profileDirectory = resolve(ASSETS_DIR, 'profiles');
 const profileBanners = resolve(ASSETS_DIR, 'profile-banners');
 const channelDirectory = resolve(ASSETS_DIR, 'channels');

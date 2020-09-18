@@ -63,8 +63,8 @@ class FileUploader {
 
     if (!this.res.headersSent) {
       this.res.statusCode = 500;
-      this.res.write('Cannot process uploaded file');
-      this.res.end();
+      this.res.setHeader('Content-Type', 'application/json');
+      this.res.end(JSON.stringify({error: 'Cannot process uploaded file'}));
     }
   }
 
@@ -77,7 +77,8 @@ class FileUploader {
     }
 
     this.res.statusCode = 200;
-    this.res.end();
+    this.res.setHeader('Content-Type', 'application/json');
+    this.res.end(JSON.stringify({}));
   }
 
   async onFile(_: string, file: fs.ReadStream, filename: string): Promise<void> {

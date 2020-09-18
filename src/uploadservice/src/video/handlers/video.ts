@@ -13,7 +13,7 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR);
 }
 
-interface VideoUploadRequest {
+type VideoUploadRequest = {
   channel: string;
   token: string;
   genres: string;

@@ -1,11 +1,7 @@
 <template>
   <div>
     <v-card v-for="channel in channels" :key="channel.title" max-width="344">
-      <v-img
-        height="160"
-        src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-      >
-      </v-img>
+      <v-img height="160" :src="getBanner(channel)" />
       <v-card-text>
         <div class="text-body-1">
           <nuxt-link :to="'/channel/' + channel.id">
@@ -37,6 +33,12 @@ export default {
     channels: {
       type: Array,
       default: () => [],
+    },
+  },
+  methods: {
+    getBanner(channel) {
+      const apiURL = this.$config.apiURL
+      return `${apiURL}/api/assets/channel/banner?id=${channel.id}.png`
     },
   },
 }

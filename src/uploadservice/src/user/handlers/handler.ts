@@ -1,12 +1,6 @@
 import { resolve } from 'path';
 import fs from 'fs';
-import { RequestHandler, UploadContext } from '../../upload_interface';
-import { Auth } from '@me/common/utils';
-
-interface UserUploadFields {
-  id: string;
-  token: string;
-}
+import { RequestHandler, UploadContext, UserUploadFields } from '../../upload_interface';
 
 export class Handler implements RequestHandler {
   basePath: string;
@@ -17,7 +11,7 @@ export class Handler implements RequestHandler {
     this.generatedName = null;
 
     if (!fs.existsSync(this.basePath)) {
-      fs.mkdirSync(this.basePath);
+      fs.mkdirSync(this.basePath, {recursive: true});
     }
   }
 
@@ -36,11 +30,6 @@ export class Handler implements RequestHandler {
     const fields: UserUploadFields = context.fields as UserUploadFields;
     if (!fields.token) {
       throw new Error('Please supply a user token');
-    }
-
-    const user = Auth.getUserFromToken(fields.token);
-    if (!user) {
-      throw new Error('Unauthorized');
     }
   }
 }

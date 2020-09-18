@@ -11,7 +11,11 @@
     <v-list dense nav>
       <v-list-item v-if="isLoggedIn()" two-line class="px-0">
         <v-list-item-avatar>
-          <img src="https://randomuser.me/api/portraits/men/81.jpg" />
+          <v-img
+            :src="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
+            width="32"
+            height="32"
+          />
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -50,6 +54,7 @@ export default {
 
     return {
       drawer: false,
+      apiURL: this.$config.apiURL,
       generalItems: [
         {
           icon: 'mdi-home',

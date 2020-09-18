@@ -1,12 +1,14 @@
 <template>
-  <v-container class="pt-0" fluid>
+  <v-container class="pt-0">
     <banner
       :title.sync="user.name"
-      :subtitle1="user.createdAt"
+      :subtitle1="createdAt"
       :body.sync="user.description"
-      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}`"
-      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}`"
+      :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}.png`"
+      :profile="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
       :editable="editable"
+      @profileChange="updateProfile"
+      @bannerChange="updateBanner"
     />
     <v-container>
       <div class="text-body-1 mb-6">Channel list</div>
@@ -30,13 +32,6 @@ export default {
       return
     }
 
-    user.createdAt = `Joined ${Humanize(
-      Date.now() - new Date(user.joined).getTime(),
-      {
-        largest: 1,
-      }
-    )} ago`
-
     return { user }
   },
 
@@ -49,6 +44,14 @@ export default {
   computed: {
     editable() {
       return this.$route.params.id === this.$store.state.app.userInfo.username
+    },
+    createdAt() {
+      return `Joined ${Humanize(
+        Date.now() - new Date(this.user.joined).getTime(),
+        {
+          largest: 1,
+        }
+      )} ago`
     },
   },
   watch: {
@@ -78,6 +81,37 @@ export default {
         this.user.description
       )
 
+      this.$store.commit('app/setUserInfo', { name: this.user.name })
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
+
+    async updateProfile(file) {
+      const formData = new FormData()
+      formData.append('id', this.user.username)
+      formData.append('token', this.$store.state.auth.token)
+      formData.append('file', file, 'profile.png')
+
+      const response = await this.$sdk.Assets.uploadUserProfile(formData)
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
+
+    async updateBanner(file) {
+      const formData = new FormData()
+      formData.append('id', this.user.username)
+      formData.append('token', this.$store.state.auth.token)
+      formData.append('file', file, 'banner.png')
+
+      const response = await this.$sdk.Assets.uploadUserBanner(formData)
       if (response.error) {
         this.$nuxt.$emit('childEvent', {
           action: 'error',

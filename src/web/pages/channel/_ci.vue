@@ -1,15 +1,17 @@
 <template>
-  <v-container class="pt-0" fluid>
+  <v-container class="pt-0">
     <banner
       :title.sync="channel.title"
       :subtitle1="subCount"
       :body.sync="channel.description"
       subtitle2="Created by"
       :subtitle-link="subtitleLink"
-      :banner-bg="`${apiURL}/api/assets/channel/banner?id=${channel.id}`"
-      :profile="`${apiURL}/api/assets/channel?id=${channel.id}`"
+      :banner-bg="`${apiURL}/api/assets/channel/banner?id=${channel.id}.png`"
+      :profile="`${apiURL}/api/assets/channel?id=${channel.id}.png`"
       :editable="editable"
       :actions="actions"
+      @profileChange="updateProfile"
+      @bannerChange="updateBanner"
     ></banner>
     <v-container>
       <div class="text-body-1 mb-2">Recently Uploaded</div>
@@ -190,6 +192,36 @@ export default {
         this.channel.description
       )
 
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
+
+    async updateProfile(file) {
+      const formData = new FormData()
+      formData.append('id', this.channel.id)
+      formData.append('token', this.$store.state.auth.token)
+      formData.append('file', file, 'profile.png')
+
+      const response = await this.$sdk.Assets.uploadChannelProfile(formData)
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+      }
+    },
+
+    async updateBanner(file) {
+      const formData = new FormData()
+      formData.append('id', this.channel.id)
+      formData.append('token', this.$store.state.auth.token)
+      formData.append('file', file, 'banner.png')
+
+      const response = await this.$sdk.Assets.uploadChannelBanner(formData)
       if (response.error) {
         this.$nuxt.$emit('childEvent', {
           action: 'error',
