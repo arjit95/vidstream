@@ -15,17 +15,6 @@ export interface ChannelCreate {
  * @classdesc Manages videos index in elasticsearch
  */
 export class Channels extends Model {
-  static fieldsToSearch: Field[] = [
-    {
-      name: 'title',
-      boost: 1.0,
-    },
-    {
-      name: 'description',
-      boost: 0.2,
-    },
-  ];
-
   constructor(client: Client) {
     super(client);
     this.index = 'channels';

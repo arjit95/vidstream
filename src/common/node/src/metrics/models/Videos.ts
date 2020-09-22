@@ -4,7 +4,7 @@ import { VideoSchema as Schema } from '../schema/Video';
 
 export interface VideoCreate {
   title: string;
-  genres: Array<string>;
+  categories: Array<string>;
   userID: string;
   id: string;
   description?: string;
@@ -17,21 +17,6 @@ export interface VideoCreate {
  * @classdesc Manages videos index in elasticsearch
  */
 export class Videos extends Model {
-  static fieldsToSearch: Field[] = [
-    {
-      name: 'title.raw',
-      boost: 1.0,
-    },
-    {
-      name: 'genres.raw',
-      boost: 0.4,
-    },
-    {
-      name: 'description',
-      boost: 0.2,
-    },
-  ];
-
   constructor(client: Client) {
     super(client);
     this.index = 'videos';
@@ -47,7 +32,7 @@ export class Videos extends Model {
       id: videoInfo.id,
       body: {
         title: videoInfo.title,
-        genres: videoInfo.genres,
+        categories: videoInfo.categories,
         username: videoInfo.userID,
         description: videoInfo.description,
         channel_id: videoInfo.channelId,

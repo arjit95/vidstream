@@ -22,24 +22,22 @@ build:
       context: src
       docker: 
         dockerfile: transcodeworker/Dockerfile
-    - image: registry.gitlab.com/arjit95/vidstream/metadata-service
-      context: src
-      docker: 
-        dockerfile: metadata/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/transcode-reducer
       context: src
       docker: 
         dockerfile: transcodereducer/Dockerfile
-    - image: registry.gitlab.com/arjit95/vidstream/metrics-service
+    - image: registry.gitlab.com/arjit95/vidstream/metadata-service
       context: src
       docker: 
-        dockerfile: metrics/Dockerfile
+        dockerfile: metadata/Dockerfile
+    - image: registry.gitlab.com/arjit95/vidstream/recommendation-service
+      context: src
+      docker: 
+        dockerfile: recommendation/Dockerfile
     - image: registry.gitlab.com/arjit95/vidstream/auth-service
       context: src
       docker: 
         dockerfile: auth/Dockerfile
-    - image: registry.gitlab.com/arjit95/vidstream/spark-jobs
-      context: src/spark
   local:
     push: false
   tagPolicy:
@@ -50,17 +48,12 @@ deploy:
     manifests:
       - deploy/kubectl/configmap.yml
       - deploy/kubectl/secrets.yml
-      - deploy/kubectl/elasticsearch.yml
-      - deploy/kubectl/mysql.yml
       - deploy/kubectl/uploadservice.yml
       - deploy/kubectl/assetsservice.yml
       - deploy/kubectl/metadataservice.yml
       - deploy/kubectl/transcoder/master.yml
       - deploy/kubectl/transcoder/worker.yml
       - deploy/kubectl/transcoder/reducer.yml
-      - deploy/kubectl/metrics.yml
+      - deploy/kubectl/recommendationservice.yml
       - deploy/kubectl/api.yml
       - deploy/kubectl/auth.yml
-      - deploy/kubectl/spark/serviceaccount.yml
-      - deploy/kubectl/spark/recommender.yml
-      - deploy/kubectl/spark/trends.yml

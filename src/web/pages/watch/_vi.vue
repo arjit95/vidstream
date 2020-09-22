@@ -6,6 +6,7 @@
       :options="videoPlayerOptions"
       :video-info="videoInfo"
       @like="onVideoLike"
+      @end="onVideoEnd"
     ></video-player>
     <v-row class="flex-row">
       <v-col cols="12">
@@ -59,7 +60,11 @@
       </v-col>
       <v-col sm="12" md="4">
         <p class="text-subtitle-1 ms-0">Related</p>
-        <video-thumbs vertical :videos="related"></video-thumbs>
+        <video-thumbs
+          vertical
+          :videos="related"
+          :loading="related.length > 0"
+        ></video-thumbs>
       </v-col>
     </v-row>
   </v-container>
@@ -92,14 +97,17 @@ export default {
     if (videoInfo.error) {
       return error({ statusCode: 404, message: 'This video is unavailable.' })
     }
-    let related = await $sdk.Recommendations.getRelatedVideos(params.vi)
+    const related = await $sdk.Recommendations.getRelatedVideos(params.vi)
     if (related.error) {
-      related = null
+      return error({
+        statusCode: 500,
+        message: 'Error while fetching related videos',
+      })
     }
 
     return {
       videoInfo,
-      related: related?.result,
+      related: related.result,
     }
   },
 
@@ -149,6 +157,9 @@ export default {
     }
   },
   methods: {
+    // TODO: Add this data to metrics
+    onVideoEnd({ duration }) {},
+
     async getComments(id) {
       const comments = await this.$sdk.Metadata.getComments(
         this.videoInfo.id,

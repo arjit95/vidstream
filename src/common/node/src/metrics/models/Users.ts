@@ -14,17 +14,6 @@ export interface UserCreate {
  * @classdesc Manages users index in elasticsearch
  */
 export class Users extends Model {
-  static fieldsToSearch: Field[] = [
-    {
-      name: 'name',
-      boost: 0.5,
-    },
-    {
-      name: 'username',
-      boost: 1.0,
-    },
-  ];
-
   constructor(client: Client) {
     super(client);
 

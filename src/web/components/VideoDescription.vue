@@ -23,9 +23,9 @@
           <v-icon left>mdi-youtube-subscription</v-icon> Subscribe
         </v-btn>
         <div class="mb-4 text-body-2">
-          Genres:
-          <span v-for="genre in videoInfo.genres" :key="genre"
-            >{{ genre }}&nbsp;</span
+          Categories:
+          <span v-for="category in videoInfo.categories" :key="category"
+            >{{ category }}&nbsp;</span
           >
         </div>
       </v-col>
@@ -59,7 +59,7 @@ export default {
           subscribers: 0,
         },
         tags: [],
-        genres: [],
+        categories: [],
         user: {
           username: '',
         },

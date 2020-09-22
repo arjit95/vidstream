@@ -11,7 +11,11 @@
           {{ playlist.title }}
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <video-thumbs :videos="playlist.children" horizontal></video-thumbs>
+          <video-thumbs
+            :videos="playlist.children"
+            horizontal
+            :loading="false"
+          ></video-thumbs>
           <nuxt-link
             v-if="playlist.total > playlist.children.length"
             :to="playlist.href"
@@ -59,7 +63,7 @@ export default {
     ]
 
     return {
-      playlists: playlists.filter(({ children }) => children.length),
+      playlists,
     }
   },
   computed: {

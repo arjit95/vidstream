@@ -37,7 +37,7 @@ export class Related {
             fields: [
               'title^3',
               'name^3',
-              'genres.raw',
+              'categories.raw',
               'tags.raw',
               'description',
               'username^5',

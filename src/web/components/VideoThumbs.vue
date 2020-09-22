@@ -1,5 +1,8 @@
 <template>
-  <div :class="horizontal ? 'horizontal' : 'vertical'">
+  <div
+    v-if="videos.length || !isLoaded"
+    :class="horizontal ? 'horizontal' : 'vertical'"
+  >
     <video-thumb
       v-for="item in videos"
       :key="item.name"
@@ -18,6 +21,9 @@
       </v-skeleton-loader>
     </v-col>
   </div>
+  <v-row v-else justify="center" class="text-subtitle-2">
+    No video(s) available
+  </v-row>
 </template>
 
 <style lang="scss" scoped>

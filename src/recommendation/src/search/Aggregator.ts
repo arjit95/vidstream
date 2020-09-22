@@ -122,7 +122,7 @@ export class Aggregator {
             fields: [
               'title',
               'name',
-              'genres.raw',
+              'categories.raw',
               'tags.raw',
               'description',
               'username',

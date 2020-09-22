@@ -137,7 +137,7 @@ export default {
       formData.append('token', this.$store.state.auth.token)
       formData.append('tags', this.getTags().join(','))
       formData.append(
-        'genres',
+        'categories',
         this.$refs.categoryInput.select
           .map((str) => str.toLowerCase())
           .join(',')

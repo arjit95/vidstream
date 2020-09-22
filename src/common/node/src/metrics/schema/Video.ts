@@ -16,7 +16,7 @@ export const VideoSchema = {
       username: {
         type: 'keyword',
       },
-      genres: {
+      categories: {
         type: 'text',
         fields: {
           raw: {

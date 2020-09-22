@@ -64,7 +64,7 @@ export class Video extends BaseEntity {
 
   @Column('json', { nullable: true })
   @Field(() => [String])
-  genres?: string[];
+  categories?: string[];
 
   @Column('integer', { default: () => 0, nullable: false })
   @Field(() => Int)

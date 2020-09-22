@@ -16,7 +16,7 @@ query getVideo($id: String!) {
     dislikes
     description
     tags
-    genres
+    categories
     liked
   }
 }

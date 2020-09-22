@@ -23,7 +23,7 @@
           >
             <v-col class="video-meta" md="7">
               <v-col id="video-name">
-                <p class="channel">{{ info.genres }}</p>
+                <p class="channel">{{ info.categories }}</p>
                 <p class="title">{{ videoInfo.title }}</p>
                 <p class="views">{{ videoViews }}</p>
               </v-col>
@@ -238,11 +238,37 @@ class PlayerUtils {
     this.player = player
     this.info = info
     this.video = video
+    this.durationPlayed = 0
+    this.timer = null
+    this.durationParts = [] // Total parts in which video was played
+
     this.debouncedHide = _.debounce(() => {
-      if (this.player.paused()) return
+      if (this.player.el() && this.player.paused()) return
 
       info.classList.add('d-none')
     }, 2500)
+  }
+
+  startTimer() {
+    const startTime = Date.now()
+    this.timer = setInterval(() => {
+      if (!this.player.el()) {
+        // Player is removed
+        return this.stopTimer()
+      } else if (this.player.currentTime() > this._getTotalDuration()) {
+        this.durationPlayed = Date.now() - startTime
+      }
+    }, 15)
+  }
+
+  stopTimer() {
+    if (!this.timer) {
+      return
+    }
+
+    clearInterval(this.timer)
+    this.timer = null
+    this.durationParts.push(this.durationPlayed)
   }
 
   addListeners() {
@@ -259,19 +285,32 @@ class PlayerUtils {
       player.bigPlayButton.hide()
     })
 
+    player.on('play', () => this.startTimer())
+    player.on('seeking', () => this.stopTimer())
+
     player.on('pause', () => {
       if (player.seeking()) {
         return
       }
 
+      this.stopTimer()
       this.info.classList.remove('d-none')
     })
 
     this.hideInfoScreen()
   }
 
+  _getTotalDuration() {
+    return this.durationParts.reduce((acc, part) => acc + part, 0)
+  }
+
+  getTotalDurationPlayed() {
+    this.stopTimer()
+    return this._getTotalDuration()
+  }
+
   hideInfoScreen() {
-    if (this.player.paused()) return
+    if (this.player.el() && this.player.paused()) return
 
     this.info.classList.remove('d-none')
     this.debouncedHide()
@@ -305,22 +344,25 @@ export default {
         views: 0,
         likes: 0,
         dislikes: 0,
-        genres: [],
+        categories: [],
       }),
     },
   },
   data() {
     return {
-      player: null,
+      playerWrapper: null,
       isLoading: true,
       lights: true,
+      ended: false,
     }
   },
   computed: {
     info() {
       return {
         title: this.videoInfo.title,
-        genres: humanize.titleCase(humanize.oxford(this.videoInfo.genres)),
+        categories: humanize.titleCase(
+          humanize.oxford(this.videoInfo.categories)
+        ),
       }
     },
 
@@ -330,30 +372,33 @@ export default {
   },
 
   mounted() {
-    this.player = videojs(this.$refs.videoPlayer, this.options)
-
-    this.player.on('loadstart', () => {
-      const playerContainer = this.$refs.playerContainer
-      this.player.requestFullscreen = playerContainer.requestFullscreen.bind(
-        playerContainer
-      )
-      this.player.exitFullscreen = document.exitFullscreen.bind(document)
-      this.player.isFullscreen = () => document.fullscreen
-
-      const utils = new PlayerUtils({
-        player: this.player,
-        info: this.$refs.playerInfo,
-        video: this.$refs.videoPlayer,
-      })
-
-      utils.addListeners()
+    const player = videojs(this.$refs.videoPlayer, this.options)
+    this.playerWrapper = new PlayerUtils({
+      player,
+      info: this.$refs.playerInfo,
+      video: this.$refs.videoPlayer,
     })
 
-    this.player.on('loadeddata', () => {
+    player.on('loadstart', () => {
+      const playerContainer = this.$refs.playerContainer
+      player.requestFullscreen = playerContainer.requestFullscreen.bind(
+        playerContainer
+      )
+      player.exitFullscreen = document.exitFullscreen.bind(document)
+      player.isFullscreen = () => document.fullscreen
+
+      this.playerWrapper.addListeners()
+    })
+
+    player.on('loadeddata', () => {
       this.isLoading = false
     })
 
-    Promise.resolve(this.onReady(this.player))
+    player.on('ended', () => {
+      this.finish()
+    })
+
+    Promise.resolve(this.onReady(player))
       .catch((err) => {
         this.$nuxt.$emit('childEvent', {
           action: 'error',
@@ -361,15 +406,33 @@ export default {
         })
       })
       .finally(() => {
-        this.player.hlsQualitySelector()
+        player.hlsQualitySelector()
       })
   },
 
   beforeDestroy() {
-    this.player && this.player.dispose()
+    if (!this.playerWrapper) {
+      return
+    }
+
+    this.finish()
+    this.playerWrapper.player.dispose()
   },
 
   methods: {
+    finish() {
+      if (this.ended) {
+        return
+      }
+
+      const duration = this.playerWrapper.getTotalDurationPlayed()
+      this.$emit('end', {
+        duration,
+      })
+
+      this.ended = true
+    },
+
     updateLikes(state) {
       this.$emit('like', state)
     },
@@ -379,9 +442,9 @@ export default {
       this.lights = !this.lights
 
       if (this.lights) {
-        this.player.el().classList.remove('accent-glow')
+        this.playerWrapper.player.el().classList.remove('accent-glow')
       } else {
-        this.player.el().classList.add('accent-glow')
+        this.playerWrapper.player.el().classList.add('accent-glow')
       }
 
       this.$nuxt.$emit('childEvent', {

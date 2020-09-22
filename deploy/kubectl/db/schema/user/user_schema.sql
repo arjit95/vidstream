@@ -35,7 +35,7 @@ CREATE TABLE `videos` (
     `uploaded_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `listing` smallint NOT NULL,
     `tags` json,
-    `genres` json,
+    `categories` json,
     `likes` int NOT NULL DEFAULT 0,
     `dislikes` int NOT NULL DEFAULT 0,
     `views` int NOT NULL DEFAULT 0,

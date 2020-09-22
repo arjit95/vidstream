@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 type VideoUploadRequest = {
   channel: string;
   token: string;
-  genres: string;
+  categories: string;
   title: string;
   description: string;
   tags: string;
@@ -70,11 +70,11 @@ export class Video implements RequestHandler {
     }
 
     for (let name of this.fileNames) {
-      const genres = body.genres.split(',').map(genre => genre.trim());
+      const categories = body.categories.split(',').map(category => category.trim());
       const id = path.basename(name, path.extname(name))
       await metrics.Videos.create({
         userID: this.User.username,
-        genres,
+        categories,
         title: body.title,
         id,
         description: body.description,
@@ -85,7 +85,7 @@ export class Video implements RequestHandler {
       video.id = id;
       video.title = body.title;
       video.description = body.description;
-      video.genres = genres;
+      video.categories = categories;
       video.tags = body.tags.split(',').map(tag => tag.trim());
       video.channel = this.Channel;
       video.user = this.User;
