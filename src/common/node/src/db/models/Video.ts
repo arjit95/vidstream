@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   BaseEntity,
+  UpdateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field, Int } from 'type-graphql';
 
@@ -80,6 +81,9 @@ export class Video extends BaseEntity {
   @Column('tinyint', { default: () => 1, nullable: false })
   @Field(() => Int)
   uploading!: number;
+
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  updatedAt!: Date;
 
   static itemType = '03';
 }

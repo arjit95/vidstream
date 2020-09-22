@@ -1,13 +1,20 @@
 export class IdGen {
   private static validChars =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._';
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._';
+  public static SeparatorChar = '-';
 
   static encode(str: string, validChars: string = IdGen.validChars) {
     const charLength: bigint = BigInt(validChars.length);
 
-    let values: string[] = str.split('').map(ch => {
+    let values: number[] = str.split('').map(ch => {
       const entry = validChars.indexOf(ch);
-      return entry < 10 ? `${validChars.length + entry}` : `${entry}`;
+      if (entry === -1) {
+        return validChars.length + 10;
+      } else if (entry < 10) {
+        return validChars.length + entry;
+      } else {
+        return entry;
+      }
     });
 
     let id = BigInt(values.join(''));
@@ -34,8 +41,13 @@ export class IdGen {
 
     let originalId = final.toString();
     for (let i = 0; i < originalId.length; i += 2) {
-      const current = originalId[i] + originalId[i + 1];
-      original += validChars[parseInt(current) % validChars.length];
+      const current = parseInt(originalId[i] + originalId[i + 1]);
+      if (current === validChars.length + 10) {
+        // Separator
+        original += IdGen.SeparatorChar;
+      } else {
+        original += validChars[current % validChars.length];
+      }
     }
 
     return original;

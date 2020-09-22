@@ -1,9 +1,15 @@
 import { Client, ApiResponse } from '@elastic/elasticsearch';
 
-export default abstract class Model {
+export type Field = {
+  name: string;
+  boost: number;
+};
+
+export abstract class Model {
   client: Client;
   index: string;
   schema: any;
+  static fieldsToSearch: Field[] = [];
 
   constructor(client: Client) {
     this.client = client;
@@ -43,8 +49,8 @@ export default abstract class Model {
       id,
       body: {
         doc,
-      }
-    })
+      },
+    });
 
     this._throwErrorIfFailed(response);
     return true;

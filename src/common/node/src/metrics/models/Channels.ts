@@ -1,5 +1,5 @@
 import { Client } from '@elastic/elasticsearch';
-import Model from './Model';
+import { Model, Field } from './Model';
 import { ChannelSchema as Schema } from '../schema/Channel';
 
 export interface ChannelCreate {
@@ -15,6 +15,17 @@ export interface ChannelCreate {
  * @classdesc Manages videos index in elasticsearch
  */
 export class Channels extends Model {
+  static fieldsToSearch: Field[] = [
+    {
+      name: 'title',
+      boost: 1.0,
+    },
+    {
+      name: 'description',
+      boost: 0.2,
+    },
+  ];
+
   constructor(client: Client) {
     super(client);
     this.index = 'channels';
@@ -30,7 +41,7 @@ export class Channels extends Model {
       id: channelInfo.id,
       body: {
         title: channelInfo.title,
-        user_id: channelInfo.userID,
+        username: channelInfo.userID,
         description: channelInfo.description,
       },
     });

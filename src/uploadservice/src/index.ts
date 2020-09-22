@@ -52,8 +52,6 @@ class FileUploader {
   }
 
   async onError(error: Error) {
-    console.log(error.message);
-
     this.req.unpipe(this.parser);
     this.parser.removeAllListeners();
 

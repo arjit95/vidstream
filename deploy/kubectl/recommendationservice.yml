@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: metrics-service
+  name: recommendation-service
 spec:
   selector:
     matchLabels:
-      app: metrics-service
+      app: recommendation-service
   template:
     metadata:
       labels:
-        app: metrics-service
+        app: recommendation-service
     spec:
       containers:
         - name: server
-          image: registry.gitlab.com/arjit95/vidstream/metrics-service:v1
+          image: registry.gitlab.com/arjit95/vidstream/recommendation-service:v1
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
@@ -34,12 +34,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: metrics-service
+  name: recommendation-service
 spec:
   type: ClusterIP
   selector:
-    app: metrics-service
+    app: recommendation-service
   ports:
   - name: http
     port: 8080
     targetPort: 8080
+  - name: tcp
+    port: 9229
+    targetPort: 9229

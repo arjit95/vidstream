@@ -8,7 +8,7 @@
             {{ channel.title }}
           </nuxt-link>
         </div>
-        <div class="text-caption">{{ channel.subscribers }} Subscribers</div>
+        <div class="text-caption"></div>
         <div class="text-subtitle-2 channel-description">
           {{ channel.description || 'No description available' }}
         </div>
@@ -33,6 +33,11 @@ export default {
     channels: {
       type: Array,
       default: () => [],
+    },
+  },
+  computed: {
+    subscriberrs() {
+      return this.$sdk.Utils.pluralize(this.channel.subscriberrs, 'Subscribers')
     },
   },
   methods: {

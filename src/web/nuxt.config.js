@@ -105,16 +105,14 @@ export default {
 
   publicRuntimeConfig: {
     apiURL: process.env.API_SERVICE_ADDR,
-  },
-
-  privateRuntimeConfig: {
-    apiURL: process.env.API_SERVICE_ADDR,
+    categories: ['Entertainment', 'Technology', 'Comedy', 'Education', 'Blogs'],
   },
 
   apollo: {
     clientConfigs: {
       default: '~/plugins/sdk/config/metadata.js',
       auth: '~/plugins/sdk/config/auth.js',
+      recommendations: '~/plugins/sdk/config/recommendations',
     },
   },
 }

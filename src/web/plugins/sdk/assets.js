@@ -16,7 +16,7 @@ export default class {
       await this.api.post(url, payload, headers)
       return { error: null }
     } catch (err) {
-      return { error: err.response.data.error }
+      return { error: err.response?.data.error || err.error }
     }
   }
 

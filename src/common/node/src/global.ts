@@ -10,7 +10,7 @@ declare global {
       CONFIG_UPLOAD_SERVICE: string;
       CONFIG_AUTH_SERVICE: string;
       CONFIG_METADATA_SERVICE: string;
-      CONFIG_METRICS_SERVICE: string;
+      CONFIG_RECOMMENDATION_SERVICE: string;
       CONFIG_HLS_BASE_URL: string;
 
       CONFIG_CORS_ALLOWED_ORIGINS: string;

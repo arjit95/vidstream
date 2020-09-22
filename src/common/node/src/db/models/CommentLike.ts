@@ -7,7 +7,7 @@ import {
   BaseEntity,
   SelectQueryBuilder,
   FindConditions,
-  ObjectLiteral
+  ObjectLiteral,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
@@ -47,10 +47,14 @@ export class CommentLike extends BaseEntity {
 
   static itemType = '05';
 
-  static getQuery(where: FindConditions<CommentLike> | ObjectLiteral, take?: number, skip?: number): SelectQueryBuilder<CommentLike> {
-    let query = CommentLike.getRepository().createQueryBuilder('t1')
+  static getQuery(
+    where: FindConditions<CommentLike> | ObjectLiteral,
+    take?: number,
+    skip?: number
+  ): SelectQueryBuilder<CommentLike> {
+    let query = CommentLike.getRepository().createQueryBuilder('t1');
     if (skip) {
-      query = query.skip(skip)
+      query = query.skip(skip);
     }
 
     if (take) {

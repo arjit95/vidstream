@@ -87,8 +87,20 @@ export default {
     CommentBox,
   },
 
-  async asyncData({ $sdk, params }) {
-    return { videoInfo: await $sdk.Video.getInfo(params.vi) }
+  async asyncData({ $sdk, params, error }) {
+    const videoInfo = await $sdk.Video.getInfo(params.vi)
+    if (videoInfo.error) {
+      return error({ statusCode: 404, message: 'This video is unavailable.' })
+    }
+    let related = await $sdk.Recommendations.getRelatedVideos(params.vi)
+    if (related.error) {
+      related = null
+    }
+
+    return {
+      videoInfo,
+      related: related?.result,
+    }
   },
 
   data() {
@@ -104,7 +116,6 @@ export default {
         },
       },
       next: [],
-      related: [],
       comments: [],
       commentsLoaded: false,
 

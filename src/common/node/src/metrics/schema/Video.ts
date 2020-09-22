@@ -1,19 +1,45 @@
+import { ChannelSchema } from './Channel';
+
 export const VideoSchema = {
+  ...ChannelSchema,
   mappings: {
     properties: {
       title: {
-        type: 'search_as_you_type',
+        type: 'text',
+        fields: {
+          trigram: {
+            type: 'text',
+            analyzer: 'trigram',
+          },
+        },
       },
-      user_id: {
+      username: {
         type: 'keyword',
       },
       genres: {
         type: 'text',
+        fields: {
+          raw: {
+            type: 'text',
+            analyzer: 'keyword',
+            term_vector: 'yes',
+          },
+        },
       },
       description: {
         type: 'text',
       },
       tags: {
+        type: 'text',
+        fields: {
+          raw: {
+            type: 'text',
+            analyzer: 'keyword',
+            term_vector: 'yes',
+          },
+        },
+      },
+      channel_id: {
         type: 'text',
       },
       model_factor: {

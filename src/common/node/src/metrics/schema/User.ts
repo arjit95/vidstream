@@ -1,11 +1,26 @@
+import { ChannelSchema } from './Channel';
+
 export const UserSchema = {
+  ...ChannelSchema,
   mappings: {
     properties: {
       name: {
-        type: 'search_as_you_type',
+        type: 'text',
+        fields: {
+          trigram: {
+            type: 'text',
+            analyzer: 'trigram',
+          },
+        },
       },
       username: {
-        type: 'keyword',
+        type: 'text',
+        fields: {
+          trigram: {
+            type: 'text',
+            analyzer: 'trigram',
+          },
+        },
       },
       model_factor: {
         type: 'dense_vector',

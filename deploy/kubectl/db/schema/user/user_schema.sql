@@ -7,7 +7,7 @@ CREATE TABLE `users` (
     `description` text,
 
     INDEX `user_index` (`username`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `channels` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
@@ -24,7 +24,7 @@ CREATE TABLE `channels` (
         ON UPDATE NO ACTION,
 
     INDEX `channel_id_pk` (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `videos` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
@@ -40,7 +40,7 @@ CREATE TABLE `videos` (
     `dislikes` int NOT NULL DEFAULT 0,
     `views` int NOT NULL DEFAULT 0,
     `uploading` tinyint NOT NULL DEFAULT 1,
-
+    `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     CONSTRAINT `FK_023a8e4f3f1a34ff3d8ca04a4cc`
         FOREIGN KEY (`channel_id`)
         REFERENCES `channels`(`id`)
@@ -54,7 +54,7 @@ CREATE TABLE `videos` (
         ON UPDATE NO ACTION,
     
     INDEX `video_pk` (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `comments` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
@@ -85,7 +85,7 @@ CREATE TABLE `comments` (
         ON UPDATE NO ACTION,
 
     INDEX `comment_video_id_pk` (`video_id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `comment_likes` (
     `id` varchar(36) NOT NULL PRIMARY KEY,

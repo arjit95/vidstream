@@ -7,7 +7,7 @@ const availableServices: { [key: string]: string } = {
   upload: process.env.CONFIG_UPLOAD_SERVICE,
   assets: process.env.CONFIG_ASSETS_SERVICE,
   auth: process.env.CONFIG_AUTH_SERVICE,
-  metrics: process.env.CONFIG_METRICS_SERVICE,
+  recommendation: process.env.CONFIG_RECOMMENDATION_SERVICE,
   metadata: process.env.CONFIG_METADATA_SERVICE,
 };
 
@@ -37,9 +37,7 @@ proxy.on('error', function(
   _: http.IncomingMessage,
   res: http.ServerResponse
 ): void {
-  console.log(err.message);
   res.statusCode = 500;
-  addCorsHeaders(res);
   res.end();
 });
 

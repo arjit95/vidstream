@@ -1,7 +1,7 @@
 import { getInstance } from './adapter';
 
 import { Users, Videos, Watch, Channels } from './models';
-import Model from './models/Model';
+import { Model } from './models/Model';
 import { Client } from '@elastic/elasticsearch';
 
 export type ElasticObj = {

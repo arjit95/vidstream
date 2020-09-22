@@ -16,9 +16,7 @@
         <div class="text-caption mb-4 sub-count">
           {{ videoInfo.channel.subscribers }} subscribers
         </div>
-        <div class="text-body-2">
-          {{ videoInfo.description }}
-        </div>
+        <markdown-viewer :source="videoInfo.description" />
       </v-col>
       <v-col cols="3">
         <v-btn v-if="canSubscribe" class="mb-4" tile color="accent" outlined>
@@ -30,10 +28,6 @@
             >{{ genre }}&nbsp;</span
           >
         </div>
-        <div class="text-body-2">
-          Tags:
-          <span v-for="tag in videoInfo.tags" :key="tag">{{ tag }}&nbsp;</span>
-        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -43,10 +37,17 @@
 .sub-count {
   opacity: 0.9;
 }
+.video-description {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
 </style>
 <script>
+import MarkdownViewer from '~/components/MarkdownViewer'
+
 export default {
   name: 'VideoDescription',
+  components: { MarkdownViewer },
   props: {
     videoInfo: {
       type: Object,
@@ -71,6 +72,12 @@ export default {
       return (
         this.$store.state.app.userInfo.username !== this.videoInfo.user.username
       )
+    },
+    formattedDesc() {
+      let description = this.videoInfo.description
+      description += this.videoInfo.tags.map((tag) => `#${tag}`).join(' ')
+
+      return description
     },
   },
 }

@@ -21,11 +21,11 @@
             align="center"
             class="video-info"
           >
-            <v-col class="video-meta" md="8">
+            <v-col class="video-meta" md="7">
               <v-col id="video-name">
                 <p class="channel">{{ info.genres }}</p>
                 <p class="title">{{ videoInfo.title }}</p>
-                <p class="views">{{ info.views }} Views</p>
+                <p class="views">{{ videoViews }}</p>
               </v-col>
               <v-col class="video-stats d-flex flex-row">
                 <like
@@ -320,9 +320,12 @@ export default {
     info() {
       return {
         title: this.videoInfo.title,
-        views: humanize.compactInteger(this.videoInfo.views),
         genres: humanize.titleCase(humanize.oxford(this.videoInfo.genres)),
       }
+    },
+
+    videoViews() {
+      return this.$sdk.Utils.pluralize(this.videoInfo.views, 'View')
     },
   },
 
@@ -386,8 +389,6 @@ export default {
         state: this.lights,
       })
     },
-    like() {},
-    dislike() {},
   },
 }
 </script>

@@ -1,14 +1,23 @@
 <template>
   <v-container>
-    <v-row justify="center" dense>
-      <v-col sm="12" md="8" justify="center">
-        <v-card class="mx-auto" outlined>
-          <v-card-title>Upload</v-card-title>
-          <v-card-subtitle
-            >Upload your video using the form below.</v-card-subtitle
-          >
-          <v-card-text>
-            <v-form ref="form" v-model="valid">
+    <v-stepper v-model="step">
+      <v-card-title>Upload</v-card-title>
+      <v-card-subtitle>
+        Upload your video using the form below.
+      </v-card-subtitle>
+      <v-stepper-header>
+        <v-stepper-step :complete="step > 1" step="1">Add File</v-stepper-step>
+
+        <v-divider></v-divider>
+
+        <v-stepper-step :complete="step > 2" step="2"
+          >Add Description</v-stepper-step
+        >
+      </v-stepper-header>
+      <v-form ref="form" v-model="valid">
+        <v-stepper-content step="1">
+          <v-row>
+            <v-col cols="12" justify="center">
               <v-text-field v-model="video.name" label="Title"></v-text-field>
               <v-file-input
                 v-model="video.file"
@@ -17,12 +26,6 @@
                 clear-icon
                 label="File"
               ></v-file-input>
-
-              <v-textarea
-                v-model="video.description"
-                label="Describe your video"
-              ></v-textarea>
-              <chip-input ref="tagInput"></chip-input>
               <v-select
                 v-model="video.channel"
                 :items="channels"
@@ -35,21 +38,46 @@
               <chip-input
                 ref="categoryInput"
                 label="Categories"
-                :items="genres"
+                :items="this.$config.categories"
               ></chip-input>
-              <v-btn
-                :disabled="!valid"
-                color="accent"
-                :loading="isUploadInProgress"
-                @click="validate"
-              >
-                Upload
-              </v-btn>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+            </v-col>
+          </v-row>
+          <v-row class="ms-0">
+            <v-btn color="accent" @click="step = 2">
+              Continue
+            </v-btn>
+          </v-row>
+        </v-stepper-content>
+        <v-stepper-content step="2">
+          <v-row>
+            <v-col sm="12" md="6" justify="center">
+              <v-textarea
+                v-model="video.description"
+                label="Describe your video"
+                hint="Supports markdown"
+                auto-grow
+              ></v-textarea>
+            </v-col>
+            <v-col sm="12" md="6" justify="center">
+              <markdown-viewer :source="video.description" />
+            </v-col>
+          </v-row>
+          <v-row class="ms-0">
+            <v-btn
+              color="accent"
+              :disabled="!valid"
+              :loading="isUploadInProgress"
+              @click="validate"
+            >
+              Upload
+            </v-btn>
+            <v-btn class="ms-2" color="primary" @click="step = 1">
+              Back
+            </v-btn>
+          </v-row>
+        </v-stepper-content>
+      </v-form>
+    </v-stepper>
   </v-container>
 </template>
 
@@ -63,21 +91,22 @@
 </style>
 
 <script>
-import ChipInput from '~/components/ChipInput.vue'
+import MarkdownViewer from '~/components/MarkdownViewer'
 
 export default {
   name: 'Upload',
-  components: { ChipInput },
+  components: { MarkdownViewer },
   middleware: 'authenticated',
   data: () => ({
     valid: true,
     video: {
       name: null,
       file: null,
-      description: null,
+      description: '',
       channel: null,
+      tags: [],
     },
-    genres: ['entertainment', 'technology'],
+    step: 1,
     channels: [],
     isUploadInProgress: false,
   }),
@@ -85,7 +114,6 @@ export default {
   mounted() {
     this.init()
   },
-
   methods: {
     async init() {
       // populate channels
@@ -107,10 +135,16 @@ export default {
 
       const formData = new FormData()
       formData.append('token', this.$store.state.auth.token)
-      formData.append('tags', this.$refs.tagInput.select.join(','))
-      formData.append('genres', this.$refs.categoryInput.select.join(','))
-      formData.append('title', this.video.name)
-      formData.append('description', this.video.description)
+      formData.append('tags', this.getTags().join(','))
+      formData.append(
+        'genres',
+        this.$refs.categoryInput.select
+          .map((str) => str.toLowerCase())
+          .join(',')
+      )
+
+      formData.append('title', this.video.name.trim())
+      formData.append('description', this.video.description.trim())
       formData.append('channel', this.video.channel)
       formData.append('file', this.video.file)
 
@@ -125,6 +159,17 @@ export default {
       } else {
         this.$router.push('/')
       }
+    },
+
+    getTags() {
+      const description = this.video.description.trim()
+      const matcher = /(\s|^)#\w\w+\b/gm
+      const result = description.match(matcher)
+      if (result) {
+        return result.map((s) => s.trim())
+      }
+
+      return []
     },
   },
 }

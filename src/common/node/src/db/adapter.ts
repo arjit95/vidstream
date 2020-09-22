@@ -46,6 +46,7 @@ export class Adapter {
       logging: true,
       entities,
       namingStrategy: new SnakeNamingStrategy(),
+      charset: 'utf8_unicode_ci',
     });
 
     if (await Adapter.shouldCreateTables(entities)) {

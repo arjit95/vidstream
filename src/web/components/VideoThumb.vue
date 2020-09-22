@@ -5,24 +5,26 @@
         <v-img :src="thumb"></v-img>
       </v-avatar>
     </nuxt-link>
-    <v-row>
-      <nuxt-link :to="channelURL">
-        <v-avatar v-if="horizontal" class="mt-4 ml-4">
-          <v-img :src="channelThumb"></v-img>
-        </v-avatar>
-      </nuxt-link>
-      <v-col :class="vertical ? 'pt-0 ml-4' : ''">
-        <div class="text-subtitle-2">
-          <nuxt-link :to="url">{{ video.title }}</nuxt-link>
+    <div class="info-container">
+      <v-col v-if="horizontal" cols="3">
+        <nuxt-link :to="channelURL">
+          <v-avatar class="mt-2 ms-2">
+            <v-img :src="channelThumb"></v-img>
+          </v-avatar>
+        </nuxt-link>
+      </v-col>
+      <v-col cols="8" :class="videoInfoClass">
+        <div class="text-subtitle-2 video-title">
+          <nuxt-link :to="url" :title="video.title">{{
+            video.title
+          }}</nuxt-link>
         </div>
         <div class="text-caption">
           <nuxt-link :to="channelURL">{{ video.channel.title }}</nuxt-link>
         </div>
-        <div class="text-caption">
-          {{ videoViews }} views | {{ uploadedDate }}
-        </div>
+        <div class="text-caption">{{ videoViews }} | {{ uploadedDate }}</div>
       </v-col>
-    </v-row>
+    </div>
   </div>
 </template>
 
@@ -37,6 +39,10 @@
   .video-thumb.dense {
     height: 40px;
   }
+
+  .info-container {
+    max-width: 80%;
+  }
 }
 
 .thumb-container.flex-column {
@@ -45,11 +51,27 @@
     height: 160px !important;
     border-radius: 0;
   }
+
+  .info-container {
+    max-width: 100%;
+    display: flex;
+  }
+}
+
+.info-container {
+  .video-title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .video-info {
+    overflow: hidden;
+  }
 }
 </style>
 <script>
 import Humanize from 'humanize-duration'
-import humanize from 'humanize-plus'
 
 export default {
   name: 'VideoThumb',
@@ -82,6 +104,10 @@ export default {
     },
   },
   computed: {
+    videoInfoClass() {
+      return 'video-info ' + (this.horizontal ? '' : 'pt-0 ms-2')
+    },
+
     containerClass() {
       return `d-inline-flex thumb-container ${
         this.horizontal ? 'flex-column' : 'flex-row'
@@ -91,7 +117,7 @@ export default {
       return `${this.$config.apiURL}/api/assets/video/image/${this.video.id}/poster.png`
     },
     channelThumb() {
-      return `${this.$config.apiURL}/api/assets/channel?id=${this.video.channel.id}`
+      return `${this.$config.apiURL}/api/assets/channel?id=${this.video.channel.id}.png`
     },
     url() {
       return `/watch/${this.video.id}`
@@ -107,7 +133,7 @@ export default {
       )
     },
     videoViews() {
-      return humanize.compactInteger(this.video.views)
+      return this.$sdk.Utils.pluralize(this.video.views, 'View')
     },
   },
 }

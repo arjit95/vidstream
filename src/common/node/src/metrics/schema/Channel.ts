@@ -1,15 +1,41 @@
 export const ChannelSchema = {
+  settings: {
+    index: {
+      analysis: {
+        analyzer: {
+          trigram: {
+            type: 'custom',
+            tokenizer: 'standard',
+            filter: ['lowercase', 'shingle'],
+          },
+        },
+        filter: {
+          shingle: {
+            type: 'shingle',
+            min_shingle_size: 2,
+            max_shingle_size: 3,
+          },
+        },
+      },
+    },
+  },
   mappings: {
     properties: {
       title: {
-        type: 'search_as_you_type',
+        type: 'text',
+        fields: {
+          trigram: {
+            type: 'text',
+            analyzer: 'trigram',
+          },
+        },
       },
-      user_id: {
+      username: {
         type: 'keyword',
       },
       description: {
         type: 'text',
-      }
+      },
     },
   },
 };

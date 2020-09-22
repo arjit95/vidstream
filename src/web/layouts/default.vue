@@ -15,7 +15,7 @@
           <v-scale-transition origin="right center 0">
             <v-autocomplete
               v-show="isSearchShown"
-              v-model="searchQuery"
+              v-model="searchModel"
               :loading="isLoading"
               :items="searchResults"
               :search-input.sync="search"
@@ -24,7 +24,25 @@
               label="Search..."
               solo-inverted
               hide-no-data
+              item-text="title"
+              item-value="id"
+              return-object
             >
+              <template v-slot:item="{ item }">
+                <template>
+                  <v-list-item-avatar>
+                    <v-img :src="item.avatar" />
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title class="search-title">{{
+                      item.title
+                    }}</v-list-item-title>
+                    <v-list-item-subtitle class="search-subtitle">{{
+                      item.subtitle
+                    }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </template>
+              </template>
             </v-autocomplete>
           </v-scale-transition>
           <v-btn icon @click="toggleSearch">
@@ -129,9 +147,17 @@
   background: rgba(0, 0, 0, 0.9);
   visibility: visible;
 }
+
+.search-result .search-subtitle {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 <script>
 import _ from 'lodash'
+import humanize from 'humanize-plus'
 import NavDrawer from '~/components/NavDrawer'
 import Token from '~/plugins/Token'
 
@@ -163,7 +189,7 @@ export default {
 
   data() {
     return {
-      searchQuery: null,
+      searchModel: null,
       search: null,
       searchResults: [],
       isLoading: false,
@@ -200,12 +226,53 @@ export default {
     },
   },
   watch: {
+    searchModel(val) {
+      if (!val) {
+        return
+      }
+
+      this.$router.push(val.url)
+    },
+
     search: _.debounce(async function (val) {
-      if (!val) return
+      if (!val || val?.trim().length < 3) return this.resetSearchResults()
 
       this.isLoading = true
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-      this.searchResults = ['hello', 'world']
+      const response = await this.$sdk.Recommendations.search(val)
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+
+        this.resetSearchResults()
+        return
+      }
+
+      if (this.search !== val) {
+        return
+      }
+
+      this.searchResults = response.results.map((res) => {
+        switch (res.type) {
+          case 'video':
+            res.avatar = `${this.$config.apiURL}/api/assets/video/image/${res.id}/poster.png`
+            res.url = `/watch/${res.id}`
+            break
+          case 'user':
+            res.avatar = `${this.$config.apiURL}/api/assets/user/profile?id=${res.id}.png`
+            res.url = `/profile/${res.id}`
+            break
+          case 'channel':
+            res.avatar = `${this.$config.apiURL}}/api/assets/channel/banner?id=${res.id}.png`
+            res.url = `/channel/${res.id}`
+            break
+        }
+
+        res.subtitle = humanize.titleCase(res.type)
+        return res
+      })
+
       this.isLoading = false
     }, 1000),
   },
@@ -214,6 +281,10 @@ export default {
     this.$vuetify.theme.dark = this.darkMode
   },
   methods: {
+    resetSearchResults() {
+      this.searchResults = []
+    },
+
     handleEvent(event) {
       switch (event.action) {
         case 'toggle-lights':

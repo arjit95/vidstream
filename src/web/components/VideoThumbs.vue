@@ -55,7 +55,7 @@
 
   > * {
     margin: 5px;
-    height: 300px;
+    height: 240px;
   }
 
   .thumb:not(:first) {

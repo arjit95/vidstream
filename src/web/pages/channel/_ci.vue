@@ -28,7 +28,6 @@
   </v-container>
 </template>
 <script>
-import humanize from 'humanize-plus'
 import VideoThumbs from '~/components/VideoThumbs'
 import Banner from '~/components/Banner'
 
@@ -69,7 +68,7 @@ export default {
   },
   computed: {
     subCount() {
-      return humanize.compactInteger(this.channel.subscribers) + ' subscribers'
+      return this.$sdk.Utils.pluralize(this.channel.subscribers, 'Subscriber')
     },
 
     editable() {

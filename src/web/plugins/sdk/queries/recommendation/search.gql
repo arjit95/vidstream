@@ -1,0 +1,12 @@
+query search($query: String!, $pagination: PaginatedInput) {
+    search(query: $query, pagination: $pagination) {
+        results {
+            title
+            type
+            id
+        }
+        suggestion {
+            query
+        }
+    }
+}

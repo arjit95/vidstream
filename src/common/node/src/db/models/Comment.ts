@@ -8,7 +8,7 @@ import {
   PrimaryColumn,
   SelectQueryBuilder,
   FindConditions,
-  ObjectLiteral
+  ObjectLiteral,
 } from 'typeorm';
 import { Field, ObjectType, Int } from 'type-graphql';
 
@@ -49,12 +49,16 @@ export class Comment extends BaseEntity {
   @Field(() => Video)
   video!: Video;
 
-  @ManyToOne(() => Comment, (comment) => comment.id, {
-    onDelete: 'CASCADE',
-    eager: true,
-    nullable: true,
-  })
-  @JoinColumn({name: 'parent_id'})
+  @ManyToOne(
+    () => Comment,
+    comment => comment.id,
+    {
+      onDelete: 'CASCADE',
+      eager: true,
+      nullable: true,
+    }
+  )
+  @JoinColumn({ name: 'parent_id' })
   @Field({ nullable: true })
   parent?: Comment;
 
@@ -68,16 +72,20 @@ export class Comment extends BaseEntity {
 
   static itemType = '04';
 
-  static getQuery(where: FindConditions<Comment> | ObjectLiteral, take?: number, skip?: number): SelectQueryBuilder<Comment> {
-    let query = Comment.getRepository().createQueryBuilder('t1')
+  static getQuery(
+    where: FindConditions<Comment> | ObjectLiteral,
+    take?: number,
+    skip?: number
+  ): SelectQueryBuilder<Comment> {
+    let query = Comment.getRepository().createQueryBuilder('t1');
     if (skip) {
       query = query.skip(skip);
     }
 
     if (take) {
-      query = query.take(take)
+      query = query.take(take);
     }
-    
+
     return query
       .leftJoinAndMapOne('t1.user', User, 't2', 't1.username = t2.username')
       .where(where);
