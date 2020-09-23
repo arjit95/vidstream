@@ -1,5 +1,6 @@
 import SearchQuery from '~/plugins/sdk/queries/recommendation/search'
 import RelatedVideoQuery from '~/plugins/sdk/queries/recommendation/relatedVideos'
+import AddRecommendation from '~/plugins/sdk/mutations/recommendation/addRecommendation'
 
 export default class {
   constructor({ store }, api) {
@@ -19,6 +20,28 @@ export default class {
       }
 
       return response.data.search
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async addRecommendation(videoId, duration) {
+    try {
+      const response = await this.api.mutate({
+        mutation: AddRecommendation,
+        variables: { id: videoId, duration },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.addRecommendation
     } catch (error) {
       return { error }
     }

@@ -18,20 +18,23 @@ es_config = {
 }
 
 reader = sql_context.read.format("org.elasticsearch.spark.sql").options(**es_config)
-df = reader.load("watch")
+df = reader.load("watch").where(col("username").isNotNull())
+df = df \
+   .groupBy(['username', 'video_id']) \
+   .agg({'duration': 'average'}) \
+   .withColumnRenamed("avg(duration)", "rating")
+
 string_indexer = StringIndexer(inputCol="video_id", outputCol="video_idx")
 model = string_indexer.fit(df)
 df = model.transform(df)
-string_indexer = StringIndexer(inputCol="user_id", outputCol="user_idx")
+string_indexer = StringIndexer(inputCol="username", outputCol="user_idx")
 model = string_indexer.fit(df)
 df = model.transform(df)
-
-(training, test) = df.randomSplit([0.8, 0.2])
 
 # train
 als = ALS(regParam=0.02, implicitPrefs=True, userCol="user_idx", seed=54,
          itemCol="video_idx", ratingCol="rating", coldStartStrategy="drop", rank=20)
-model = als.fit(training)
+model = als.fit(df)
 
 # # save
 ver = model.uid
@@ -42,14 +45,15 @@ video_vectors = model.itemFactors \
    .select("video_id", col("features").alias("model_factor")) \
    .distinct() \
    .select("video_id", "model_factor", lit(ver).alias("model_version"), ts.alias("model_timestamp"))
+
 user_vectors = model.userFactors \
    .join(df, df.user_idx == model.userFactors.id) \
-   .select("user_id", col("features").alias("model_factor")) \
+   .select("username", col("features").alias("model_factor")) \
    .distinct() \
-   .select("user_id", "model_factor", lit(ver).alias("model_version"), ts.alias("model_timestamp"))
+   .select("username", "model_factor", lit(ver).alias("model_version"), ts.alias("model_timestamp"))
 
 user_config = es_config.copy()
-user_config["es.mapping.id"] = "user_id"
+user_config["es.mapping.id"] = "username"
 user_vectors.write.format("org.elasticsearch.spark.sql").options(**user_config).save("users", mode="append")
 
 video_config = es_config.copy()

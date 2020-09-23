@@ -4,7 +4,9 @@ declare global {
       CONFIG_API_SERVICE: string;
       CONFIG_QUEUE_SERVICE: string;
       CONFIG_DB_SERVICE: string;
-      CONFIG_ELASTICSEARCH_SERVICE: string;
+      CONFIG_ELASTICSEARCH_SCHEME: string;
+      CONFIG_ELASTICSEARCH_HOST: string;
+      CONFIG_ELASTICSEARCH_PORT: string;
       CONFIG_LOGGER_SERVICE: string;
       CONFIG_ASSETS_SERVICE: string;
       CONFIG_UPLOAD_SERVICE: string;

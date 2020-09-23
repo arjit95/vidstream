@@ -1,12 +1,12 @@
 import { Client } from '@elastic/elasticsearch';
-import { Model, Field } from './Model';
+import { Model } from './Model';
 import { UserSchema as Schema } from '../schema/User';
 
-export interface UserCreate {
+export type UserCreate = {
   name: string;
   username: string;
   id: string;
-}
+};
 
 /**
  * Allows to manage User index in elasticsearch database

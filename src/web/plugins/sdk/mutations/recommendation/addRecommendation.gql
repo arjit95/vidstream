@@ -1,0 +1,5 @@
+mutation addRecommendation($id: String!, $duration: Float!) {
+    addRecommendation(id: $id, duration: $duration) {
+        status
+    }
+}

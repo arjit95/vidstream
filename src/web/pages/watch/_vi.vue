@@ -157,8 +157,21 @@ export default {
     }
   },
   methods: {
-    // TODO: Add this data to metrics
-    onVideoEnd({ duration }) {},
+    onVideoEnd({ duration, videoDuration }) {
+      if (
+        (isNaN(duration) || isNaN(videoDuration)) &&
+        !(duration && videoDuration)
+      ) {
+        return
+      }
+
+      const timeWatched = duration / videoDuration
+      // TODO: Move to server.
+      if (timeWatched < 0.2) return
+
+      const vi = this.$route.params.vi
+      this.$sdk.Recommendations.addRecommendation(vi, timeWatched)
+    },
 
     async getComments(id) {
       const comments = await this.$sdk.Metadata.getComments(

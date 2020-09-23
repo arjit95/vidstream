@@ -1,13 +1,13 @@
 import { Client } from '@elastic/elasticsearch';
-import { Model, Field } from './Model';
+import { Model } from './Model';
 import { ChannelSchema as Schema } from '../schema/Channel';
 
-export interface ChannelCreate {
+export type ChannelCreate = {
   title: string;
   userID: string;
   id: string;
   description?: string;
-}
+};
 
 /**
  * Allows to manage Videos index in elasticsearch database

@@ -7,8 +7,14 @@ export async function getInstance(): Promise<Client> {
     return instance;
   }
 
+  const svcAddr =
+    process.env.CONFIG_ELASTICSEARCH_SCHEME +
+    '://' +
+    process.env.CONFIG_ELASTICSEARCH_HOST +
+    ':' +
+    process.env.CONFIG_ELASTICSEARCH_PORT;
   instance = new Client({
-    node: process.env.CONFIG_ELASTICSEARCH_SERVICE,
+    node: svcAddr,
   });
 
   return instance;

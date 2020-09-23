@@ -19,9 +19,9 @@ export class Recommendation {
     if (ctx.user) {
       idParts.unshift(ctx.user.username);
       username = ctx.user.username;
-    } else {
-      idParts.unshift(Date.now().toString());
     }
+
+    idParts.unshift(Date.now().toString());    
 
     await Video.findOneOrFail({ id: videoId });
     const payload = {

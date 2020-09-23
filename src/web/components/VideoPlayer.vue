@@ -301,7 +301,7 @@ class PlayerUtils {
   }
 
   _getTotalDuration() {
-    return this.durationParts.reduce((acc, part) => acc + part, 0)
+    return this.durationParts.reduce((acc, part) => acc + part, 0) / 1000
   }
 
   getTotalDurationPlayed() {
@@ -354,6 +354,7 @@ export default {
       isLoading: true,
       lights: true,
       ended: false,
+      videoDuration: 0,
     }
   },
   computed: {
@@ -392,6 +393,7 @@ export default {
 
     player.on('loadeddata', () => {
       this.isLoading = false
+      this.videoDuration = player.duration()
     })
 
     player.on('ended', () => {
@@ -428,6 +430,7 @@ export default {
       const duration = this.playerWrapper.getTotalDurationPlayed()
       this.$emit('end', {
         duration,
+        videoDuration: this.videoDuration,
       })
 
       this.ended = true

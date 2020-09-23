@@ -31,7 +31,9 @@
             />
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="accent" @click="doLogin">LOGIN</v-btn>
+            <v-btn :loading="loading" text color="accent" @click="doLogin"
+              >LOGIN</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -71,7 +73,9 @@
             />
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="secondary" @click="doRegister">REGISTER</v-btn>
+            <v-btn text :loading="loading" color="secondary" @click="doRegister"
+              >REGISTER</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -108,6 +112,7 @@ export default {
         username: '',
         password: '',
       },
+      loading: false,
       register: {
         username: '',
         password: '',
@@ -123,7 +128,10 @@ export default {
     },
 
     async doRegister() {
+      this.loading = true
       const response = await this.$sdk.Auth.register(this.register)
+      this.loading = false
+
       if (response.error) {
         return this.showError(response.error)
       }
@@ -132,7 +140,9 @@ export default {
     },
 
     async doLogin() {
+      this.loading = true
       const response = await this.$sdk.Auth.login(this.login)
+      this.loading = false
       if (response.error) {
         return this.showError(response.error)
       }

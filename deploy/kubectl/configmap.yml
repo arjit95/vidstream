@@ -7,13 +7,15 @@ data:
     CONFIG_API_SERVICE: http://localhost:32767
     CONFIG_QUEUE_SERVICE: amqp://rabbitmq:5672
     CONFIG_DB_SERVICE: "mysql"
-    CONFIG_ELASTICSEARCH_SERVICE: http://elasticsearch:9200
+    CONFIG_ELASTICSEARCH_HOST: 'elasticsearch'
+    CONFIG_ELASTICSEARCH_SCHEME: http
+    CONFIG_ELASTICSEARCH_PORT: '9200'
     CONFIG_LOGGER_SERVICE: tcp://fluentd-service:24224
     CONFIG_ASSETS_SERVICE: http://assets-service:8080
     CONFIG_UPLOAD_SERVICE: http://upload-service:8080
     CONFIG_AUTH_SERVICE: http://auth-service:8080
     CONFIG_METADATA_SERVICE: http://metadata-service:8080
-    CONFIG_METRICS_SERVICE: http://metrics-service:8080
+    CONFIG_RECOMMENDATION_SERVICE: http://recommendation-service:8080
     CONFIG_HLS_BASE_URL: /api/assets/video
 
     CONFIG_CORS_ALLOWED_ORIGINS: "http://localhost:3000"

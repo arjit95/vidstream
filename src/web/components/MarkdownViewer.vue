@@ -27,6 +27,7 @@ export default {
     return {
       options: {
         markdownIt: {
+          html: true,
           linkify: true,
         },
       },
@@ -90,15 +91,7 @@ export default {
         .trim()
         .split(/\r\n|\r|\n/g)
         .map((l, idx, arr) => {
-          if (idx < arr.length - 1) {
-            const header = /^(#+) (\w)/
-            const nextLine = arr[idx + 1]
-            if (!header.test(nextLine)) {
-              l += '\\'
-            }
-          }
-
-          return l + '\n'
+          return l + '<br/>'
         })
 
       return formatted.join('')

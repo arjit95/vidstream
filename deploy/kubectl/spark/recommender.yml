@@ -13,10 +13,10 @@ spec:
     mainApplicationFile: "local:///opt/src/recommender.py"
     deps:
       jars:
-        - local:///opt/src/jars/mongo.jar
+        - local:///opt/src/jars/mysql.jar
         - local:///opt/src/jars/elasticsearch.jar
       pyFiles:
-        - local:///opt/src/jars/mongo.jar
+        - local:///opt/src/jars/mysql.jar
         - local:///opt/src/jars/elasticsearch.jar
     sparkVersion: "2.4.5"
     restartPolicy:
@@ -36,6 +36,6 @@ spec:
         version: 2.4.5 
     envFrom:
     - secretRef:
-      name: network-secret
+      name: vidstream-secret
     - configMapRef:
-      name: network-config
+      name: vidstream-config

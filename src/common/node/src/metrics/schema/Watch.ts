@@ -7,10 +7,6 @@ export const WatchSchema = {
       video_id: {
         type: 'text',
       },
-      rating: {
-        type: 'double',
-        index: false,
-      },
       duration: {
         type: 'double',
         index: false,

@@ -3,7 +3,7 @@ kind: ScheduledSparkApplication
 metadata:
   name: spark-trends
 spec:
-  schedule: "@every 1h"
+  schedule: "@every 24h"
   concurrencyPolicy: Allow
   template:
     type: Python
@@ -13,10 +13,10 @@ spec:
     mainApplicationFile: "local:///opt/src/trends.py"
     deps:
       jars:
-        - local:///opt/src/jars/mongo.jar
+        - local:///opt/src/jars/mysql.jar
         - local:///opt/src/jars/elasticsearch.jar
       pyFiles:
-        - local:///opt/src/jars/mongo.jar
+        - local:///opt/src/jars/mysql.jar
         - local:///opt/src/jars/elasticsearch.jar
     sparkVersion: "2.4.5"
     restartPolicy:
@@ -36,6 +36,9 @@ spec:
         version: 2.4.5 
     envFrom:
     - secretRef:
-      name: network-secret
+      name: vidstream-secret
     - configMapRef:
-      name: network-config
+      name: vidstream-config
+    env:
+      - name: INTERVAL
+        value: "24h"

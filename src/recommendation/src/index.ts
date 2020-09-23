@@ -73,10 +73,10 @@ async function start() {
 
 start()
   .then(() => {
-    console.log('Metrics service is running');
+    console.log('Recommendation service is running');
   })
   .catch(err => {
-    console.error('Cannot start metrics service');
+    console.error('Cannot start recommendation service');
     console.log(err.stack);
     console.error(JSON.stringify(err, null, 4));
     process.exit(1);

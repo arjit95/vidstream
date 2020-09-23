@@ -1,15 +1,15 @@
 import { Client } from '@elastic/elasticsearch';
-import { Model, Field } from './Model';
+import { Model } from './Model';
 import { VideoSchema as Schema } from '../schema/Video';
 
-export interface VideoCreate {
+export type VideoCreate = {
   title: string;
   categories: Array<string>;
   userID: string;
   id: string;
   description?: string;
   channelId: string;
-}
+};
 
 /**
  * Allows to manage Videos index in elasticsearch database
