@@ -9,6 +9,7 @@ import {
   SelectQueryBuilder,
   FindConditions,
   ObjectLiteral,
+  CreateDateColumn,
 } from 'typeorm';
 import { Field, ObjectType, Int } from 'type-graphql';
 
@@ -31,9 +32,9 @@ export class Comment extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', nullable: false })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field()
-  created_at!: Date;
+  timestamp!: Date;
 
   @Column('text', { nullable: false })
   @Field()

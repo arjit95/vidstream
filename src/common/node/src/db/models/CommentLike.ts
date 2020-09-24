@@ -8,6 +8,7 @@ import {
   SelectQueryBuilder,
   FindConditions,
   ObjectLiteral,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
@@ -29,7 +30,7 @@ export class CommentLike extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   timestamp?: Date;
 
   @ManyToOne(() => Comment, {

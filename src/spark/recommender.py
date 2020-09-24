@@ -1,17 +1,21 @@
 import os
 
 from pyspark import SparkContext
-from pyspark.sql import SQLContext, Row
-from pyspark.sql.types import StructField, StructType, StringType, DoubleType
+from pyspark.sql import SQLContext
 from pyspark.sql.functions import lit, current_timestamp, unix_timestamp, col
-from pyspark.ml import Pipeline, PipelineModel
 from pyspark.ml.recommendation import ALS
 from pyspark.ml.feature import StringIndexer
 
 sc = SparkContext(appName="VideoRecommender")
 sql_context = SQLContext(sc)
+es_addr = "{scheme}://{host}:{port}".format(
+   scheme=os.getenv("CONFIG_ELASTICSEARCH_SCHEME"),
+   host=os.getenv("CONFIG_ELASTICSEARCH_HOST"),
+   port=os.getenv("CONFIG_ELASTICSEARCH_PORT")
+)
+
 es_config = { 
-   "es.nodes": os.getenv("ELASTICSEARCH_ADDR"),
+   "es.nodes": es_addr,
    "es.nodes.discovery": "false",
    "es.nodes.wan.only": "true",
    "es.write.operation": "update"

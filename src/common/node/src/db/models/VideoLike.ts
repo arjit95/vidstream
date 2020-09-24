@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   BaseEntity,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
@@ -26,7 +27,7 @@ export class VideoLike extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   timestamp?: Date;
 
   @ManyToOne(() => Video, {

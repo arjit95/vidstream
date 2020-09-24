@@ -7,6 +7,7 @@ import {
   JoinColumn,
   BaseEntity,
   UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field, Int } from 'type-graphql';
 
@@ -51,7 +52,7 @@ export class Video extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field()
   uploaded_at?: Date;
 

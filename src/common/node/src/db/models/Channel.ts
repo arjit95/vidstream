@@ -6,6 +6,7 @@ import {
   Index,
   JoinColumn,
   BaseEntity,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field, Int } from 'type-graphql';
 
@@ -36,7 +37,7 @@ export class Channel extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field()
   created_at?: Date;
 

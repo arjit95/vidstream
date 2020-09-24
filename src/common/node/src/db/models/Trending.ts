@@ -5,6 +5,7 @@ import {
   JoinColumn,
   BaseEntity,
   PrimaryColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field, Int } from 'type-graphql';
 
@@ -23,7 +24,7 @@ export class Trending extends BaseEntity {
   @Field(() => Int)
   views!: bigint;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field()
   timestamp!: Date;
 

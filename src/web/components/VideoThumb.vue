@@ -13,7 +13,7 @@
           </v-avatar>
         </nuxt-link>
       </v-col>
-      <v-col cols="8" :class="videoInfoClass">
+      <v-col cols="9" :class="videoInfoClass">
         <div class="text-subtitle-2 video-title">
           <nuxt-link :to="url" :title="video.title">{{
             video.title

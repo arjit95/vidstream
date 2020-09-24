@@ -3,7 +3,7 @@ CREATE TABLE `users` (
     `name` varchar(150) NOT NULL,
     `password` varchar(128) NOT NULL,
     `email` varchar(50) NOT NULL,
-    `joined` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `joined` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `description` text,
 
     INDEX `user_index` (`username`)
@@ -13,7 +13,7 @@ CREATE TABLE `channels` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
     `title` varchar(128) NOT NULL,
     `username` varchar(14) NOT NULL,
-    `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `created_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `subscribers` bigint NOT NULL DEFAULT 0,
     `description` text,
 
@@ -32,7 +32,7 @@ CREATE TABLE `videos` (
     `description` text,
     `channel_id` varchar(36) NOT NULL,
     `username` varchar(14) NOT NULL,
-    `uploaded_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `uploaded_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `listing` smallint NOT NULL,
     `tags` json,
     `categories` json,
@@ -40,7 +40,7 @@ CREATE TABLE `videos` (
     `dislikes` int NOT NULL DEFAULT 0,
     `views` int NOT NULL DEFAULT 0,
     `uploading` tinyint NOT NULL DEFAULT 1,
-    `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    `updated_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
     CONSTRAINT `FK_023a8e4f3f1a34ff3d8ca04a4cc`
         FOREIGN KEY (`channel_id`)
         REFERENCES `channels`(`id`)
@@ -59,7 +59,7 @@ CREATE TABLE `videos` (
 CREATE TABLE `comments` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
     `username` varchar(14) NOT NULL,
-    `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `created_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `content` text NOT NULL,
     `video_id` varchar(36) NOT NULL,
     `parent_id` varchar(36),
@@ -90,7 +90,7 @@ CREATE TABLE `comments` (
 CREATE TABLE `comment_likes` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
     `username` varchar(14) NOT NULL,
-    `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `timestamp` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `liked` tinyint NOT NULL DEFAULT 1,
     `comment_id` varchar(36) NOT NULL,
 
@@ -110,7 +110,7 @@ CREATE TABLE `comment_likes` (
 CREATE TABLE `video_likes` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
     `username` varchar(14) NOT NULL,
-    `timestamp`  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `timestamp`  timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     `video_id` varchar(36) NOT NULL,
     `liked` tinyint NOT NULL DEFAULT 1,
 
@@ -130,7 +130,7 @@ CREATE TABLE `video_likes` (
 CREATE TABLE `subscriptions` (
     `id` varchar(36) NOT NULL PRIMARY KEY, 
     `username` varchar(14) NOT NULL,
-    `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP,
+    `timestamp` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6),
     `channel_id` varchar(36) NOT NULL,
 
     CONSTRAINT `FK_cb0d911d3eec036a09331a13b4b`
@@ -148,7 +148,7 @@ CREATE TABLE `subscriptions` (
 
 CREATE TABLE trending (
     `id` bigint NOT NULL PRIMARY KEY,
-    `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `timestamp` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6),
     `views` bigint NOT NULL,
     `video_id` varchar(36) NOT NULL,
 

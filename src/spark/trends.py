@@ -3,8 +3,26 @@ from urllib.parse import urlparse
 
 from pyspark import SparkContext
 from pyspark.sql import SQLContext, Row
-from pyspark.sql.functions import current_timestamp, col, sum, lit
-from pyspark.sql.types import StructField, StructType, IntegerType
+from pyspark.sql.functions import col, lit, current_timestamp, unix_timestamp, sum as _sum
+from sqlalchemy import create_engine
+
+
+# Spark does not support mysql table updates
+def save_videos_table(rdd, engine):
+   query = """UPDATE videos SET views = %s WHERE id=%s"""
+   for row in rdd:
+      engine.execute(query, (row["views"], row["id"]))
+
+def get_engine_uri(type, driver):
+   return "{type}+{driver}://{user}:{password}@{host}:{port}/{db}".format(
+      type=type,
+      driver=driver,
+      user=os.getenv("SECRET_DB_USERNAME"),
+      password=os.getenv("SECRET_DB_PASSWORD"),
+      host=os.getenv("CONFIG_DB_SERVICE"),
+      port=os.getenv("CONFIG_DB_PORT"),
+      db=os.getenv("CONFIG_DB_NAME")
+   )
 
 q = """
    {{
@@ -44,9 +62,6 @@ df = df.groupBy("video_id") \
   .sort("count", ascending=False) \
   .select(col("count").alias("views"), "video_id")
 
-# df.show()
-
-# Get last 10 trending videos
 db_url = "jdbc:mysql://{host}:{port}/{db}".format(
    host=os.getenv("CONFIG_DB_SERVICE"),
    port=os.getenv("CONFIG_DB_PORT"),
@@ -56,24 +71,54 @@ db_url = "jdbc:mysql://{host}:{port}/{db}".format(
 sql_config = {
    "url": db_url,
    "driver": "com.mysql.cj.jdbc.Driver",
-   "dbtable": "trending",
    "user": os.getenv("SECRET_DB_USERNAME"),
    "password": os.getenv("SECRET_DB_PASSWORD"),
    "fetchSize": "1000"
 }
 
-trending_df = sql_context.read.format('jdbc').load(**sql_config)
-trending_df = trending_df.sort("timestamp", ascending=False).limit(1).select(col("views").alias("c_views"), col("video_id"))
+sql_reader = sql_context.read.format("jdbc").options(**sql_config)
 
-df = df.join(trending_df, on='video_id', how='left_outer').na.fill(0, "c_views")
-df = df \
+## Update view count
+videos_df = sql_reader.options(**sql_config).option("dbtable", "videos").load().withColumnRenamed("views", "c_views")
+videos_df = df.join(videos_df, col("video_id") == col("id"), "left_outer").drop("video_id")
+videos_df = videos_df \
    .withColumn("sum", col("views") + col("c_views")) \
    .drop("views") \
    .drop("c_views") \
-   .select(col("sum").alias("views"), col("video_id"))
+   .withColumnRenamed("sum", "views") \
+   .select(col("id"), col("views"))
 
-df.write \
+engine = create_engine(get_engine_uri("mysql", "pymysql"), pool_size=50)
+save_videos_table(videos_df.rdd.collect(), engine)
+
+# Process trending videos
+#TODO: Replace with an env variable
+if len(df.take(10)) < 10: # insufficient videos
+   print("Too few videos, exiting...")
+   exit(0)
+
+trending_df = sql_reader.options(**sql_config).option("dbtable", "trending").load()
+trending_df = trending_df \
+   .sort("timestamp", ascending=False) \
+   .limit(10) \
+   .groupBy("video_id") \
+   .agg(_sum("views").alias("c_views"))
+
+ts = current_timestamp()
+trending_df = df.join(trending_df, on='video_id', how='left_outer').na.fill(0, "c_views")
+trending_df = trending_df \
+   .withColumn("sum", col("views") + col("c_views")) \
+   .drop("views") \
+   .drop("c_views") \
+   .drop("id") \
+   .withColumnRenamed("sum", "views") \
+   .withColumn("timestamp", ts) \
+   .sort("views", ascending=False) \
+   .limit(10)
+
+trending_df.write \
    .mode("append") \
    .format("jdbc") \
    .options(**sql_config) \
+   .option("dbtable", "trending") \
    .save()

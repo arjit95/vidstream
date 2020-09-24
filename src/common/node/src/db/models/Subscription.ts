@@ -1,10 +1,10 @@
 import {
   PrimaryColumn,
-  Column,
   ManyToOne,
   Entity,
   JoinColumn,
   BaseEntity,
+  CreateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
@@ -26,8 +26,8 @@ export class Subscription extends BaseEntity {
   @Field(() => User)
   user!: User;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-  timestamp?: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  timestamp!: Date;
 
   @ManyToOne(() => Channel, {
     onDelete: 'CASCADE',

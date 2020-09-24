@@ -1,4 +1,11 @@
-import { Column, PrimaryColumn, Entity, BaseEntity, Index } from 'typeorm';
+import {
+  Column,
+  PrimaryColumn,
+  Entity,
+  BaseEntity,
+  Index,
+  CreateDateColumn,
+} from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 
 @Entity({ name: 'users' })
@@ -20,7 +27,7 @@ export class User extends BaseEntity {
   @Field()
   email!: string;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field()
   joined?: Date;
 

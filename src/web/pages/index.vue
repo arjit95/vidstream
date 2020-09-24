@@ -50,7 +50,7 @@ export default {
     const playlists = [
       {
         title: 'Recently uploaded',
-        href: '/page/recent',
+        href: '/page/recents',
         children: recents.result,
         total: recents.total,
       },

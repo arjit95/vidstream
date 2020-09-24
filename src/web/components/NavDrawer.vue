@@ -64,12 +64,12 @@ export default {
         {
           icon: 'mdi-history',
           title: 'Recently Added',
-          href: '/recents',
+          href: '/page/recents',
         },
         {
           icon: 'mdi-trending-up',
           title: 'Trending',
-          href: '/trending',
+          href: '/page/trending',
         },
       ],
       user,

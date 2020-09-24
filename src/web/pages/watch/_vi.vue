@@ -128,7 +128,7 @@ export default {
       commentsLoaded: false,
 
       onVideoPlayerReady(player) {
-        const vi = this.$route.params.vi
+        const vi = this.videoInfo.id
         const apiURL = this.$config.apiURL
 
         player.poster(`${apiURL}/api/assets/video/image/${vi}/poster.png`)
@@ -169,8 +169,10 @@ export default {
       // TODO: Move to server.
       if (timeWatched < 0.2) return
 
-      const vi = this.$route.params.vi
-      this.$sdk.Recommendations.addRecommendation(vi, timeWatched)
+      this.$sdk.Recommendations.addRecommendation(
+        this.videoInfo.id,
+        timeWatched
+      )
     },
 
     async getComments(id) {
