@@ -1,0 +1,11 @@
+mutation Channel($title: String!) {
+    addChannel(title: $title) {
+        id
+        title
+        subscribers
+        user {
+            username
+        }
+        description
+    }
+}

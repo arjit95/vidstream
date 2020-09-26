@@ -4,9 +4,9 @@
 
     <v-app-bar class="app-bar" clipped-left app fixed elevate-on-scroll dense>
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
-      <v-icon class="mx-4" large>
-        mdi-theater
-      </v-icon>
+      <v-avatar class="mx-4" size="36">
+        <img src="/logo.png" alt="Logo" />
+      </v-avatar>
       <v-toolbar-title class="mr-12 align-center">
         <nuxt-link to="/"><span class="title">Vidstream</span></nuxt-link>
       </v-toolbar-title>
@@ -31,7 +31,11 @@
               <template v-slot:item="{ item }">
                 <template>
                   <v-list-item-avatar>
-                    <v-img :src="item.avatar" />
+                    <text-avatar
+                      :profile="item.avatar"
+                      :name="item.title"
+                      :size="48"
+                    />
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title class="search-title">{{

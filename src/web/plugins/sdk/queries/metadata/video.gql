@@ -8,6 +8,7 @@ query getVideo($id: String!) {
       id
       title
       subscribers
+      subscribed
     }
     user {
       username

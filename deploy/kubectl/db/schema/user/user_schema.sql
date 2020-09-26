@@ -40,7 +40,8 @@ CREATE TABLE `videos` (
     `dislikes` int NOT NULL DEFAULT 0,
     `views` int NOT NULL DEFAULT 0,
     `uploading` tinyint NOT NULL DEFAULT 1,
-    `updated_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+    `updated_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+
     CONSTRAINT `FK_023a8e4f3f1a34ff3d8ca04a4cc`
         FOREIGN KEY (`channel_id`)
         REFERENCES `channels`(`id`)
@@ -105,7 +106,7 @@ CREATE TABLE `comment_likes` (
         REFERENCES `comments`(`id`)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `video_likes` (
     `id` varchar(36) NOT NULL PRIMARY KEY,
@@ -125,7 +126,7 @@ CREATE TABLE `video_likes` (
         REFERENCES `videos`(`id`)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE `subscriptions` (
     `id` varchar(36) NOT NULL PRIMARY KEY, 
@@ -144,9 +145,9 @@ CREATE TABLE `subscriptions` (
         REFERENCES `channels`(`id`)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-CREATE TABLE trending (
+CREATE TABLE `trending` (
     `id` bigint NOT NULL PRIMARY KEY,
     `timestamp` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6),
     `views` bigint NOT NULL,
@@ -157,4 +158,4 @@ CREATE TABLE trending (
         REFERENCES `videos`(`id`)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_unicode_ci;

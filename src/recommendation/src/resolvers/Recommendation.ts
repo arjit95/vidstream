@@ -21,7 +21,7 @@ export class Recommendation {
       username = ctx.user.username;
     }
 
-    idParts.unshift(Date.now().toString());    
+    idParts.unshift(Date.now().toString());
 
     await Video.findOneOrFail({ id: videoId });
     const payload = {

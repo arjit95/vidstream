@@ -6,14 +6,34 @@
       :body.sync="user.description"
       :banner-bg="`${apiURL}/api/assets/user/profile/banner?id=${user.username}.png`"
       :profile="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
-      :editable="editable"
+      :profile-name="user.name"
+      :editable="isAdmin"
       @profileChange="updateProfile"
       @bannerChange="updateBanner"
     />
-    <v-container>
-      <div class="text-body-1 mb-6">Channel list</div>
-      <channel-card :channels="channels" />
-    </v-container>
+    <v-card>
+      <v-tabs v-model="tab" color="accent-4" centered @change="loadContent">
+        <v-tab>Channels</v-tab>
+        <v-tab v-if="isAdmin">Subscriptions</v-tab>
+      </v-tabs>
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
+          <channel-card
+            :channels="channels"
+            :disabled="processing"
+            :user="user"
+            @addChannel="addChannel"
+          />
+        </v-tab-item>
+        <v-tab-item>
+          <channel-card
+            :channels="subscriptions"
+            :can-create="false"
+            :user="user"
+          />
+        </v-tab-item>
+      </v-tabs-items>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -25,7 +45,7 @@ export default {
   name: 'Channels',
   components: { Banner, ChannelCard },
 
-  async asyncData({ $sdk, params, redirect }) {
+  async asyncData({ $store, $sdk, params, redirect }) {
     const user = await $sdk.Metadata.getUser(params.id)
     if (user.error) {
       redirect('/404')
@@ -38,12 +58,17 @@ export default {
   data() {
     return {
       channels: [],
+      subscriptions: [],
       apiURL: this.$config.apiURL,
+      processing: false,
+      subscriptionsLoaded: false,
+      tab: null,
     }
   },
   computed: {
-    editable() {
-      return this.$route.params.id === this.$store.state.app.userInfo.username
+    isAdmin() {
+      const userInfo = this.$store.state.app.userInfo
+      return userInfo.isLoggedIn && userInfo.username === this.$route.params.id
     },
     createdAt() {
       return `Joined ${Humanize(
@@ -75,6 +100,43 @@ export default {
     })
   },
   methods: {
+    async deleteChannel(id) {
+      this.processing = true
+
+      const response = await this.$sdk.Metadata.deleteChannel(id)
+      this.processing = false
+
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+        return
+      }
+
+      this.channels.splice(
+        this.channels.findIndex(({ id }) => id),
+        1
+      )
+    },
+
+    async addChannel() {
+      this.processing = true
+      const title = `Channel ${this.channels.length}`
+      const response = await this.$sdk.Metadata.addChannel(title)
+      this.processing = false
+
+      if (response.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: response.error,
+        })
+        return
+      }
+
+      this.channels.push(response)
+    },
+
     async updateInfo() {
       const response = await this.$sdk.Metadata.editUserInfo(
         this.user.name,
@@ -102,6 +164,33 @@ export default {
           action: 'error',
           message: response.error,
         })
+      }
+    },
+
+    async loadSubscriptions() {
+      if (this.subscriptionsLoaded) {
+        return
+      }
+
+      const subscriptions = await this.$sdk.Metadata.getSubscriptions(true)
+      if (subscriptions.error) {
+        this.$nuxt.$emit('childEvent', {
+          action: 'error',
+          message: subscriptions.error,
+        })
+
+        return
+      }
+
+      this.subscriptionsLoaded = true
+      this.subscriptions = subscriptions.result
+    },
+
+    loadContent(num) {
+      switch (num) {
+        case 1:
+          this.loadSubscriptions()
+          break
       }
     },
 

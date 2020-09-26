@@ -9,10 +9,10 @@
         ref="editField"
         v-model="editableModel"
         label="Edit"
-        counter="50"
+        :counter="maxlength"
         hint="Press Ctrl + Enter to save"
         clearable
-        maxlength="50"
+        :maxlength="maxlength"
         :rules="rules"
         @blur="cancel"
         @click:clear="cancel"
@@ -30,6 +30,9 @@
         hint="Press Ctrl + Enter to save"
         no-resize
         rows="4"
+        :counter="maxlength"
+        :maxlength="maxlength"
+        :rules="rules"
         @blur="cancel"
         @click:clear="cancel"
         @keydown="waitForFinish($event)"
@@ -69,6 +72,10 @@ export default {
     rules: {
       type: Array,
       default: () => [],
+    },
+    maxlength: {
+      type: Number,
+      default: 50,
     },
   },
   data() {

@@ -163,7 +163,11 @@ export default {
       let styles = ''
       styles += `width: ${this.inputWidth}px;`
       styles += `height: ${this.inputHeight}px;`
-      return styles + `background: ${this.overlay};`
+      if (this.overlay) {
+        return styles + `background: ${this.overlay};`
+      }
+
+      return styles
     },
   },
   watch: {

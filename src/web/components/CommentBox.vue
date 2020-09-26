@@ -2,9 +2,7 @@
   <v-form ref="form" v-model="valid" class="comment-box mt-2">
     <v-row>
       <v-col cols="1">
-        <v-avatar>
-          <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg"></v-img>
-        </v-avatar>
+        <text-avatar :name="username" :profile="profile" :size="48" />
       </v-col>
       <v-col cols="11">
         <v-textarea
@@ -31,8 +29,11 @@
 }
 </style>
 <script>
+import TextAvatar from '~/components/TextAvatar'
+
 export default {
   name: 'CommentBox',
+  components: { TextAvatar },
   props: {
     thumb: {
       type: String,
@@ -45,6 +46,14 @@ export default {
       rules: [(val) => (val?.trim().length ? true : 'Please enter a value')],
       valid: true,
     }
+  },
+  computed: {
+    username() {
+      return this.$store.state.app.userInfo.username
+    },
+    profile() {
+      return `${this.$config.apiURL}/api/assets/user/profile?id=${this.username}.png`
+    },
   },
   methods: {
     waitForFinish(e) {

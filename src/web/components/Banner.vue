@@ -34,7 +34,11 @@
               >{{ subtitleLink.text }}</nuxt-link
             >
           </p>
-          <editable-field :model.sync="bodyInput" :editable="editable">
+          <editable-field
+            :model.sync="bodyInput"
+            :editable="editable"
+            :maxlength="500"
+          >
             <p class="text-body-2">
               {{ bodyInput || 'No Description Available' }}
             </p>
@@ -63,9 +67,11 @@
             @image="uploadImage"
           >
             <template #image>
-              <v-avatar color="accent" class="avatar" size="128">
-                <v-img :src="profile" height="128" width="128" />
-              </v-avatar>
+              <text-avatar
+                class="avatar"
+                :name="profileName"
+                :profile="profile"
+              />
             </template>
           </image-uploader>
         </v-col>
@@ -86,7 +92,7 @@
 .banner-container {
   position: relative;
   height: 50vh;
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
 .avatar {
@@ -102,10 +108,11 @@
 <script>
 import EditableField from '~/components/EditableField'
 import ImageUploader from '~/components/ImageUploader'
+import TextAvatar from '~/components/TextAvatar'
 
 export default {
   name: 'Banner',
-  components: { EditableField, ImageUploader },
+  components: { EditableField, ImageUploader, TextAvatar },
   props: {
     title: {
       type: String,
@@ -135,6 +142,10 @@ export default {
       default: null,
     },
     profile: {
+      type: String,
+      default: null,
+    },
+    profileName: {
       type: String,
       default: null,
     },

@@ -2,14 +2,14 @@
   <v-container class="pl-sm-1 pr-sm-1" fluid>
     <v-row class="mb-4 description-container">
       <v-col cols="1">
-        <v-avatar class="ms-2">
-          <v-img
-            class="description-thumb"
-            src="https://cdn.vuetifyjs.com/images/cards/store.jpg"
-          ></v-img>
-        </v-avatar>
+        <text-avatar
+          class="ms-2"
+          :name="videoInfo.channel.title"
+          :profile="channelThumb"
+          :size="48"
+        />
       </v-col>
-      <v-col class="pt-0" cols="8">
+      <v-col class="pt-1" cols="8">
         <nuxt-link :to="'/channel/' + videoInfo.channel.id">
           <div class="text-subtitle-1">{{ videoInfo.channel.title }}</div>
         </nuxt-link>
@@ -19,8 +19,15 @@
         <markdown-viewer :source="videoInfo.description" />
       </v-col>
       <v-col cols="3">
-        <v-btn v-if="canSubscribe" class="mb-4" tile color="accent" outlined>
-          <v-icon left>mdi-youtube-subscription</v-icon> Subscribe
+        <v-btn
+          v-if="canSubscribe"
+          class="mb-4"
+          tile
+          color="accent"
+          outlined
+          @click="toggleSubscription"
+        >
+          <v-icon left>mdi-youtube-subscription</v-icon> {{ subscribeText }}
         </v-btn>
         <div class="mb-4 text-body-2">
           Categories:
@@ -44,10 +51,11 @@
 </style>
 <script>
 import MarkdownViewer from '~/components/MarkdownViewer'
+import TextAvatar from '~/components/TextAvatar'
 
 export default {
   name: 'VideoDescription',
-  components: { MarkdownViewer },
+  components: { MarkdownViewer, TextAvatar },
   props: {
     videoInfo: {
       type: Object,
@@ -57,6 +65,7 @@ export default {
           id: '',
           title: '',
           subscribers: 0,
+          subscribed: false,
         },
         tags: [],
         categories: [],
@@ -66,10 +75,10 @@ export default {
       }),
     },
   },
-
   computed: {
     canSubscribe() {
       return (
+        this.$store.state.app.userInfo.isLoggedIn &&
         this.$store.state.app.userInfo.username !== this.videoInfo.user.username
       )
     },
@@ -78,6 +87,20 @@ export default {
       description += this.videoInfo.tags.map((tag) => `#${tag}`).join(' ')
 
       return description
+    },
+
+    subscribeText() {
+      return this.subscribed ? 'Subscribed' : 'Subscribe'
+    },
+
+    channelThumb() {
+      return `${this.$config.apiURL}/api/assets/channel?id=${this.videoInfo.channel.id}.png`
+    },
+  },
+
+  methods: {
+    toggleSubscription() {
+      this.$emit('subscription', !this.channel.subscribed)
     },
   },
 }

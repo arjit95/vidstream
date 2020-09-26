@@ -6,7 +6,7 @@ query Comments($video_id: String!, $pagination: PaginatedInput, $parent: String)
                 username
                 name
             }
-            created_at
+            timestamp
             likes
             dislikes
             content

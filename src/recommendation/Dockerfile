@@ -20,4 +20,4 @@ FROM node:14-alpine3.12
 WORKDIR /usr/src
 COPY --from=builder /usr/src/app .
 
-CMD [ "node", "--inspect", "dist/index.js" ]
+CMD [ "node", "dist/index.js" ]

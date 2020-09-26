@@ -11,10 +11,10 @@
     <v-list dense nav>
       <v-list-item v-if="isLoggedIn()" two-line class="px-0">
         <v-list-item-avatar>
-          <v-img
-            :src="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
-            width="32"
-            height="32"
+          <text-avatar
+            :profile="`${apiURL}/api/assets/user/profile?id=${user.username}.png`"
+            :size="36"
+            :name="user.username"
           />
         </v-list-item-avatar>
 
@@ -39,10 +39,11 @@
 </style>
 <script>
 import ItemIconList from '~/components/ItemIconList'
+import TextAvatar from '~/components/TextAvatar'
 
 export default {
   name: 'NavBar',
-  components: { ItemIconList },
+  components: { ItemIconList, TextAvatar },
   props: {
     showDrawer: {
       type: Boolean,
@@ -78,11 +79,6 @@ export default {
           icon: 'mdi-view-dashboard',
           title: 'Dashboard',
           href: `/profile/${user.username}`,
-        },
-        {
-          icon: 'mdi-youtube-subscription',
-          title: 'Subscriptions',
-          href: `/profile/${user.username}/subscriptions`,
         },
         // {
         //   icon: 'mdi-playlist-play',

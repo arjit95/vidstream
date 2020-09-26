@@ -8,6 +8,7 @@
       :subtitle-link="subtitleLink"
       :banner-bg="`${apiURL}/api/assets/channel/banner?id=${channel.id}.png`"
       :profile="`${apiURL}/api/assets/channel?id=${channel.id}.png`"
+      :profile-name="channel.title"
       :editable="editable"
       :actions="actions"
       @profileChange="updateProfile"
@@ -172,6 +173,37 @@ export default {
       }
     } else {
       this.actions = []
+    }
+
+    const userInfo = this.$store.state.app.userInfo
+    const isAdmin =
+      userInfo.isLoggedIn && this.channel.user.username === userInfo.username
+
+    if (isAdmin) {
+      const deleteChannel = {
+        text: 'Delete channel',
+        icon: 'mdi-delete',
+        loading: false,
+        onClick: async () => {
+          deleteChannel.loading = true
+          const response = await this.$sdk.Metadata.deleteChannel(
+            this.channel.id
+          )
+
+          if (response.error) {
+            this.$nuxt.$emit('childEvent', {
+              action: 'error',
+              message: response.error,
+            })
+
+            return
+          }
+
+          this.$router.push(`/profile/${userInfo.username}`)
+        },
+      }
+
+      this.actions.push(deleteChannel)
     }
 
     const channelId = this.$route.params.ci

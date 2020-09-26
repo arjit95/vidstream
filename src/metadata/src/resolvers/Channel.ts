@@ -17,7 +17,7 @@ import {
   EditChannelInput,
   PaginatedInput,
   CreateChannelInput,
-  DeleteChannelInput,
+  EmptyResponse,
 } from '../types';
 import { Context } from '../context';
 
@@ -101,17 +101,50 @@ export class ChannelResolver {
 
   @Authorized()
   @Mutation(() => Channel)
-  async deleteChannel(
-    @Arg('channel') input: DeleteChannelInput,
+  async addChannel(
+    @Arg('title') title: string,
     @Ctx() ctx: Context
   ): Promise<Channel> {
     if (!ctx.user) {
       throw new UnauthorizedError();
     }
 
+    const user = await User.findOneOrFail({
+      where: {
+        username: ctx.user.username,
+      },
+    });
+
+    const channel = new Channel();
+    channel.title = title;
+    channel.user = user;
+    channel.id = IdGen.encode(
+      `${user.username}-${Channel.itemType}-${Date.now()}`
+    );
+
+    await ctx.metrics.Channels.create({
+      title: channel.title,
+      userID: user.username,
+      id: channel.id,
+      description: channel.description,
+    });
+
+    return channel.save();
+  }
+
+  @Authorized()
+  @Mutation(() => EmptyResponse)
+  async deleteChannel(
+    @Arg('id') id: string,
+    @Ctx() ctx: Context
+  ): Promise<EmptyResponse> {
+    if (!ctx.user) {
+      throw new UnauthorizedError();
+    }
+
     const channel = await Channel.findOneOrFail({
       where: {
-        id: input.id,
+        id,
         user: {
           username: ctx.user.username,
         },
@@ -121,7 +154,7 @@ export class ChannelResolver {
     await ctx.metrics.Channels.delete(channel.id);
     await channel.remove();
 
-    return channel;
+    return new EmptyResponse();
   }
 
   @Authorized()

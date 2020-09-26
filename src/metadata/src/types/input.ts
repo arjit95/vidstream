@@ -35,12 +35,6 @@ export class EditChannelInput {
 }
 
 @InputType()
-export class DeleteChannelInput {
-  @Field()
-  id!: string;
-}
-
-@InputType()
 export class CreateChannelInput {
   @Field()
   title!: string;

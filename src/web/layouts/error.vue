@@ -1,6 +1,6 @@
 <template>
   <v-col align="center">
-    <v-img src="/vuetify-logo.svg" aspect-ratio="2" height="125" contain />
+    <v-img src="/logo.png" aspect-ratio="2" height="125" contain />
     <h1 v-if="error.statusCode === 404">
       {{ pageNotFound }}
     </h1>

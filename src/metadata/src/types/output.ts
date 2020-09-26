@@ -23,9 +23,18 @@ export class Videos extends BaseType {
 }
 
 @ObjectType()
+export class ChannelMeta extends Channel {
+  @Field({ defaultValue: false })
+  subscribed?: boolean;
+}
+
+@ObjectType()
 export class VideoMeta extends Video {
   @Field()
   liked?: LikeType;
+
+  @Field(() => ChannelMeta)
+  channel!: ChannelMeta;
 }
 
 @ObjectType()
@@ -44,4 +53,10 @@ export class Comments extends BaseType {
 export class Subscriptions extends BaseType {
   @Field(() => [Subscription])
   result!: Array<Subscription>;
+}
+
+@ObjectType()
+export class EmptyResponse {
+  @Field(() => Int, { defaultValue: 200 })
+  status!: number;
 }

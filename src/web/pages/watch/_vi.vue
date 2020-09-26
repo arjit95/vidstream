@@ -32,11 +32,18 @@
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>
-              <video-description :video-info="videoInfo"></video-description>
+              <video-description
+                :video-info="videoInfo"
+                @subscription="updateSubscription"
+              ></video-description>
             </v-tab-item>
             <v-tab-item>
               <v-container>
-                <comment-box :thumb="userProfile" @commentAdd="onCommentAdd" />
+                <comment-box
+                  v-if="isLoggedIn"
+                  :thumb="userProfile"
+                  @commentAdd="onCommentAdd"
+                />
                 <comment
                   v-for="comment in comments"
                   :key="comment.id"
@@ -148,6 +155,9 @@ export default {
     userProfile() {
       return this.$store.state.app.userInfo.username
     },
+    isLoggedIn() {
+      return this.$store.state.app.userInfo.isLoggedIn
+    },
   },
 
   middleware({ route, error }) {
@@ -157,6 +167,15 @@ export default {
     }
   },
   methods: {
+    updateSubscription(state) {
+      this.videoInfo.channel.subscribed = state
+      if (state) {
+        this.$sdk.Metadata.addSubscription(this.videoInfo.channel.id)
+      } else {
+        this.$sdk.Metadata.removeSubscription(this.videoInfo.channel.id)
+      }
+    },
+
     onVideoEnd({ duration, videoDuration }) {
       if (
         (isNaN(duration) || isNaN(videoDuration)) &&

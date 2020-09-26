@@ -1,9 +1,12 @@
 <template>
   <v-row class="mb-4" :style="indent">
     <v-col cols="1">
-      <v-avatar class="comment-thumb">
-        <v-img :src="profileThumb"></v-img>
-      </v-avatar>
+      <text-avatar
+        :profile="profileThumb"
+        :name="comment.user.username"
+        :size="48"
+        class="mt-1"
+      />
     </v-col>
     <v-col :cols="11 - depth" :class="!depth ? '' : `ms-${depth + 2}`">
       <v-row class="comment-info">
@@ -95,16 +98,17 @@
 <script>
 import Humanize from 'humanize-duration'
 import CommentBox from '~/components/CommentBox'
+import TextAvatar from '~/components/TextAvatar'
 
 export default {
   name: 'Comment',
-  components: { CommentBox },
+  components: { CommentBox, TextAvatar },
   props: {
     comment: {
       type: Object,
       default: () => ({
         id: '',
-        created_at: '',
+        timestamp: '',
         content: '',
         user: {
           username: '',
@@ -138,8 +142,7 @@ export default {
       return `transform: translate(-${this.depth + 5}px)`
     },
     profileThumb() {
-      return 'https://cdn.vuetifyjs.com/images/cards/store.jpg'
-      // return `${this.apiURL}/api/assets/user/profile?id=${this.comment.user.username}`
+      return `${this.apiURL}/api/assets/user/profile?id=${this.comment.user.username}`
     },
     profile() {
       return `/profile/${this.comment.user.username}`
@@ -149,7 +152,7 @@ export default {
     },
     date() {
       return (
-        Humanize(Date.now() - new Date(this.comment.created_at).getTime(), {
+        Humanize(Date.now() - new Date(this.comment.timestamp).getTime(), {
           largest: 1,
         }) + ' ago'
       )

@@ -9,6 +9,8 @@ import AddSubscription from '~/plugins/sdk/mutations/metadata/addSubscription'
 import RemoveSubscription from '~/plugins/sdk/mutations/metadata/removeSubscription'
 import IsSubscribed from '~/plugins/sdk/queries/metadata/isSubscribed'
 import EditChannel from '~/plugins/sdk/mutations/metadata/editChannel'
+import AddChannel from '~/plugins/sdk/mutations/metadata/addChannel'
+import DeleteChannel from '~/plugins/sdk/mutations/metadata/deleteChannel'
 import EditUser from '~/plugins/sdk/mutations/metadata/editUser'
 import MinimalSubscriptions from '~/plugins/sdk/queries/metadata/subscriptionsMin'
 import CommentsQuery from '~/plugins/sdk/queries/metadata/comments'
@@ -198,6 +200,50 @@ export default class {
       }
 
       return response.data.user
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async deleteChannel(id) {
+    try {
+      const response = await this.api.mutate({
+        mutation: DeleteChannel,
+        variables: { id },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.deleteChannel
+    } catch (error) {
+      return { error }
+    }
+  }
+
+  async addChannel(title) {
+    try {
+      const response = await this.api.mutate({
+        mutation: AddChannel,
+        variables: { title },
+        context: {
+          headers: {
+            Authorization: `Bearer ${this.store.state.auth.token}`,
+          },
+        },
+      })
+
+      if (response.errors) {
+        throw response.errors[0].message
+      }
+
+      return response.data.addChannel
     } catch (error) {
       return { error }
     }

@@ -8,9 +8,12 @@
     <div class="info-container">
       <v-col v-if="horizontal" cols="3">
         <nuxt-link :to="channelURL">
-          <v-avatar class="mt-2 ms-2">
-            <v-img :src="channelThumb"></v-img>
-          </v-avatar>
+          <text-avatar
+            :profile="channelThumb"
+            :name="video.channel.title"
+            class="mt-2"
+            :size="42"
+          />
         </nuxt-link>
       </v-col>
       <v-col cols="9" :class="videoInfoClass">
@@ -72,9 +75,10 @@
 </style>
 <script>
 import Humanize from 'humanize-duration'
-
+import TextAvatar from '~/components/TextAvatar'
 export default {
   name: 'VideoThumb',
+  components: { TextAvatar },
   props: {
     video: {
       type: Object,
@@ -105,7 +109,7 @@ export default {
   },
   computed: {
     videoInfoClass() {
-      return 'video-info ' + (this.horizontal ? '' : 'pt-0 ms-2')
+      return 'video-info pr-0 ' + (this.horizontal ? '' : 'pt-0 ms-2')
     },
 
     containerClass() {

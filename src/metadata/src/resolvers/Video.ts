@@ -5,6 +5,7 @@ import { IdGen } from '@me/common/utils/IdGen';
 import { Videos, VideoMeta, LikeType, PaginatedInput } from '../types';
 import { Context } from '../context';
 import { VideoLike } from '@me/common/db/models/VideoLike';
+import { Subscription } from '@me/common/db/models/Subscription';
 
 @Resolver(Video)
 export class VideoResolver {
@@ -30,6 +31,16 @@ export class VideoResolver {
       });
 
       video.liked = like ? like.liked : LikeType.Unliked;
+      video.channel.subscribed = !!(await Subscription.findOne({
+        where: {
+          user: {
+            username: ctx.user.username,
+          },
+          channel: {
+            id: video.channel.id,
+          },
+        },
+      }));
     }
 
     return video;

@@ -33,7 +33,7 @@ export class SearchResponse {
 
 @ObjectType()
 class BaseType {
-  @Field(() => Int)
+  @Field(() => Int, { defaultValue: 0 })
   total!: number;
 }
 
