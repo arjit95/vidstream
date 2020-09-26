@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: registry.gitlab.com/arjit95/vidstream/vidstream-api:v1
+          image: docker.pkg.github.com/arjit95/vidstream/vidstream-api:v1
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:

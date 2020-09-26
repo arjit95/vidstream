@@ -8,7 +8,7 @@ spec:
   template:
     type: Python
     mode: cluster
-    image: "registry.gitlab.com/arjit95/vidstream/spark-jobs:v1"
+    image: "docker.pkg.github.com/arjit95/vidstream/spark-jobs:v1"
     imagePullPolicy: IfNotPresent
     mainApplicationFile: "local:///opt/src/recommender.py"
     deps:

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: registry.gitlab.com/arjit95/vidstream/auth-service:v1
+          image: docker.pkg.github.com/arjit95/vidstream/auth-service:v1
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:

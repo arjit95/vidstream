@@ -15,7 +15,7 @@ $ helm install incubator/sparkoperator:v1beta2-1.1.2-2.4.5 --namespace spark-ope
 - Build docker image
 ```bash
 $ cd src/spark
-$ docker build . -t registry.gitlab.com/arjit95/vidstream/spark-jobs:v1
+$ docker build . -t docker.pkg.github.com/arjit95/vidstream/spark-jobs:v1
 $ cd ../
 ```
 - Schedule spark pods
