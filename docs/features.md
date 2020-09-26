@@ -1,0 +1,22 @@
+### List of all features
+- Material Design
+- Login/Signup
+- Adaptive video playback
+- Video uploads
+- Dark/Light mode
+- Channel subscription
+- Video likes, comments
+- Turn off lights
+- Trending, recent videos
+- Recommended videos based on watch history
+- Markdown support
+- Search
+- Multiple audio stream support
+- Thumbnail seeking
+- Subtitle support
+- Categories/Tags
+- Multiple channel per user
+- Distributed video transcoding
+- Hls support
+- Db sharding
+- Graphql
